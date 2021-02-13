@@ -1,0 +1,51 @@
+
+# For this project
+###################
+/arxiv
+/weights
+/data
+test.py
+
+
+###VS CODE
+###################
+.vscode
+
+#PACKAGE
+#################
+/node_modules
+/packages
+
+#LOG
+##############
+*.log
+logs/
+
+# venv
+###################
+.venv
+venv/
+
+# Compiled
+###################
+*.pyc
+/__pycache__
+.pytest_cache/
+nt/__pycache__
+*/__pycache__
+
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+#OTHER
+#####
+/bin
+/out
