@@ -36,6 +36,7 @@ def pdftotxt():
 #pdftotxt()
 
 #####------------CONVERSION ALL EPUB to TXT
+#TODO: This one does not work, look at the epub.sh file which work for epub conversion
 def epub2thtml(epub_path):
     book = epub.read_epub(epub_path)
     chapters = []
@@ -61,26 +62,25 @@ def epubtotxt():
 #epubtotxt()#ISSUE currently
 
 #####------------CONVERSION ALL DJVU to TXT
-
+ #TODO: Do djvu to txt conversion
 def djvutotxt():
     print("Start conversion djvu to txt.")
     for djvufile in findfiles(data_folder, '*.djvu'):
         filename = os.path.basename(epubfile)
         print(filename)
-        txtfile=epubfile.replace(".epub",".txt")
-        print("Converting to txt:"+txtfile)
+
         pass
 
 #####----------MERGE TXT into newfile
 
-def mergetxt():
+def mergetxt(txt_folder):
     print("Start merging")
     #Combine your uploaded files into one called merged.txt
     with open(merged_txt_path, 'a+') as outfile:
-        for filename in glob.glob(data_folder+'*.txt'):
+        for filename in glob.glob(txt_folder+'*.txt'):
             with open(filename, 'r') as readfile:
                 print("starting the file"+filename)
                 shutil.copyfileobj(readfile, outfile)
                 print("Added the txt file"+filename)
         print(f'merged Text created in {data_folder}data/')
-#mergetxt()
+mergetxt('./data/frompdf/')

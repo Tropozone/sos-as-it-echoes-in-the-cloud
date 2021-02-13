@@ -3,7 +3,7 @@
 ###################
 /arxiv
 /weights
-/data
+/data/frompdf
 test.py
 
 
