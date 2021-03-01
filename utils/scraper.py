@@ -7,7 +7,6 @@
 import random
 import spacy
 from string import punctuation
-import google
 from googlesearch import search #google library
 import newspaper
 import nltk
