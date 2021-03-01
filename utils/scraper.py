@@ -7,7 +7,8 @@
 import random
 import spacy
 from string import punctuation
-from googlesearch import search
+import google
+from googlesearch import search #google library
 import newspaper
 import nltk
 import requests
@@ -101,7 +102,7 @@ def parse_article(urls):
 #**********************************************************************MAIN PROCEDURE**************************************************************************
 
 
-def surf_google(query, min_char_bit, min_char_block, maximum_char):
+def surf_google(query):
     """
     Main procedure to scrap google result of a query: will scrap the urls first, then the texts of the articles, parse the text and choose
     one of these extracts.
