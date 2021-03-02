@@ -2,22 +2,30 @@
 #!/usr/bin/env python3 # to use in terminal
 #**********************************************************************IMPORT**************************************************************************
 
-
-
 import random
 import spacy
 from string import punctuation
 from googlesearch import search #google library
 import newspaper
 import nltk
+nltk.download('punkt')
 import requests
 from time import sleep
 from urllib.error import URLError
 import pathlib
 
+
+# FIX for the scraper method 1 to work: (no need for method 2)
+#TODO: This is a temporary insecure fix, as disable need for certificate
+# Better fix: https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed-certi
+import os, ssl
+if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
+    ssl._create_default_https_context = ssl._create_unverified_context
+
 #TODO: CHECK ALL FILTERS/EXTRACT AND IMPROVE. cf bottom page
 
-# #FOR ALTERMATIVE SCRAPER ONLY
+
+# #FOR ALTERMATIVE URL SCRAPER ONLY
 # from configparser import ConfigParser
 # from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
 
@@ -112,7 +120,7 @@ def surf_google(query):
     print("=======================================================")
     print("Scraping Google results and get urls")
     urls = retrieve_google_urls(query)
-    # TODO: Check, this is an alternative procedure else but need Google API key:
+    # TODO: Check, this is an alternative urlprocedure else but need Google API key:
     #urls= alt_retrieve_google_urls(query, api_key=my_api_key, cse_id=my_cse_id)
     print(urls)
 

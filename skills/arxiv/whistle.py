@@ -5,10 +5,10 @@
 ######Description############
 #
 #
-######About############
+# #####About############
 # This script was created for the workshop Unfamiliar Virtual Convenient - Growing your Voice Assistant
 # led by Vytautas Jankauskas and Claire Glanois through School of Machines, Make & believe, in spring 2020.
-#
+
 
 
 
