@@ -133,7 +133,7 @@ def surf_google(query):
    
     return extract
 
-###Launch it to try. Test Save
+###Example to run it:
 surf_google("amino acids are hot")
 
 
@@ -142,18 +142,18 @@ surf_google("amino acids are hot")
 ######*****************************************************************************************
 
 
-# def alt_retrieve_google_urls(self, search_term, api_key, cse_id, **kwargs):
-#     """
-#         Use Google Search API to get Google results over a query
-#         Send back urls
-#     """
-#     service = build("customsearch", "v1", developerKey=api_key)
-#     res = service.cse().list(q=search_term, cx=cse_id, **kwargs).execute()
+def alt_retrieve_google_urls(self, search_term, api_key, cse_id, **kwargs):
+    """
+        Use Google Search API to get Google results over a query
+        Send back urls
+    """
+    service = build("customsearch", "v1", developerKey=api_key)
+    res = service.cse().list(q=search_term, cx=cse_id, **kwargs).execute()
 
-#     search_items = res.get("items")
-#     urls=[]
-#     for i, search_item in enumerate(search_items, start=1):
-#         title = search_item.get("title")
-#         link = search_item.get("link")
-#         urls.append(link)
-#     return urls
+    search_items = res.get("items")
+    urls=[]
+    for i, search_item in enumerate(search_items, start=1):
+        title = search_item.get("title")
+        link = search_item.get("link")
+        urls.append(link)
+    return urls
