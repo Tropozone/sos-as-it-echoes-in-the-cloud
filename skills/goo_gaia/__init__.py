@@ -1,9 +1,20 @@
+########################  ABOUT THIS SKILL
+
+##### Will reformulate your request with a ecological concern and scrape the web.
+
+# May be tested by asking stuff like "how to cook quinoa".
+# To see the other triggers, cf vocab file.
+# 
+
+# TODO: What are the things triggering it ?
+# TODO: Desactivate other Mycroft skills for other intents
+######################## INITIALISATION
+
 ###Mycroft Imports
 from adapt.intent import IntentBuilder # adapt intent parser
 from mycroft import MycroftSkill, intent_handler #padatious intent parser
 from mycroft.skills.audioservice import AudioService
 from mycroft.audio import wait_while_speaking
-
 ###Other imports
 import spacy
 from string import punctuation
@@ -16,11 +27,12 @@ from time import sleep
 from urllib.error import URLError
 import random
 from configparser import ConfigParser
+import pathlib
+import re
 
-#For alternative scraper
+#For alternative scraper, not needed currently
 #from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
- 
-#TODO: What are the intent which trigger this skill?
+
 
 class GooGaiaSkill(MycroftSkill):
     def __init__(self):
@@ -36,12 +48,12 @@ class GooGaiaSkill(MycroftSkill):
         This function is invoked after the skill is fully constructed and
         registered with the system. Intents will be registered and Skill
         settings will be available."""
-        #my_setting = self.settings.get('my_setting')
+        # my_setting = self.settings.get('my_setting') #not needed yet
+
         # load machine learning model for keyword extraction
         self.log.info("--Importing ML model--")
         self.keyworder = spacy.load("en_core_web_sm")
-        #Load Gaia Concerns
-        self.log.info("--Importing Gaia Concerns--")
+        self.log.info("--Importing Gaia Concerns--")#
         with open(str(pathlib.Path(__file__).parent.absolute())+'/data/gaia_concerns.txt', 'r') as f:
             self.gaia_concerns=[line.rstrip('\n') for line in f]#f.readlines()
 
@@ -57,8 +69,8 @@ class GooGaiaSkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("==========step 0: GooGaia caught Human Utterance=======")
         self.log.info("=======================================================")
-        # step 0: extract what human asked 
-        human_said = str(message.data.get('utterances')[0])
+        # 0-- extract what human asked 
+        human_said = str(message.data.get("utterance"))
         self.log.info(f'Human said {human_said}')
         stuff = str(message.data.get('stuff')) #catch what human was talking about
         self.log.info(f'Stuff human talking about {stuff}')
@@ -66,42 +78,64 @@ class GooGaiaSkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("==========step 1: Extract Keywords and pick concern=======")
         self.log.info("=======================================================")
-        # step 1: extract keywords from the phrase and add a search_context picked randomly among concerns
+        # 1--- extract keywords from the phrase and add a search_context picked randomly among concerns
         search_context=random.choice(self.gaia_concerns)
         keyword = stuff
         #keyword=extract_keywords(str(human_said))  # Dont need this now, but alternatively could use it
 
-        query = keyword + " " + search_context 
-
         self.log.info("=======================================================")
         self.log.info("==========step 2: Retrieve urls from Google=======")
         self.log.info("=======================================================")
+        # 2---- query Google and retrieve urls
+        query = keyword + " " + search_context 
         self.log.info("Querying on the web: " + query)
-        # step 3: retrieve page url from Google
         urls = self.retrieve_google_urls(query)
-        # #TODO: Check Scraper, alternative procedure with API below for memo (need Google API keys...)
-        # urls= alt_retrieve_google_urls(query, api_key=my_api_key, cse_id=my_cse_id)
+        # urls= alt_retrieve_google_urls(query, api_key=my_api_key, cse_id=my_cse_id) #alternative w/Google API keys...)
 
         self.log.info("=======================================================")
         self.log.info("==========step 3: Pick & Parse Some Content=======")
         self.log.info("=======================================================")
-        # step 3: parse contents of the page
-        goo_extract = self.parse_article(urls)
-        self.log.info(goo_extract)
+        # 3----  parse contents of the page
+        content = self.parse_article(urls)
+        self.log.info(content)
 
         self.log.info("=======================================================")
         self.log.info("==========step 4: Share what found=======")
         self.log.info("=======================================================")
-        # step 4: share what found
-        # sleep(3) 
-        # wait_while_speaking
-        self.speak(goo_extract)
+        # 4----share an extract of what found online
+        extract=self.cut_extract(content, maximum_char=1000)
+        self.log.info("FOUND ONLINE:"+ extract)
+        self.speak(extract)
+        
 
 ######*****************************************************************************************
 ######*********************** SCRAPING PROCEDURES ***********************************************
 ######*****************************************************************************************
 
-    def retrieve_google_urls(self, query):
+    def cut_extract(self, extract, maximum_char):
+        """
+        Cut a text extract if above a certain nb character
+        """
+        bound_extract=extract[:maximum_char]
+        return  self.crop_unfinished_sentence(bound_extract)
+
+    def crop_unfinished_sentence(self, text):
+        """
+        Remove last unfinished bit from text. 
+        """
+        #TODO: better? as SELECT FROM THE RIGHT rindex s[s.rindex('-')+1:]  
+        stuff= re.split(r'(?<=[^A-Z].[.!?]) +(?=[A-Z])', text)
+
+        new_text=""
+        for i in range(len(stuff)):
+            if i<len(stuff)-1:
+                new_text+= " " + stuff[i]
+            elif len(stuff[i])>0 and (stuff[i][-1] in [".", ":", "?", "!", ";"]):#only if last character punctuation keep
+                new_text+= " " + stuff[i]
+
+        return new_text
+
+    def retrieve_google_urls(self,query, num_links=8):
         # query search terms on google
         # tld: top level domain, in our case "google.com"
         # lang: search language
@@ -109,44 +143,43 @@ class GooGaiaSkill(MycroftSkill):
         # stop: after how many links to stop (needed otherwise keeps going?!)
         # pause: if needing multiple results, put at least '2' (2s) to avoid being blocked)
         try:
-            online_search = search(query, tld='com',
-                                lang='en', num=5, stop=3, pause=2)
+            online_search = search(query, tld='com', lang='en', num=10, stop=num_links, pause=2)
         except URLError:
             pass
         website_urls = []
         for link in online_search:
             website_urls.append(link)
-
-        # returns a list of links
         return website_urls
 
-    def parse_article(self, urls):
-        #TODO: Use random article instead first one fine?
-        #TODO: Check first above certain length ?
 
+    def parse_article(self,urls):
         article_downloaded = False
-        while not article_downloaded:
+        MIN_LENGTH=50
+        count=1
+        while not article_downloaded and count<10:
             try:
                 # choose random url from list obtained from Google
-                url = urls[randint(0, len(urls)-1)]
+                url = urls[random.randint(0, len(urls)-1)]
                 # locate website
                 article = newspaper.Article(url)
                 # download website
-                self.log.info('Downloading ' + url)
+                print('Downloading ' + url)
                 article.download()
-                article_downloaded = True
+                # parse .html to normal text
+                article.parse()
+                #get text
+                content=article.text
+                if len(content)>MIN_LENGTH:
+                    article_downloaded = True
+                    self.log.info("WHAT FOUND ONLINE:"+content)
+                count+=1
             except requests.exceptions.RequestException:
-                self.log.info("Article download failed. Trying again")
-                article_downloaded = False
+                print("Article download failed. Trying again")
                 pass
-        # parse .html to normal text
-        article.parse()
+        
         # analyze text with natural language processing
-        article.nlp()
-        # return summary
-        return article.summary
-        # Or return text:
-        #return article.text
+        # article.nlp()
+        return content
 
 ######*****************************************************************************************
 ######*********************** EXTRACTING // NLP PROCEDURES ***********************************************
