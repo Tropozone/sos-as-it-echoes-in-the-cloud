@@ -1,0 +1,56 @@
+password:convenient
+
+
+********** basic commands
+
+Start Mycroft:
+./mycroft-core/start-mycroft.sh all
+
+Restart if needed:
+./mycroft-core/start-mycroft.sh restart all
+
+Use command line interface with mycroft
+./mycroft-core/start-mycroft.sh cli      
+
+If use virtual environment, to activate it :
+source .venv/bin/activate
+source venv/bin/activate
+
+********** useful folders:
+
+Where the skills are (where you have to put the skills like goo_gaia and fallback_ML):
+/opt/mycroft/skills/
+
+Where the files should be saved if needed:
+.mycroft/name_skill (ex: fallback_googaia)
+
+Where the logs are to check error message (absolute path):
+Notably may look at skills.log, if a skill loaded properly or not (and why)
+/var/log/mycroft/
+
+
+NB: To open a folder may use: xdg-open path_to_folder
+
+
+
+
+********** useful commands while writing a skill
+
+self.log.info(stuff): so will print the stuff on the cli interface (easy to debug a skill)
+
+************ more advanced / debug 
+
+Where some of the how-mycroft-handle a skill are: (not the skills themselves!)
+./mycroft-core/mycroft/skills/
+
+Also useful if get error message as QuestionQuery time out
+./mycroft-core/opt/mycroft/skills/fallback-query
+./mycroft-core/opt/mycroft/skills/fallback-unknown
+
+
+
+********** about install (check if need or if in requirements.txt)
+
+pip3 install spacy
+python3 -m spacy download en_core_web_sm
+

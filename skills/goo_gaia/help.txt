@@ -1,0 +1,7 @@
+
+
+
+Try to trigger it for instance with:
+how to cook quinoa
+Or anything which match the classic.intent file of the skill
+
