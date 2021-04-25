@@ -22,18 +22,23 @@ def findfiles (path, filter):
 #for filename in glob.glob(data_folder+'*.pdf'): OLD WAY
 
 def pdftotxt():
-    print("Start conversion pdf to txt of the pdf.")
-    for pdffile in findfiles(data_folder, '*.pdf'):#CATCH ALL txt
+    print("Converting pdf to txt in{}.".format(data_folder))
+    #catch all pdf
+    for pdffile in findfiles(data_folder, '*.pdf'):
         filename = os.path.basename(pdffile)
-        print(filename)
-        with open(pdffile, "rb") as f:
-            pdf = pdftotext.PDF(f)
+        print("looking at", filename)
         txtfile=pdffile.replace(".pdf",".txt")
-        print("Converting to txt:"+txtfile)
-        with open(txtfile, 'w') as f:
-            f.write("\n\n".join(pdf))
-    print("Converted all pdf to txt.")
-#pdftotxt()
+        #only if file.txt does not exist already (already converted )
+        if not os.path.exists(txtfile):
+            with open(pdffile, "rb") as f:
+                pdf = pdftotext.PDF(f)
+            print("Converting to txt:"+txtfile)
+            with open(txtfile, 'w') as f:
+                f.write("\n\n".join(pdf))
+        else:
+            print("already converted")
+    print("Converted all pdf to txt in{}.".format(data_folder))
+pdftotxt()
 
 #####------------CONVERSION ALL EPUB to TXT
 #TODO: This one does not work, look at the epub.sh file which work for epub conversion
@@ -71,7 +76,7 @@ def djvutotxt():
 
         pass
 
-#####----------MERGE TXT into newfile
+#####----------Merge txt files into one
 
 def mergetxt(txt_folder):
     print("Start merging")
@@ -83,4 +88,4 @@ def mergetxt(txt_folder):
                 shutil.copyfileobj(readfile, outfile)
                 print("Added the txt file"+filename)
         print(f'merged Text created in {data_folder}data/')
-mergetxt('./data/frompdf/')
+#mergetxt('./data/frompdf/')
