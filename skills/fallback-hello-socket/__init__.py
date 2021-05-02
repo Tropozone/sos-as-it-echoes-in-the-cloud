@@ -4,8 +4,9 @@
 
 ######Description############
 
+#TODO: not a FALLBACK?, spontaneous trigger...
+# #TODO: use regex for reading text file
 
-#TODO: use regex for reading text file
 #*********************************************INITIALIZATION***********
 
 
@@ -33,107 +34,9 @@ temperature = 0.8
 # Repetition penalty. In general makes sentences shorter and reduces repetition of words an punctuation.
 repetition_penalty = 1.4
 
-#******************************MAIN PROCEDURE**********
 
 
-class WhatIfWeBucketFallback(FallbackSkill):
-
-    def __init__(self):
-        super(WhatIfWeBucketFallback, self).__init__(name='Weird Answers Skill')
-
-        # Initialize language generation model
-        if my_ML_model:
-            self.log.info("Loading my own machine learning model")
-            self.model = GPT2LMHeadModel.from_pretrained(my_ML_model_path)
-        else:
-            self.log.info("Loading generic GPT-2 model")
-            self.model = GPT2LMHeadModel.from_pretrained("distilgpt2")
-
-        # Initialise a tokenizer
-        self.tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
-        # load
-        self.SEEDS= self.load_messages()
-
-    def initialize(self):
-        """
-            Registers the fallback handler.
-            The second argument is the priority associated to the request;
-            Because there are several fallback skills available, priority helps
-            to tell Mycroft how 'sensitively' this particular skill should be triggered.
-            Lower number means higher priority, however number 1-4 are bypassing other skills.
-        """
-        self.register_fallback(self.handle_fantasize, 6)
-
-    def fantasize(self, question):
-        """
-            Fabulate
-        """
-
-        # step 1-- extract a keyword from what human said
-        keyword= extract_keywords(human_bla)
-        self.log.info("=======================================================")
-        self.log.info("step 1---Extracted keyword"+keyword)
-        self.log.info("=======================================================")
-
-        # step 2--- pick a seed from file and replace if xxx by keyword
-        seed = random.choice(self.SEEDS)
-        seed=seed.replace("xxx", keyword)#replace xxx (if exist w/ keyword)
-        self.log.info("=======================================================")
-        self.log.info("step 2---Seed used"+seed)
-        self.log.info("=======================================================")
-
-        #  # step2---Say a splash phrase since the generation might take a while#TODO: keep?
-        # splash_phrases = ["Lemme think for a minute", "Give me a minute to think about my answer",
-        #                   "I need some time to think about this", "Hold on while I think this through"]
-        # self.speak(random.choice(splash_phrases))
-
-        # step 3--Generate machine learning text based on parameters
-        self.log.info("=======================================================")
-        self.log.info("step 3---gpt2 generation..."+seed)
-        
-        encode = self.tokenizer.encode(seed, return_tensors="pt")
-        #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
-        generated = self.model.generate(encoded_context, max_length = length_drift , temperature= temperature, repetition_penalty = repetition_penalty, do_sample=True, top_k=20)
-        response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
-        self.log.info(response)
-        self.log.info("=======================================================")
-
-        #step 4 --- #TODO: Filter ?
-        # Text cleaning function to go here
-        # cleaned_output = clean_text(question, output)
-
-        # step 5 --Speak generated text aloud
-        self.speak(response)
-
-    def handle_fantasize(self, message):
-        """
-            Several gpt-2 drifts from the last utterance, with a possible mode
-        """
-        # Obtain what the human said
-        utterance = message.data.get("utterance")
-
-        self.fantasize(utterance)
-
-        return True
-
-    # Required: Skill creator must make sure the skill is removed when the Skill is shutdown by the system.
-    def shutdown(self):
-        """
-            Remove the skill from list of fallback skills
-        """
-        self.remove_fallback(self.handle_fantasize)
-        super(WhatIfWeBucketFallback, self).shutdown()
-
-
-    def load_messages(self):
-        self.log.info("Loading txt file")
-        path_folder=str(pathlib.Path(__file__).parent.absolute())
-        #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-        return self.load_data_txt("whatif.txt", path_folder=path_folder)
-
-
-##-----------------UTILS 
-# #TODO: ok to be there
+##-**************** UTILS 
 
 #TODO COMMON FOR DIFFERENT ML SKILLS!
 # simply cleans up machine-generated text
@@ -145,27 +48,23 @@ def clean_text(question, generated):
     return output
 
 
-#TODO COMMON FOR DIFFERENT SKILLS!
-def extract_keywords(input):
-    # we're looking for proper nouns, nouns, and adjectives
-    pos_tag = ['PROPN', 'NOUN', 'ADJ']
-    # tokenize and store input
-    phrase = keyworder(input.lower())
-    keywords = []
-    # for each tokenized word
-    for token in phrase:
-        # if word is a proper noun, noun, or adjective;
-        if token.pos_ in pos_tag:
-            # and if NOT a stop word or NOT punctuation
-            if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
-                keywords.append(token.text)
-    # convert list back to string
-    key_string = " ".join(keywords)
+def load_data_kin(filename, path_folder="", mode="r"):
+    """
+    for messages in skill, load txt
+    """
+    with open(path_folder+filename,  mode=mode) as f:
+        data = f.read() #here string with '\n' in it
+    #cut into list when jump lines
+    sliced_data=data.slice ('\n \n')#TODO: check ok
+    sliced_data=sliced_data.replace('\n', "")#if single ones remaining?
+    return sliced_data
 
-    return key_string
+def load_objects():
+    path_folder=str(pathlib.Path(__file__).parent.absolute())
+    #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
+    return load_data_txt("objects.txt", path_folder=path_folder)
 
-
-def load_data_txt(self, filename, path_folder="", mode="r"):
+def load_data_txt(filename, path_folder="", mode="r"):
     """
     for messages in skill, load txt
     """
@@ -173,8 +72,84 @@ def load_data_txt(self, filename, path_folder="", mode="r"):
         data = f.readlines()
     return data
 
+def load_makingkin():
+    path_folder=str(pathlib.Path(__file__).parent.absolute())
+    #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
+    return load_data_kin("yoko.txt", path_folder=path_folder)
+
+def read_event(event_score, agent):
+    #TODO
+    event=event_score.replace("xxx", agent)#replace xxx (if exist w/ keyword)
+    return event
+
+#******************************MAIN PROCEDURE**********
+
+
+
+class HelloSocketFallback(FallbackSkill):
+
+    def __init__(self):
+        super(HelloSocketFallback, self).__init__(name='Hello Socket Fallback Skill')
+
+        # load events and objects
+        self.events= load_makingkin()
+        self.objects= load_objects()
+
+    def initialize(self):
+        """
+            Registers the fallback handler.
+            The second argument is the priority associated to the request;
+            Because there are several fallback skills available, priority helps
+            to tell Mycroft how 'sensitively' this particular skill should be triggered.
+            Lower number means higher priority, however number 1-4 are bypassing other skills.
+        """
+        self.register_fallback(self.handle_make_kin, 6)
+
+    def make_kin(self):
+        """
+            Fabulate
+        """
+
+        # step 1-- pick an object
+        agent= random.choice(self.objects)
+        self.log.info("=======================================================")
+        self.log.info("step 1---Extracted object"+agent)
+        self.log.info("=======================================================")
+
+        # step 2--- pick a seed from file and replace if xxx by keyword
+        event_score = random.choice(self.events)
+        event=read_event(event_score, agent) #define it.
+        self.log.info("=======================================================")
+        self.log.info("step 2---Event:"+event)
+        self.log.info("=======================================================")
+
+        # step 3 --Speak generated text aloud
+        self.speak(event)
+
+        #TODO: wait for comment about it?
+        #TODO: More interactive with VA, has to record it to send to network>>>
+
+    def handle_make_kin(self, message):
+        """
+            Several gpt-2 drifts from the last utterance, with a possible mode
+        """
+        # Obtain what the human said
+        utterance = message.data.get("utterance")#TODO: here not utterance...
+
+        self.make_kin(utterance)
+
+        return True
+
+    # Required: Skill creator must make sure the skill is removed when the Skill is shutdown by the system.
+    def shutdown(self):
+        """
+            Remove the skill from list of fallback skills
+        """
+        self.remove_fallback(self.handle_make_kin)
+        super(HelloSocketFallback, self).shutdown()
+
 
 ##-----------------CREATE
 
 def create_skill():
-    return WhatIfWeBucketFallback()
+    return HelloSocketFallback()

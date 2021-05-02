@@ -40,7 +40,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         It is often used to declare variables or perform setup actions, however
         it cannot utilise MycroftSkill methods as the class does not yet exist.
         """
-        super().__init__()
+        super(QuinoaCollapseSkill, self).__init__(name='Quinoa Collapse Skill')
         #self.learning = True 
 
     def initialize(self):

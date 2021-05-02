@@ -33,13 +33,61 @@ temperature = 0.8
 # Repetition penalty. In general makes sentences shorter and reduces repetition of words an punctuation.
 repetition_penalty = 1.4
 
+
+
+#*****************************UTILS **********
+
+# #TODO: ok to be there?
+
+#TODO COMMON FOR DIFFERENT ML SKILLS!
+# simply cleans up machine-generated text
+def clean_text(question, generated):
+    # remove the question text from the generated answer
+    output = generated.replace(question, '')
+    # remove incomplete sencentes at the end, if any.
+    output = output.rsplit('.', 1)[0] + '.'
+    return output
+
+
+#TODO COMMON FOR DIFFERENT SKILLS!
+def extract_keywords(input):
+    # we're looking for proper nouns, nouns, and adjectives
+    pos_tag = ['PROPN', 'NOUN', 'ADJ']
+    # tokenize and store input
+    phrase = keyworder(input.lower())
+    keywords = []
+    # for each tokenized word
+    for token in phrase:
+        # if word is a proper noun, noun, or adjective;
+        if token.pos_ in pos_tag:
+            # and if NOT a stop word or NOT punctuation
+            if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
+                keywords.append(token.text)
+    # convert list back to string
+    key_string = " ".join(keywords)
+
+    return key_string
+
+def load_whatif():
+    path_folder=str(pathlib.Path(__file__).parent.absolute())
+    #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
+    return load_data_txt("whatif.txt", path_folder=path_folder)
+
+def load_data_txt(filename, path_folder="", mode="r"):
+    """
+    for messages in skill, load txt
+    """
+    with open(path_folder+filename,  mode=mode) as f:
+        data = f.readlines()
+    return data
+    
 #******************************MAIN PROCEDURE**********
 
 
 class WhatIfWeBucketFallback(FallbackSkill):
 
     def __init__(self):
-        super(WhatIfWeBucketFallback, self).__init__(name='Weird Answers Skill')
+        super(WhatIfWeBucketFallback, self).__init__(name='What If We Bucket Fallback Skill')
 
         # Initialize language generation model
         if my_ML_model:
@@ -52,7 +100,7 @@ class WhatIfWeBucketFallback(FallbackSkill):
         # Initialise a tokenizer
         self.tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
         # load
-        self.SEEDS= self.load_messages()
+        self.whatif = load_whatif()
 
     def initialize(self):
         """
@@ -76,7 +124,7 @@ class WhatIfWeBucketFallback(FallbackSkill):
         self.log.info("=======================================================")
 
         # step 2--- pick a seed from file and replace if xxx by keyword
-        seed = random.choice(self.SEEDS)
+        seed = random.choice(self.whatif)
         seed=seed.replace("xxx", keyword)#replace xxx (if exist w/ keyword)
         self.log.info("=======================================================")
         self.log.info("step 2---Seed used"+seed)
@@ -125,54 +173,8 @@ class WhatIfWeBucketFallback(FallbackSkill):
         super(WhatIfWeBucketFallback, self).shutdown()
 
 
-    def load_messages(self):
-        self.log.info("Loading txt file")
-        path_folder=str(pathlib.Path(__file__).parent.absolute())
-        #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-        return self.load_data_txt("whatif.txt", path_folder=path_folder)
 
-
-##-----------------UTILS 
-# #TODO: ok to be there
-
-#TODO COMMON FOR DIFFERENT ML SKILLS!
-# simply cleans up machine-generated text
-def clean_text(question, generated):
-    # remove the question text from the generated answer
-    output = generated.replace(question, '')
-    # remove incomplete sencentes at the end, if any.
-    output = output.rsplit('.', 1)[0] + '.'
-    return output
-
-
-#TODO COMMON FOR DIFFERENT SKILLS!
-def extract_keywords(input):
-    # we're looking for proper nouns, nouns, and adjectives
-    pos_tag = ['PROPN', 'NOUN', 'ADJ']
-    # tokenize and store input
-    phrase = keyworder(input.lower())
-    keywords = []
-    # for each tokenized word
-    for token in phrase:
-        # if word is a proper noun, noun, or adjective;
-        if token.pos_ in pos_tag:
-            # and if NOT a stop word or NOT punctuation
-            if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
-                keywords.append(token.text)
-    # convert list back to string
-    key_string = " ".join(keywords)
-
-    return key_string
-
-
-def load_data_txt(self, filename, path_folder="", mode="r"):
-    """
-    for messages in skill, load txt
-    """
-    with open(path_folder+filename,  mode=mode) as f:
-        data = f.readlines()
-    return data
-
+    
 
 ##-----------------CREATE
 
