@@ -1,6 +1,10 @@
 password:convenient
 
 
+#### to download the git repo:
+git clone https://github.com/claireaoi/sos-as-it-echoes-in-the-cloud
+
+
 ********** basic commands
 
 Start Mycroft:

@@ -78,8 +78,9 @@ def load_makingkin():
     return load_data_kin("yoko.txt", path_folder=path_folder)
 
 def read_event(event_score, agent):
-    #TODO
+    
     event=event_score.replace("xxx", agent)#replace xxx (if exist w/ keyword)
+    #TODO: more variation, generations...
     return event
 
 #******************************MAIN PROCEDURE**********
@@ -153,3 +154,5 @@ class HelloSocketFallback(FallbackSkill):
 
 def create_skill():
     return HelloSocketFallback()
+
+    
