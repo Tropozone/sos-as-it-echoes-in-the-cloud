@@ -3,8 +3,6 @@
 
 
 ######Description############
-#
-# FallBack Skill where the VA do ML drifts, from a gpt-2 model, and the parameters registered in parametersDrift.py
 
 
 #TODO: Clean this skill, as it is an old skill
@@ -29,7 +27,6 @@ import pathlib
 # from nltk.corpus import wordnet
 # from nltk.stem.wordnet import WordNetLemmatizer
 # lemmatizer = WordNetLemmatizer()
-
 #TOKENIZERS_PARALLELISM=False #TODO Check tokenizer parallelism hugging face. May need this.?
 
 #******************************************PARAMETERS ****************************
@@ -41,13 +38,14 @@ my_ML_model_path = str(pathlib.Path(__file__).parent.absolute())+'/gpt2_model'  
 
 # More parameters are available and more detail about gpt-2 parameters can be found here: https://huggingface.co/blog/how-to-generate
 # Maximum length of the generated answer, counted in characters and spaces.
-length_drift = 200 #TODO: stochastic
+length_drift = 100
+var_length = 20
 # Increase the likelihood of high probability words by lowering the temperature (aka make it sound more 'normal')
 temperature = 0.9
 # Repetition penalty. In general makes sentences shorter and reduces repetition of words an punctuation.
 repetition_penalty = 1.4
 # Number successive generations:
-nDrift=1 
+nDrift=1
 
 #*****************************OLD PARAMETERS for the ML Drift********************
 
@@ -91,7 +89,7 @@ class MLdriftFallback(FallbackSkill):
     """
     def __init__(self):
         super(MLdriftFallback, self).__init__(name='MLdrift')
-        self.moodySeed=""
+        #self.moodySeed=""
         # Initialize model
         if my_ML_model:
             self.model = GPT2LMHeadModel.from_pretrained(my_ML_model_path)
@@ -110,17 +108,17 @@ class MLdriftFallback(FallbackSkill):
         # Could register several handle
 
 
-    def pickMoodySeed(self):
-        """
-           Choose a seed to potentially add as contaxt for the gpt-2 Drift
-        """
-        if randomMode: #if random Mode chosen only
-            #From the dictionnary probaMode randomly pick a mode following their probability
-            currentMode=random.choices(population=list(probaMode.keys()), weights=list(probaMode.values()), k=1)[0]
-        else:
-            currentMode=defaultMode
-        if currentMode in modeSeeds.keys():#in case mode entered wrong by human to avoid error
-            self.moodySeed=random.choice(modeSeeds[currentMode])
+    # def pickMoodySeed(self):
+    #     """
+    #        Choose a seed to potentially add as contaxt for the gpt-2 Drift
+    #     """
+    #     if randomMode: #if random Mode chosen only
+    #         #From the dictionnary probaMode randomly pick a mode following their probability
+    #         currentMode=random.choices(population=list(probaMode.keys()), weights=list(probaMode.values()), k=1)[0]
+    #     else:
+    #         currentMode=defaultMode
+    #     if currentMode in modeSeeds.keys():#in case mode entered wrong by human to avoid error
+    #         self.moodySeed=random.choice(modeSeeds[currentMode])
 
             
 
@@ -133,8 +131,10 @@ class MLdriftFallback(FallbackSkill):
         # step 1--- Choose the mode and possible seed and add it after the blabla
         # self.pickMoodySeed()
         # blabla=blabla+ " " + self.moodySeed
+
         seed="" #TODO: May want to change context
         context = utterance + seed
+
         self.log.info("=======================================================")
         self.log.info("Step 1--context:"+context )
         self.log.info("=======================================================") 
@@ -148,7 +148,9 @@ class MLdriftFallback(FallbackSkill):
         self.log.info("=======================================================")
         self.log.info("Step 3--gpt2 generation....")
         encoded_context= self.tokenizer.encode(context, return_tensors = "pt")
-        generated = self.model.generate(encoded_context, max_length = length_drift , temperature= temperature, repetition_penalty = repetition_penalty, do_sample=True, top_k=20)
+        max_length= length_drift+random.randint(-var_length,var_length)
+        generated = self.model.generate(encoded_context, max_length = max_length , temperature= temperature, repetition_penalty = repetition_penalty, do_sample=True, top_k=10)
+        self.log.info("Step 3--gpt2 generation....")
         drift = self.tokenizer.decode(generated.tolist()[0])
         self.log.info("gpt2 Response: "+ drift)
         self.log.info("=======================================================") 
@@ -188,6 +190,7 @@ class MLdriftFallback(FallbackSkill):
         """
             Several gpt-2 drifts from the last utterance, with a possible mode
         """
+        #TODO: as a converse?
         #(0) Get the human utterance
         utterance = message.data.get("utterance")
         #(1) Choose the mode and possible seed and add it
@@ -211,9 +214,6 @@ class MLdriftFallback(FallbackSkill):
 
 def create_skill():
     return MLdriftFallback()
-
-
-
 
 
 

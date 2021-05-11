@@ -5,7 +5,11 @@
 ######Description############
 
 
-#TODO: use regex for reading text file
+
+#TODO: or structure of a fabulation instead, query only gpt2 for words? 
+#TODO: or use generator without ML?
+#TODO: Rethink which sentences work well!
+
 #*********************************************INITIALIZATION***********
 
 
@@ -15,6 +19,10 @@ import transformers
 import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 import pathlib
+import re
+
+#import os
+#os.environ['KMP_DUPLICATE_LIB_OK']='True' #ONLY IF ERROR MESSAGE
 
 #******************************************PARAMETERS ****************************
 
@@ -24,15 +32,14 @@ my_ML_model = False  # If do have a fine-tuned model, set to True
 # Global path_finetuned_ML_model #TODO: CHange path... here placed in another skill
 my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-MLdrift/gpt2_model'  # path to your fine tuned model
 
-
 # More parameters are available and more detail about gpt-2 parameters can be found here: https://huggingface.co/blog/how-to-generate
 # Maximum length of the generated answer, counted in characters and spaces.
-length_drift = 200 #TODO: stochastic
+length_drift = 80
+var_drift=20
 # Increase the likelihood of high probability words by lowering the temperature (aka make it sound more 'normal')
 temperature = 0.8
 # Repetition penalty. In general makes sentences shorter and reduces repetition of words an punctuation.
 repetition_penalty = 1.4
-
 
 
 #*****************************UTILS **********
@@ -46,6 +53,11 @@ def clean_text(question, generated):
     output = generated.replace(question, '')
     # remove incomplete sencentes at the end, if any.
     output = output.rsplit('.', 1)[0] + '.'
+    return output
+
+
+def cut_one_sentence(generated):
+    output = re.split('.|?|!', generated)[0]+"."
     return output
 
 
@@ -71,7 +83,7 @@ def extract_keywords(input):
 def load_whatif():
     path_folder=str(pathlib.Path(__file__).parent.absolute())
     #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_txt("whatif.txt", path_folder=path_folder)
+    return load_data_txt("/whatif.txt", path_folder=path_folder)
 
 def load_data_txt(filename, path_folder="", mode="r"):
     """
@@ -116,6 +128,7 @@ class WhatIfWeBucketFallback(FallbackSkill):
         """
             Fabulate
         """
+        #TODO: think about specific questions?
 
         # step 1-- extract a keyword from what human said
         keyword= extract_keywords(human_bla)
@@ -139,7 +152,7 @@ class WhatIfWeBucketFallback(FallbackSkill):
         self.log.info("=======================================================")
         self.log.info("step 3---gpt2 generation..."+seed)
         
-        encode = self.tokenizer.encode(seed, return_tensors="pt")
+        encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         generated = self.model.generate(encoded_context, max_length = length_drift , temperature= temperature, repetition_penalty = repetition_penalty, do_sample=True, top_k=20)
         response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
@@ -149,6 +162,7 @@ class WhatIfWeBucketFallback(FallbackSkill):
         #step 4 --- #TODO: Filter ?
         # Text cleaning function to go here
         # cleaned_output = clean_text(question, output)
+        #response=cut_one_sentence(response)#TODO: CUt or not? ISSUE with this cut!
 
         # step 5 --Speak generated text aloud
         self.speak(response)
@@ -180,3 +194,4 @@ class WhatIfWeBucketFallback(FallbackSkill):
 
 def create_skill():
     return WhatIfWeBucketFallback()
+

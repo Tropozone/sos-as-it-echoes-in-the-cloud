@@ -5,7 +5,24 @@ monstera
 calathea
 wooden floor
 lightbulb
-Keyboard
-
+keyboard
+carpet
+Lava lamp
+Coffee cup
+Tea bag
+bathroom moisture
+Towel
+Soap
+Funnel
+windowsill
+Candle
+Duvet
+Bedsheet
+Waterpipe
+Door
+Fridge
+Microwave
+Toaster
+Wire
 
 

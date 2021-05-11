@@ -5,36 +5,23 @@
 ######Description############
 
 #TODO: not a FALLBACK?, spontaneous trigger...
-# #TODO: use regex for reading text file
+#TODO: some events require conversatioN!
+# # #TODO: use regex for reading text file ? ore 
+#https://github.com/galaxykate/tracery
+#https://github.com/aparrish/pytracery
 
-#*********************************************INITIALIZATION***********
+#********************************************INITIALIZATION***********
 
 
 from mycroft.skills.core import FallbackSkill
 import random
-import transformers 
-import torch
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
 import pathlib
-
 #******************************************PARAMETERS ****************************
 
-# GPT-2 parameters
-# Once you have your own model, adjust these accordingly
-my_ML_model = False  # If do have a fine-tuned model, set to True
-# Global path_finetuned_ML_model #TODO: CHange path... here placed in another skill
-my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-MLdrift/gpt2_model'  # path to your fine tuned model
 
+words_path= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-hello-socket/data/"
 
-# More parameters are available and more detail about gpt-2 parameters can be found here: https://huggingface.co/blog/how-to-generate
-# Maximum length of the generated answer, counted in characters and spaces.
-length_drift = 200 #TODO: stochastic
-# Increase the likelihood of high probability words by lowering the temperature (aka make it sound more 'normal')
-temperature = 0.8
-# Repetition penalty. In general makes sentences shorter and reduces repetition of words an punctuation.
-repetition_penalty = 1.4
-
-
+WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
 ##-**************** UTILS 
 
@@ -55,14 +42,14 @@ def load_data_kin(filename, path_folder="", mode="r"):
     with open(path_folder+filename,  mode=mode) as f:
         data = f.read() #here string with '\n' in it
     #cut into list when jump lines
-    sliced_data=data.slice ('\n \n')#TODO: check ok
-    sliced_data=sliced_data.replace('\n', "")#if single ones remaining?
+    sliced_data=data.split('\n \n')#TODO: check ok
+    #sliced_data=sliced_data.replace('\n', "")#if single ones remaining?
     return sliced_data
 
 def load_objects():
     path_folder=str(pathlib.Path(__file__).parent.absolute())
     #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_txt("objects.txt", path_folder=path_folder)
+    return load_data_txt("/objects.txt", path_folder=path_folder)
 
 def load_data_txt(filename, path_folder="", mode="r"):
     """
@@ -75,13 +62,38 @@ def load_data_txt(filename, path_folder="", mode="r"):
 def load_makingkin():
     path_folder=str(pathlib.Path(__file__).parent.absolute())
     #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_kin("yoko.txt", path_folder=path_folder)
+    return load_data_kin("/yoko.txt", path_folder=path_folder)
 
-def read_event(event_score, agent):
-    
-    event=event_score.replace("xxx", agent)#replace xxx (if exist w/ keyword)
+
+def read_event(event_score, agent, dico):
+    event_lines=event_score.split("/n")
+    event=""
+    for line in event_lines:
+        neue_line=""
+        line=line.replace("  ", " ")#in case double space by accident.
+        line=line.replace("xxx", agent)
+        units=line.split(" ")#split into units
+        for unit in units:
+            neue_unit=readUnit(unit, dico)
+            neue_line+=neue_unit+" "
+        neue_line=neue_line.replace(" .", ".")
+        neue_line=neue_line.replace(" ,", ",")
+        event+=neue_line+"\n"
     #TODO: more variation, generations...
     return event
+
+def readUnit(unit, dico):
+    if unit in WORDS_LISTS:
+        neue=random.choice(dico[unit])#choose one randomly
+   # elif unit=="Vg":
+        #TODO
+        # verb=random.choice(wordsDic["V"])
+        # neue=lexeme(verb[0])[2]
+        # if len(verb)>0:
+        #     neue+=' '.join(verb[1:]        
+    else:
+        neue=unit
+    return neue
 
 #******************************MAIN PROCEDURE**********
 
@@ -93,8 +105,14 @@ class HelloSocketFallback(FallbackSkill):
         super(HelloSocketFallback, self).__init__(name='Hello Socket Fallback Skill')
 
         # load events and objects
+        self.log.info("Load events and objects...")
         self.events= load_makingkin()
         self.objects= load_objects()
+        
+        self.log.info("Load dictionary...")
+        dico = {} #Dictionnary of list words
+        for filename in WORDS_LISTS:
+            dico[filename] = [line.rstrip('\n') for line in open(words_path+filename+'.txt')]
 
     def initialize(self):
         """
@@ -104,24 +122,26 @@ class HelloSocketFallback(FallbackSkill):
             to tell Mycroft how 'sensitively' this particular skill should be triggered.
             Lower number means higher priority, however number 1-4 are bypassing other skills.
         """
-        self.register_fallback(self.handle_make_kin, 6)
+        self.register_fallback(self.handle_make_kin, 6) #NOTE: change priority of other fallback when want to test so no conflict?
 
-    def make_kin(self):
+    def handle_make_kin(self, message):
         """
-            Fabulate
+            Make Kin practices
         """
+        # step-0 Obtain what the human said
+        utterance = message.data.get("utterance")#TODO: here not utterance...
 
         # step 1-- pick an object
-        agent= random.choice(self.objects)
+        agent= random.choice(self.objects).strip("\n")
         self.log.info("=======================================================")
-        self.log.info("step 1---Extracted object"+agent)
+        self.log.info("step 1---Extracted object "+agent)
         self.log.info("=======================================================")
 
         # step 2--- pick a seed from file and replace if xxx by keyword
         event_score = random.choice(self.events)
-        event=read_event(event_score, agent) #define it.
+        event=read_event(event_score, agent, self.dico) #define it.
         self.log.info("=======================================================")
-        self.log.info("step 2---Event:"+event)
+        self.log.info("step 2---Created a Makin kin Event Score:"+"\n"+event)
         self.log.info("=======================================================")
 
         # step 3 --Speak generated text aloud
@@ -130,16 +150,10 @@ class HelloSocketFallback(FallbackSkill):
         #TODO: wait for comment about it?
         #TODO: More interactive with VA, has to record it to send to network>>>
 
-    def handle_make_kin(self, message):
-        """
-            Several gpt-2 drifts from the last utterance, with a possible mode
-        """
-        # Obtain what the human said
-        utterance = message.data.get("utterance")#TODO: here not utterance...
-
-        self.make_kin(utterance)
-
         return True
+
+
+
 
     # Required: Skill creator must make sure the skill is removed when the Skill is shutdown by the system.
     def shutdown(self):
