@@ -7,31 +7,42 @@ wooden floor
 lightbulb
 keyboard
 aluminium foil
-wooden spoon
+spoon
 carpet
-Lava lamp
-Coffee cup
-Tea bag
+lava lamp
+coffee cup
+tea bag
 bathroom moisture
 towel
 Cotton pad
-Soap
-Funnel
+soap
+funnel
 windowsill
-Candle
-Duvet
+candle
+duvet
 Bedsheet
-Waterpipe
-Door
-Fridge
-Microwave
-Toaster
-Wire
-Door handle
-Curtain
-Coffee grinder
-Tea pot
-Ceramic plate
-Bathroom carpet
+waterpipe
+door
+fridge
+microwave
+toaster
+wire
+door handle
+curtain
+coffee grinder
+tea pot
+ceramic plate
+bathroom carpet
 USB key
-Nail clipper
+nail clipper
+doorlock
+oven grid
+shower curtain
+fork
+windowsill
+olive oil bottle
+onion
+coffee bean
+spiderweb
+dust
+bucket
