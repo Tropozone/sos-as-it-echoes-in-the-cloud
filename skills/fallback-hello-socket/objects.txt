@@ -27,5 +27,10 @@ Fridge
 Microwave
 Toaster
 Wire
-
-
+Door handle
+Curtain
+Coffee grinder
+Tea pot
+Ceramic plate
+Bathroom carpet
+USB key
