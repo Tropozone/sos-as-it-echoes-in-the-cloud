@@ -4,41 +4,45 @@
 
 ######Description############
 
-###### TODO ############
-####### NOW
-# TODO: More objects?
-# TODO: What trigger it ? Spontaneously when movement or sound detected ? "hey, come here..."
-# TODO: Some events require conversatioN!
 
-####### MAYBE
+
+# ============================================
+# ------------------TODO-----------------------
+# =============================================
+
+#--- NOW
+# TODO: RECORD for some events
+# TODO: What trigger it ? Spontaneously when movement or sound detected ? "hey, come here..."
+# TODO: Replace Location and Temporalities and objects to fit Expo in Public space
 # TODO: use regex for reading text file ? ore 
 #https://github.com/galaxykate/tracery
 #https://github.com/aparrish/pytracery
 
-#********************************************INITIALIZATION***********
+#--- LATER
+# TODO: Event asking for successive interaction as conversation
+# TODO: More objects?
+# TODO: More events
 
+# =============================================
+# --------------INITIALIZATION---------------
+# =============================================
 
+# --------------IMPORTS----------------------
 from mycroft.skills.core import FallbackSkill
 import random
 import pathlib
-
+import time
 from .utils import load_makingkin, load_objects, read_event
 
-from gingerit.gingerit import GingerIt
-gingerParser = GingerIt()  # for grammar
-
-#******************************************PARAMETERS ****************************
-
-
+# --------PARAMETERS TO TUNE-----------------------
+WAITING_TIME=5 #waiting time in seconds where will wait for human...
+# -------------OTHER PARAMETERS----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-hello-socket/data/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
-
-
-
-
-#****************************************** SKILL ****************************
-
+# =============================================
+# ------------------SKILL---------------
+# =============================================
 
 class HelloSocketFallback(FallbackSkill):
 
@@ -48,6 +52,7 @@ class HelloSocketFallback(FallbackSkill):
         # load events and objects
         self.log.info("Load events and objects...")
         self.events= load_makingkin()
+        self.log.info("Number different Events score:", len(events))
         self.objects= load_objects()
         
         self.log.info("Load dictionary...")
@@ -69,34 +74,52 @@ class HelloSocketFallback(FallbackSkill):
         """
             Make Kin practices
         """
-        # step-0 Obtain what the human said
-        utterance = message.data.get("utterance")#TODO: here not utterance...
+     
+        #TODO: here would change so may be triggered by other sound
+        utterance = message.data.get("utterance")
 
+
+        self.log.info("=======================================================")
+        self.log.info("step 1---Extract object ")
+        self.log.info("=======================================================")
         # step 1-- pick an object
         agent= random.choice(self.objects).strip("\n")
-        self.log.info("=======================================================")
-        self.log.info("step 1---Extracted object "+ agent)
-        self.log.info("=======================================================")
 
+        self.log.info("=======================================================")
+        self.log.info("step 2---Created a Makin kin Event Score:")
+        self.log.info("=======================================================")
         # step 2--- pick a seed from file and replace if xxx by keyword
         event_score = random.choice(self.events)
-        event=read_event(event_score, agent, self.dico) #define it.
-        self.log.info("=======================================================")
-        self.log.info("step 2---Created a Makin kin Event Score:"+"\n"+event)
-        self.log.info("=======================================================")
+        event=read_event(event_score, agent, self.dico)
 
-        # step 3 --Speak generated text aloud
         self.speak(event)
+        self.log.info("Event: "+ "\n" + event)
+        
+        self.log.info("=======================================================")
+        self.log.info("step 3---Possibly record what human share")
+        self.log.info("=======================================================")
+        # step 3 -- If has asked the human to share something, then wait for answer and record...
+        if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event):
+            #record NOW
+            #TODO: Add "I am listening ?"
+            print("Recording Human Answer...")
+            #TODO: RECORDING
 
-        #TODO: wait for comment about it?
-        #TODO: More interactive with VA, has to record it to send to network>>>
+        elif ("Narrate me" in event):
+            #record after a lil pause to let person to think
+            print("About to record Human Answer in 5 seconds")
+            time.sleep(WAITING_TIME)
+            self.speak("Please share it with me now.")
+            print("Recording Human Answer...")
+            #TODO: RECORDING
 
+        else:
+            print("******Interaction Ended******")
+        
         return True
 
 
 
-
-    # Required: Skill creator must make sure the skill is removed when the Skill is shutdown by the system.
     def shutdown(self):
         """
             Remove the skill from list of fallback skills
