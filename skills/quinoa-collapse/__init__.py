@@ -53,9 +53,6 @@ class QuinoaCollapseSkill(MycroftSkill):
         settings will be available."""
         # my_setting = self.settings.get('my_setting') #not needed yet
 
-        # load machine learning model for keyword extraction
-        self.log.info("--Importing ML model--")
-        #self.keyworder = spacy.load("en_core_web_sm")
         self.log.info("--Importing Gaia Concerns--")#
         with open(str(pathlib.Path(__file__).parent.absolute())+'/data/gaia_concerns.txt', 'r') as f:
             self.gaia_concerns=[line.rstrip('\n') for line in f]#f.readlines()
