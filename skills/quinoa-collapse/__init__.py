@@ -4,10 +4,17 @@
 
 # May be tested by asking stuff like "how to cook quinoa".
 # To see the other triggers, cf vocab file.
-# 
 
-# TODO: What are the things triggering it ?
+
+# TODO: Other triggers.
 # TODO: Desactivate other Mycroft skills for other intents
+# TODO: Kee special characters ? Test filtering
+# TODO: What happens at end ?
+
+########################  PARAMETERS To TUNE ######################## 
+MAX_LENGTH=1000 #TODO: here max length with special characters...So upper bound
+MIN_LENGTH=100
+
 ######################## INITIALISATION
 
 ###Mycroft Imports
@@ -15,21 +22,17 @@ from adapt.intent import IntentBuilder # adapt intent parser
 from mycroft import MycroftSkill, intent_handler #padatious intent parser
 from mycroft.skills.audioservice import AudioService
 from mycroft.audio import wait_while_speaking
+
 ###Other imports
-import spacy
-from string import punctuation
-from googlesearch import search
 import newspaper
-import nltk
 import requests
-from random import randint
-from time import sleep
-from urllib.error import URLError
 import random
-from configparser import ConfigParser
 import pathlib
 import re
 
+from .utils import cut_extract, retrieve_google_urls, clean_text, load_data_txt
+
+#from configparser import ConfigParser
 #For alternative scraper, not needed currently
 #from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
 
@@ -52,11 +55,15 @@ class QuinoaCollapseSkill(MycroftSkill):
 
         # load machine learning model for keyword extraction
         self.log.info("--Importing ML model--")
-        self.keyworder = spacy.load("en_core_web_sm")
+        #self.keyworder = spacy.load("en_core_web_sm")
         self.log.info("--Importing Gaia Concerns--")#
         with open(str(pathlib.Path(__file__).parent.absolute())+'/data/gaia_concerns.txt', 'r') as f:
             self.gaia_concerns=[line.rstrip('\n') for line in f]#f.readlines()
 
+        # load message
+        path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
+        self.MSG_WONDER=load_data_txt("message_wonder.txt", path_folder=path_folder)
+        
         # ####LOAD CONFIG PARAMETERS: only if use alternative method to scrap url but need api keys in config file
         # config = ConfigParser()
         # config.read(str(pathlib.Path(__file__).parent.absolute())+'/data/config.ini') 
@@ -67,21 +74,27 @@ class QuinoaCollapseSkill(MycroftSkill):
     @intent_handler('classic.intent')
     def handle_classic_intent(self, message):
         self.log.info("=======================================================")
-        self.log.info("==========step 0: QuinoaCollapse caught Human Utterance=======")
+        self.log.info("==========step 0: Caught Human utterance and Extract Keyword=======")
         self.log.info("=======================================================")
-        # 0-- extract what human asked 
+        # -- caight what human asked 
         human_said = str(message.data.get("utterance"))
         self.log.info(f'Human said {human_said}')
-        stuff = str(message.data.get('stuff')) #catch what human was talking about
-        self.log.info(f'Stuff human talking about {stuff}')
-
-        self.log.info("=======================================================")
-        self.log.info("==========step 1: Extract Keywords and pick concern=======")
-        self.log.info("=======================================================")
-        # 1--- extract keywords from the phrase and add a search_context picked randomly among concerns
-        search_context=random.choice(self.gaia_concerns)
-        keyword = stuff
+        # -- extract keyword
+        keyword = str(message.data.get('stuff')) #catch what human was talking about
+        self.log.info(f'Stuff human talking about {keyword}')
         #keyword=extract_keywords(str(human_said))  # Dont need this now, but alternatively could use it
+        
+        self.log.info("=======================================================")
+        self.log.info("==========step 1: Share concern=======")
+        self.log.info("=======================================================")
+        # - pick search_context picked randomly among concerns
+        search_context=random.choice(self.gaia_concerns)
+        # -- share what will look for online 
+        text=random.choice(self.MSG_WONDER)
+        text=text.replace("stuff",keyword)
+        text=text.replace("concern",search_context)
+        self.speak(text)
+        self.log.info(text)
 
         self.log.info("=======================================================")
         self.log.info("==========step 2: Retrieve urls from Google=======")
@@ -89,74 +102,38 @@ class QuinoaCollapseSkill(MycroftSkill):
         # 2---- query Google and retrieve urls
         query = keyword + " " + search_context 
         self.log.info("Querying on the web: " + query)
-        urls = self.retrieve_google_urls(query)
+        urls = retrieve_google_urls(query)
         # urls= alt_retrieve_google_urls(query, api_key=my_api_key, cse_id=my_cse_id) #alternative w/Google API keys...)
 
         self.log.info("=======================================================")
         self.log.info("==========step 3: Pick & Parse Some Content=======")
         self.log.info("=======================================================")
         # 3----  parse contents of the page
-        content = self.parse_article(urls)
-        self.log.info(content)
+        scraped_data = self.parse_article(urls)
+        self.log.info(scraped_data)
 
         self.log.info("=======================================================")
-        self.log.info("==========step 4: Share what found=======")
+        self.log.info("==========step 4: Clean & Cut extract=======")
         self.log.info("=======================================================")
-        # 4----share an extract of what found online
-        extract=self.cut_extract(content, maximum_char=1000)
-        self.log.info("FOUND ONLINE:"+ extract)
-        self.speak(extract)
-        
+        # 4----clean & cut extract of what found online
+        final_extract= cut_extract(scraped_data, MAX_LENGTH)#TODO: issue with cut extract for now with unconventional format
+        final_extract = clean_text(final_extract)
+
+        self.log.info("=======================================================")
+        self.log.info("==========step 5: Share what found=======")
+        self.log.info("=======================================================")
+        #- 5--- share online extract 
+        self.speak(final_extract)
+        self.log.info("Extract of what found online:"+ final_extract)        
 
 ######*****************************************************************************************
 ######*********************** SCRAPING PROCEDURES ***********************************************
 ######*****************************************************************************************
 
-    def cut_extract(self, extract, maximum_char):
-        """
-        Cut a text extract if above a certain nb character
-        """
-        bound_extract=extract[:maximum_char]
-        return  self.crop_unfinished_sentence(bound_extract)
-
-    def crop_unfinished_sentence(self, text):
-        """
-        Remove last unfinished bit from text. 
-        """
-        #TODO: better? as SELECT FROM THE RIGHT rindex s[s.rindex('-')+1:]  
-        stuff= re.split(r'(?<=[^A-Z].[.!?]) +(?=[A-Z])', text)
-
-        new_text=""
-        for i in range(len(stuff)):
-            if i<len(stuff)-1:
-                new_text+= " " + stuff[i]
-            elif len(stuff[i])>0 and (stuff[i][-1] in [".", ":", "?", "!", ";"]):#only if last character punctuation keep
-                new_text+= " " + stuff[i]
-
-        return new_text
-
-    def retrieve_google_urls(self,query, num_links=8):
-        # query search terms on google
-        # tld: top level domain, in our case "google.com"
-        # lang: search language
-        # num: how many links we should obtain
-        # stop: after how many links to stop (needed otherwise keeps going?!)
-        # pause: if needing multiple results, put at least '2' (2s) to avoid being blocked)
-        try:
-            online_search = search(query, tld='com', lang='en', num=10, stop=num_links, pause=2)
-        except URLError:
-            pass
-        website_urls = []
-        for link in online_search:
-            website_urls.append(link)
-        return website_urls
-
-
-    def parse_article(self,urls):
+    def parse_article(self, urls):
         article_downloaded = False
-        MIN_LENGTH=50
         count=1
-        while not article_downloaded and count<10:
+        while count<20 and (not article_downloaded):
             try:
                 # choose random url from list obtained from Google
                 url = urls[random.randint(0, len(urls)-1)]
@@ -171,56 +148,15 @@ class QuinoaCollapseSkill(MycroftSkill):
                 content=article.text
                 if len(content)>MIN_LENGTH:
                     article_downloaded = True
-                    self.log.info("WHAT FOUND ONLINE:"+content)
+                    self.log.info("Happy scraping. Article downloaded succeeded.")
                 count+=1
             except requests.exceptions.RequestException:
-                self.log.info("Article download failed. Trying again")
+                self.log.info("Unhappy scraping.Article download failed. Trying again")
                 pass
         
         # analyze text with natural language processing
         # article.nlp()
         return content
-
-######*****************************************************************************************
-######*********************** EXTRACTING // NLP PROCEDURES ***********************************************
-######*****************************************************************************************
-
-    def extract_keywords(self, input):
-        # proper nouns, nouns, and adjectives
-        pos_tag = ['PROPN', 'NOUN', 'ADJ'] 
-        # tokenize and store input
-        phrase = self.keyworder(input.lower())
-        keywords = []
-
-        for token in phrase:
-            if token.pos_ in pos_tag:
-                # and if NOT a stop word or NOT punctuation
-                if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
-                    keywords.append(token.text)
-        key_string = " ".join(keywords)
-
-        return key_string
-
-######*****************************************************************************************
-######*********************** ALTERNATIVE SCRAPER  ***********************************************
-######*****************************************************************************************
-
-
-    # def alt_retrieve_google_urls(self, search_term, api_key, cse_id, **kwargs):
-    #     """
-    #         Use Google Search API to get Google results over a query
-    #         Send back urls
-    #     """
-    #     service = build("customsearch", "v1", developerKey=api_key)
-    #     res = service.cse().list(q=search_term, cx=cse_id, **kwargs).execute()
-
-    #     search_items = res.get("items")
-    #     urls=[]
-    #     for i, search_item in enumerate(search_items, start=1):
-    #         title = search_item.get("title")
-    #         link = search_item.get("link")
-    #         urls.append(link)
-    #     return urls
 
 
 
@@ -234,5 +170,4 @@ class QuinoaCollapseSkill(MycroftSkill):
 
 def create_skill():
     return QuinoaCollapseSkill()
-
 
