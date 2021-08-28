@@ -6,16 +6,29 @@
 # To see the other triggers, cf vocab file.
 
 
-# TODO: Other triggers.
-# TODO: Desactivate other Mycroft skills for other intents
-# TODO: Kee special characters ? Test filtering
+
+# ============================================
+# ------------------TODO-----------------------
+# =============================================
+
+#--- NOW
 # TODO: What happens at end ?
 
-########################  PARAMETERS To TUNE ######################## 
+#--- LATER
+# TODO: Other triggers.
+# TODO: Say special characters ? Test filtering
+
+
+
+# =============================================
+# --------------INITIALIZATION---------------
+# ======================================
+
+# --------------PARAMETERS to tune----------------------
 MAX_LENGTH=1000 #TODO: here max length with special characters...So upper bound
 MIN_LENGTH=100
 
-######################## INITIALISATION
+# --------------IMPORTS----------------------
 
 ###Mycroft Imports
 from adapt.intent import IntentBuilder # adapt intent parser
@@ -35,6 +48,10 @@ from .utils import cut_extract, retrieve_google_urls, clean_text, load_data_txt
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
 #from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
+
+# =============================================
+# -------------- SKILL ---------------
+# ======================================
 
 
 class QuinoaCollapseSkill(MycroftSkill):

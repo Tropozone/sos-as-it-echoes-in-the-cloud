@@ -6,8 +6,12 @@
 # =============================================
 # --------------TODO---------------
 # ======================================
+
+#--- NOW
 # TODO: Test it
-# TODO: And playback?
+
+#--- LATER
+# TODO: Other functionality? Play back?
 
 # and small TODO in text
 
@@ -85,7 +89,7 @@ class CollectiveMemorySkill(MycroftSkill):
 
     #What happen when detect like Intent. PADATIOUS: use .intent file
     @intent_handler('share.intent')
-    def handle_classic_intent(self, message):
+    def handle_share_intent(self, message):
         #TODO: CHECK FURTHER  how record etc if memory disk full etc
         #https://github.com/MycroftAI/skill-audio-record/blob/21.02/__init__.py
         #TODO: CAN RECORD until silence? but max time?
