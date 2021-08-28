@@ -1,11 +1,6 @@
 # !/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
-#TODO: or structure of a fabulation instead, query only gpt2 for words? 
-#TODO: or use generator without ML?
-#TODO: Rethink which sentences work well!
-
-
 import random
 import transformers 
 import torch
