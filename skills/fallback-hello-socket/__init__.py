@@ -52,7 +52,7 @@ class HelloSocketFallback(FallbackSkill):
         # load events and objects
         self.log.info("Load events and objects...")
         self.eventscores= load_makingkin()
-        self.log.info("Number different Events score:", len(self.eventscores))
+        self.log.info("Number different Events score:"+ str(len(self.eventscores)))
         self.objects= load_objects()
         
         self.log.info("Load dictionary...")

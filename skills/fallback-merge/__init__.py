@@ -30,7 +30,7 @@ from mycroft.skills.audioservice import AudioService
 WAITING_TIME=5 #waiting time in seconds where will wait for human...
 
 # -------------OTHER PARAMETERS----------------------
-WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-hello-socket/data/"
+WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
 
@@ -41,7 +41,7 @@ REPETITION_PENALTY = 1.4
 
 # --------------PARAMETERS ---------------------
 my_ML_model = False  # If do have a fine-tuned model, set to True
-my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-MLdrift/gpt2_model'  # path to your fine tuned model
+my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
 
 
 #TODO: OTHER PARAM FOR ENTER THE WEIRD...
@@ -78,7 +78,7 @@ class MergeFallback(FallbackSkill):
         # load events and objects
         self.log.info("Init Hello Socket")
         self.eventscores= load_makingkin()
-        self.log.info("Number different Events score:", len(self.eventscores))
+        self.log.info("Number different Events score:"+ str(len(self.eventscores)))
         self.objects= load_objects()
         self.dico = {} #Dictionnary of list words
         for filename in WORDS_LISTS:
