@@ -36,6 +36,7 @@ from os.path import exists
 from datetime import datetime
 from datetime import timedelta
 import random
+import time
 import pathlib
 
 #from configparser import ConfigParser
@@ -47,7 +48,7 @@ DEFAULT_RECORDING_TIME=10
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-RECORDING_FOLDER="./outputs/"#.wav #TODO: Has to record in other folder...
+RECORDING_FOLDER="/home/pi/.mycroft/skills/Collective Memory Skill/"#TODO: REPLACE IF ON A SERVER
 
 # =============================================
 # --------------SKILL---------------
@@ -120,25 +121,28 @@ class CollectiveMemorySkill(MycroftSkill):
         #--- Recording id and path
         now = datetime.now()
         recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
-        recording_path=self.settings["file_folder"]+recording_id+".wav" 
+        recording_path=RECORDING_FOLDER+recording_id+".wav" 
+        self.log.info("Recording path:"+recording_path)
        
         #---check if has free disk space#TODO: add free disk space later on
-        has_free_disk_space=True#self.has_free_disk_space():
+        has_free_disk_space=self.has_free_disk_space()
 
         self.log.info("=======================================================")
         self.log.info("==========step 1: Start Recording=======")
         self.log.info("=======================================================")
         self.speak("Tell me, we are curious about it.") #TODO: Replace by messages ? We or they ?
-        
+        wait_while_speaking()
 
-        if self.has_free_disk_space():#TODO: add free disk space later on
-            record_for = nice_duration(int(recording_time),
-                                        lang=self.lang)
-            self.speak_dialog('audio.record.start.duration',
-                                {'duration': record_for})
-
+        if has_free_disk_space:
+            recording_time=int(recording_time)
+            #record_for = nice_duration(int(recording_time),
+            #                            lang=self.lang)
+            #self.log.info("record for: " + str(record_for))                            
+            #self.speak_dialog('audio.record.start.duration',
+            #                    {'duration': record_for})
+            # self.speak("Recording for {} seconds".format(recording_time))
+            # wait_while_speaking()
             # Initiate recording
-            wait_while_speaking()
             self.start_time = now_local()   # recalc after speaking completes
             self.record_process = record(recording_path,
                                             int(recording_time),
@@ -146,12 +150,14 @@ class CollectiveMemorySkill(MycroftSkill):
                                             self.settings["channels"])
             self.enclosure.eyes_color(255, 0, 0)  # set color red #WHAT FOR ?
             self.last_index = 24
-            self.schedule_repeating_event(self.recording_feedback, None, 1,
-                                            name='RecordingFeedback')
+
+    
+            #self.schedule_repeating_event(self.recording_feedback, None, 1,
+            #                                name='RecordingFeedback')
         else:
             self.speak_dialog("audio.record.disk.full")
 
-
+        time.sleep(recording_time)#NEEDED? 
         self.log.info("=======================================================")
         self.log.info("==========step 2: End Recording=======")
         self.log.info("=======================================================")
@@ -159,7 +165,9 @@ class CollectiveMemorySkill(MycroftSkill):
         self.speak("Thanks for sharing it to the Collective Memory.") #TODO: Replace by messages
        
 
-
+    def has_free_disk_space(self):
+        #TODO: add free disk space later on
+        return True
 
     # def save_recording(self, filename, recording, mode="w"):
     #     try:
