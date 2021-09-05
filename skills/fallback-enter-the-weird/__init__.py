@@ -6,7 +6,7 @@
 
 #--- NOW
 #TODO: Clean this skill, as it is an old skill
-#TODO: question Query TimeOut
+# TODO: question Query TimeOut
 # TODO: Too human filter
 # TODO: Test with different versions homemade gpt2
 # TODO: Use PERSONNA !

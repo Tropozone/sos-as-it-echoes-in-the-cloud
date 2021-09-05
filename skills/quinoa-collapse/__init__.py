@@ -12,7 +12,7 @@
 # =============================================
 
 #--- NOW
-# TODO: What happens at end ?
+# TODO: What happens at end: ask opinion ?
 
 #--- LATER
 # TODO: Other triggers.

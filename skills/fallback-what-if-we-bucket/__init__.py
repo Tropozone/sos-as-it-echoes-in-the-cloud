@@ -78,9 +78,9 @@ class WhatIfWeBucketFallback(FallbackSkill):
         self.whatif = load_whatif()
 
         # setting generation
-        self.init_settings()
+        self.init_what_if()
 
-    def init_settings(self):
+    def init_what_if(self):
         # min free diskspace (MB)
         self.settings.setdefault("repetition_penalty", REPETITION_PENALTY)  
         self.settings.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)

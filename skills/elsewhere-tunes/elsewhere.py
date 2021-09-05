@@ -56,7 +56,7 @@ def nobody_asked_this(message):
     # step 2: wait, in case skill triggered
     sleep(15)
     
-    # step 3: extract keywords from the phrase and add search_context
+    # step 3: catch attention
     message="Listen."#TODO: Shall add a message for transition?
     client.emit(Message('speak', data={'utterance': message}))
 

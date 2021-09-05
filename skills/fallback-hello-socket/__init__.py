@@ -51,14 +51,14 @@ class HelloSocketFallback(FallbackSkill):
 
         # load events and objects
         self.log.info("Load events and objects...")
-        self.events= load_makingkin()
-        self.log.info("Number different Events score:", len(events))
+        self.eventscores= load_makingkin()
+        self.log.info("Number different Events score:", len(self.eventscores))
         self.objects= load_objects()
         
         self.log.info("Load dictionary...")
-        dico = {} #Dictionnary of list words
+        self.dico = {} #Dictionnary of list words
         for filename in WORDS_LISTS:
-            dico[filename] = [line.rstrip('\n') for line in open(WORDS_PATH+filename+'.txt')]
+            self.dico[filename] = [line.rstrip('\n') for line in open(WORDS_PATH+filename+'.txt')]
 
     def initialize(self):
         """
@@ -89,7 +89,7 @@ class HelloSocketFallback(FallbackSkill):
         self.log.info("step 2---Created a Makin kin Event Score:")
         self.log.info("=======================================================")
         # step 2--- pick a seed from file and replace if xxx by keyword
-        event_score = random.choice(self.events)
+        event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
 
         self.speak(event)
