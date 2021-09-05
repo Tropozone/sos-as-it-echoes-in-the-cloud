@@ -16,7 +16,8 @@ import time
 from .utils import load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, clean_text
 
 import re
-import spacy
+import os
+#import spacy #Temporarily desactivate spacy
 import torch
 import transformers 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -48,7 +49,7 @@ MAX_LENGTH = 100
 VARIANCE_LENGTH = 20
 TEMPERATURE = 0.8
 REPETITION_PENALTY = 1.4
-NUMBER_DRIFTS=1
+NUM_DRIFTS=1
 
 
 
@@ -67,7 +68,6 @@ class MergeFallback(FallbackSkill):
         self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
         #TODO: ADD elsewhere tunes...
 
-    
         self.init_hello_socket()
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
@@ -76,7 +76,7 @@ class MergeFallback(FallbackSkill):
 
     def init_hello_socket(self):
         # load events and objects
-        self.log.info("Init Hello SOcket")
+        self.log.info("Init Hello Socket")
         self.eventscores= load_makingkin()
         self.log.info("Number different Events score:", len(self.eventscores))
         self.objects= load_objects()
@@ -97,7 +97,7 @@ class MergeFallback(FallbackSkill):
         # Initialise a tokenizer
         self.tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
         # initialise keyworder
-        self.keyworder = spacy.load("en_core_web_sm")
+        # self.keyworder = spacy.load("en_core_web_sm") #temporarily desactivated
         # load
         self.whatif = load_whatif()
 
@@ -128,16 +128,14 @@ class MergeFallback(FallbackSkill):
             Lower number means higher priority, however number 1-4 are bypassing other skills.
         """
         self.audio_service = AudioService(self.bus)#instantiate an AudioService object:
-        self.register_fallback(self.handle_merge, 6) #NOTE: change priority of other fallback when want to test so no conflict?
+        self.register_fallback(self.handle_routing, 6) 
 
-    def handle_merge(self, message):
+    def handle_routing(self, message):
         """
             Make Kin practices
         """
      
-        #TODO: here would change so may be triggered by other sound
         utterance = message.data.get("utterance")
-
 
         self.log.info("=======================================================")
         self.log.info("step 0---Randomly redirect to other skills")
@@ -145,23 +143,23 @@ class MergeFallback(FallbackSkill):
         
         rand= random.randint(0,3)
         if rand==0:
-            self.log.info("Redirecting to Hello Socket")
+            self.log.info("***Redirecting to Hello Socket***")
             #"Hello Socket"
             self.make_kin(message)
 
         elif rand==1:
-            self.log.info("Redirecting to What if We Bucket")
+            self.log.info("***Redirecting to What if We Bucket***")
             #"What if we bucket"
             self.what_if(message)
 
         elif rand==2:
-            self.log.info("Redirecting to Enter the Weird")
+            self.log.info("***Redirecting to Enter the Weird***")
             #"Enter the Weird
             self.enter_the_weird()
 
             
         elif rand==3:
-            self.log.info("Redirecting to Elsewhere Tunes")
+            self.log.info("***Redirecting to Elsewhere Tunes***")
             #Elsewhere Tunes
             self.elsewhere_tunes()
         
@@ -179,8 +177,6 @@ class MergeFallback(FallbackSkill):
         """
             Make Kin practices
         """
-     
-        #TODO: here would change so may be triggered by other sound
         utterance = message.data.get("utterance")
 
 
@@ -232,7 +228,8 @@ class MergeFallback(FallbackSkill):
         utterance = message.data.get("utterance")
 
          # step 1-- extract a keyword from what human said
-        keyword= extract_keywords(utterance, self.keyworder)
+        # keyword= extract_keywords(utterance, self.keyworder) #TODO: Reenable this once spacy issue fine
+        keyword = "petrol"
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 
@@ -251,7 +248,7 @@ class MergeFallback(FallbackSkill):
         self.log.info(raw_response)
         self.log.info("=======================================================")
 
-        # step 4 --- #TODO: Filter text cut, ?
+        # step 4 --- #TODO: Filter text cut ?
         response=raw_response
         self.speak(response)
 
@@ -348,8 +345,8 @@ class MergeFallback(FallbackSkill):
         """
             Remove the skill from list of fallback skills
         """
-        self.remove_fallback(self.handle_merge)
-        super(MergetFallback, self).shutdown()
+        self.remove_fallback(self.handle_routing)
+        super(MergeFallback, self).shutdown()
 
 
 ##-----------------CREATE
