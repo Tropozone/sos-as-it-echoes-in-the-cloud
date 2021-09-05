@@ -132,12 +132,14 @@ class HelloSocketFallback(FallbackSkill):
         self.speak(event)
         self.log.info("Event: "+ "\n" + event)
         
-        self.log.info("=======================================================")
-        self.log.info("step 3---Possibly record what human share")
-        self.log.info("=======================================================")
+    
         # step 3 -- If has asked the human to share something, then wait for answer and record...
         if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event) or ("Narrate me" in event):
 
+            self.log.info("=======================================================")
+            self.log.info("step 3---Listening to/Recording human")
+            self.log.info("=======================================================")
+            
             #--- Preliminary for recordings:
             recording_time, recording_id, recording_path, has_free_disk_space=self.recording_preliminary()
 
