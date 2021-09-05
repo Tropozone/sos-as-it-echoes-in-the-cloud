@@ -97,10 +97,12 @@ class MergeFallback(FallbackSkill):
         self.record_process = None
         self.start_time = 0
         self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
+
     
 
     def init_recording_settings(self):
         # min free diskspace (MB)
+        self.log.info("Init Recording Settings - in fallback-merge")
         self.settings.setdefault("min_free_disk", 100)
         self.settings.setdefault("rate", 16000)  # sample rate, hertz
         self.settings.setdefault("channels", 1)  # recording channels (1 = mono)
@@ -119,7 +121,7 @@ class MergeFallback(FallbackSkill):
             self.dico[filename] = [line.rstrip('\n') for line in open(WORDS_PATH+filename+'.txt')]
 
     def init_what_if_we_bucket(self):
-        self.log.info("Init What if We Bucket - in fallback-merge")
+        self.log.info("Init gpt2 and What if We Bucket - in fallback-merge")
         # Initialize language generation model
         if my_ML_model:
             self.log.info("Loading my own machine learning model")
@@ -201,8 +203,10 @@ class MergeFallback(FallbackSkill):
         else:
             raise NotImplementedError
 
-
-        
+        self.log.info("=======================================================")
+        self.log.info("---END of this INTERACTION")
+        self.log.info("=======================================================")
+    
         return True
 
 
@@ -231,11 +235,12 @@ class MergeFallback(FallbackSkill):
         self.speak(event)
         self.log.info("Event: "+ "\n" + event)
         
-        self.log.info("=======================================================")
-        self.log.info("step 3---Possibly record what human share")
-        self.log.info("=======================================================")
+
         # step 3 -- If has asked the human to share something, then wait for answer and record...
         if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event) or ("Narrate me" in event):
+            self.log.info("=======================================================")
+            self.log.info("step 3---Record what human share")
+            self.log.info("=======================================================")
 
             #--- Preliminary for recordings:
             recording_time, recording_id, recording_path, has_free_disk_space=self.recording_preliminary()
