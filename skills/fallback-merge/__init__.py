@@ -64,28 +64,29 @@ class MergeFallback(FallbackSkill):
 
     def __init__(self):
         super(MergeFallback, self).__init__(name='Merge Fallback Skill')    
-        self.log.info("Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes")
+        self.log.info("*****INIT FALLBACK MERGE ****")
+        #Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the ")
         self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
         #TODO: ADD elsewhere tunes...
 
         self.init_hello_socket()
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
-        self.elsewhere_tunes()
+        self.init_elsewhere_tunes()
 
 
     def init_hello_socket(self):
         # load events and objects
-        self.log.info("Init Hello Socket")
+        self.log.info("Init Hello Socket - in fallback-merge")
         self.eventscores= load_makingkin()
-        self.log.info("Number different Events score:"+ str(len(self.eventscores)))
+        self.log.info("Number different Events score:"+str(len(self.eventscores)))
         self.objects= load_objects()
         self.dico = {} #Dictionnary of list words
         for filename in WORDS_LISTS:
             self.dico[filename] = [line.rstrip('\n') for line in open(WORDS_PATH+filename+'.txt')]
 
     def init_what_if_we_bucket(self):
-
+        self.log.info("Init What if We Bucket - in fallback-merge")
         # Initialize language generation model
         if my_ML_model:
             self.log.info("Loading my own machine learning model")
@@ -107,6 +108,7 @@ class MergeFallback(FallbackSkill):
 
         
     def init_enter_the_weird(self):
+        self.log.info("Init Enter the Void - in fallback-merge")
         #TODO: DIFFERENT VALUES
         # min free diskspace (MB)
         self.settings.setdefault("repetition_penalty", REPETITION_PENALTY)  
@@ -155,13 +157,13 @@ class MergeFallback(FallbackSkill):
         elif rand==2:
             self.log.info("***Redirecting to Enter the Weird***")
             #"Enter the Weird
-            self.enter_the_weird()
+            self.enter_the_weird(message)
 
             
         elif rand==3:
             self.log.info("***Redirecting to Elsewhere Tunes***")
             #Elsewhere Tunes
-            self.elsewhere_tunes()
+            self.elsewhere_tunes(message)
         
         else:
             raise NotImplementedError
@@ -276,7 +278,7 @@ class MergeFallback(FallbackSkill):
         self.log.info("=======================================================")
         self.log.info("Step 2--gpt2 generation....")
         encoded_context= self.tokenizer.encode(context, return_tensors = "pt")
-        max_length= self.settings["max_length"]+random.randint(-self.settings["variance"], self.settings["variance"])
+        max_length= self.settings["max_length"]+random.randint(-self.settings["variance_length"], self.settings["variance_length"])
         generated = self.model.generate(encoded_context, max_length = max_length , temperature= self.settings["temperature"], repetition_penalty = self.settings["repetition_penalty"], do_sample=True, top_k=10)
         self.log.info("Step 3--gpt2 generation....")
         drift = self.tokenizer.decode(generated.tolist()[0])
