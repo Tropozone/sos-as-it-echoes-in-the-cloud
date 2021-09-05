@@ -70,7 +70,8 @@ DEFAULT_RECORDING_TIME=10 #TODO: PUT MORE AND HOW CUT FILE THEN IF LONGER ?
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-COLLECTIVE_MEMORY_FOLDER="/home/pi/.mycroft/skills/Collective Memory Skill/"#TODO: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#TODO: REPLACE IF ON A SERVER
+#"/home/pi/.mycroft/skills/Collective Memory Skill/
 
 
 # =============================================
