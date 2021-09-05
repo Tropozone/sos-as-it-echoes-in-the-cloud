@@ -9,22 +9,33 @@
 # ======================================
 
 # --------------IMPORTS----------------------
+
 from mycroft.skills.core import FallbackSkill
+from mycroft.skills.audioservice import AudioService
+#FOR RECORDING
+from mycroft.audio import wait_while_speaking
+from mycroft.messagebus.message import Message
+from mycroft.util import record, play_wav
+from mycroft.util.parse import extract_datetime
+from mycroft.util.format import nice_duration
+from mycroft.util.time import now_local
+
 import random
 import pathlib
 import time
-from .utils import load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, clean_text
-
 import re
 import os
+from os.path import exists
 #import spacy #Temporarily desactivate spacy
 import torch
 import transformers 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 
+from datetime import datetime
+from datetime import timedelta
 
-from mycroft.skills.audioservice import AudioService
 
+from .utils import load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, clean_text
 
 # --------PARAMETERS TO TUNE-----------------------
 WAITING_TIME=5 #waiting time in seconds where will wait for human...
@@ -52,8 +63,14 @@ REPETITION_PENALTY = 1.4
 NUM_DRIFTS=1
 
 
+#memory_folder=os.path.dirname(os.path.realpath(__file__)) +"/memory/"
 
-memory_folder=os.path.dirname(os.path.realpath(__file__)) +"/memory/"
+#-----------  PARAMETERS to TUNE ---------
+DEFAULT_RECORDING_TIME=10 #TODO: PUT MORE AND HOW CUT FILE THEN IF LONGER ?
+MAX_RECORDING_TIME=60
+
+#----------- OTHER PARAMETERS --------
+COLLECTIVE_MEMORY_FOLDER="/home/pi/.mycroft/skills/Collective Memory Skill/"#TODO: REPLACE IF ON A SERVER
 
 
 # =============================================
@@ -73,6 +90,21 @@ class MergeFallback(FallbackSkill):
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
         self.init_elsewhere_tunes()
+        self.init_recording_settings()
+
+        #FOR RECORDINGS
+        self.record_process = None
+        self.start_time = 0
+        self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
+    
+
+    def init_recording_settings(self):
+        # min free diskspace (MB)
+        self.settings.setdefault("min_free_disk", 100)
+        self.settings.setdefault("rate", 16000)  # sample rate, hertz
+        self.settings.setdefault("channels", 1)  # recording channels (1 = mono)
+        self.settings.setdefault("file_folder", COLLECTIVE_MEMORY_FOLDER)
+        self.settings.setdefault("duration", DEFAULT_RECORDING_TIME)
 
 
     def init_hello_socket(self):
@@ -202,24 +234,41 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 3---Possibly record what human share")
         self.log.info("=======================================================")
         # step 3 -- If has asked the human to share something, then wait for answer and record...
-        if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event):
-            #record NOW
-            #TODO: Add "I am listening ?"
-            print("Recording Human Answer...")
-            #TODO: RECORDING
+        if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event) or ("Narrate me" in event):
 
-        elif ("Narrate me" in event):
-            #record after a lil pause to let person to think
-            print("About to record Human Answer in 5 seconds")
-            time.sleep(WAITING_TIME)
-            self.speak("Please share it with me now.")
-            print("Recording Human Answer...")
-            #TODO: RECORDING
+            #--- Preliminary for recordings:
+            recording_time, recording_id, recording_path, has_free_disk_space=self.recording_preliminary()
 
-        else:
-            print("******Interaction Ended******")
+            if ("Narrate me" in event):
+                #record after a lil pause to let person to think
+                self.log.info("About to record Human Answer in 5 seconds")
+                time.sleep(WAITING_TIME)
+                self.speak("Please share it with me now.")
+                self.log.info("Please share it with me now.")
+            
+            wait_while_speaking()
         
-
+            if has_free_disk_space:
+                self.log.info("***Start Recording Human NOW ***")
+                # Initiate recording
+                self.start_time = now_local()   # recalc after speaking completes
+                self.record_process = record(recording_path,
+                                                int(recording_time),
+                                                self.settings["rate"],
+                                                self.settings["channels"])
+                self.enclosure.eyes_color(255, 0, 0)  # set color red #WHAT FOR ?
+                self.last_index = 24
+                #self.schedule_repeating_event(self.recording_feedback, None, 1,
+                #                                name='RecordingFeedback')
+            else:
+                self.speak_dialog("audio.record.disk.full")
+            time.sleep(recording_time)#TODO: NEEDED? 
+            self.log.info("***RECORDING ENDED***")      
+            self.speak("Thanks for sharing it with the Collective.") #TODO: Replace by messages
+    
+        else:
+            self.log.info("******Interaction Ended******")
+        
 
 
     def what_if(self, message):
@@ -326,7 +375,7 @@ class MergeFallback(FallbackSkill):
 
 
         # step 1: pick sound from collective memory
-        sound_path=random.choice(os.listdir(memory_folder))
+        sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER))
 
         # # step 2: wait, in case skill triggered
         # sleep(15)
@@ -341,6 +390,10 @@ class MergeFallback(FallbackSkill):
         self.audio_service.play(sound_path)
 
 
+
+    def has_free_disk_space(self):
+        #TODO: add free disk space later on
+        return True
 
 
     def shutdown(self):

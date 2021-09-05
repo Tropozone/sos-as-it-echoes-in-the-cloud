@@ -7,10 +7,8 @@
 # --------------TODO---------------
 # ======================================
 
-#--- NOW
-# TODO: Test it
 
-#--- LATER
+#--- SOON:
 # TODO: Other functionality? Play back?
 
 # and small TODO in text
@@ -22,6 +20,7 @@
 # -------------IMPORTS---------------
 from adapt.intent import IntentBuilder # adapt intent parser
 from mycroft import MycroftSkill, intent_handler #padatious intent parser
+#FOR RECORDING
 from mycroft.skills.audioservice import AudioService
 from mycroft.audio import wait_while_speaking
 from mycroft.messagebus.message import Message
@@ -29,15 +28,17 @@ from mycroft.util import record, play_wav
 from mycroft.util.parse import extract_datetime
 from mycroft.util.format import nice_duration
 from mycroft.util.time import now_local
+from datetime import datetime
+from datetime import timedelta
 
 import os
 from os.path import exists
 
-from datetime import datetime
-from datetime import timedelta
+
 import random
 import time
 import pathlib
+
 
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
@@ -48,7 +49,7 @@ DEFAULT_RECORDING_TIME=10
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-RECORDING_FOLDER="/home/pi/.mycroft/skills/Collective Memory Skill/"#TODO: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/.mycroft/skills/Collective Memory Skill/"#TODO: REPLACE IF ON A SERVER
 
 # =============================================
 # --------------SKILL---------------
@@ -63,7 +64,7 @@ class CollectiveMemorySkill(MycroftSkill):
         super(CollectiveMemorySkill, self).__init__(name='Collective Memory Skill')
         #self.learning = True 
 
-        self.play_process = None
+        #self.play_process = None
         self.record_process = None
         self.start_time = 0
         self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
@@ -75,7 +76,7 @@ class CollectiveMemorySkill(MycroftSkill):
         self.settings.setdefault("min_free_disk", 100)
         self.settings.setdefault("rate", 16000)  # sample rate, hertz
         self.settings.setdefault("channels", 1)  # recording channels (1 = mono)
-        self.settings.setdefault("file_folder", RECORDING_FOLDER)
+        self.settings.setdefault("file_folder", COLLECTIVE_MEMORY_FOLDER)
         self.settings.setdefault("duration", DEFAULT_RECORDING_TIME)
 
     def initialize(self):
@@ -102,30 +103,9 @@ class CollectiveMemorySkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("=========step 0: Preliminary=======")
         self.log.info("=======================================================")
-        #--- Calculate how long to record
-        self.start_time = now_local()
-        #TODO: may say time in human mesage !
-        # Extract time, if missing default to 30 seconds
-        stop_time, _ = (
-            extract_datetime(utterance, lang=self.lang) or
-            (now_local() + timedelta(seconds=self.settings["duration"]), None)
-        )
-        recording_time = (stop_time -
-                                     self.start_time).total_seconds()
-        #-- check time betweem min and max bound                            
-        if recording_time <= 0:
-            recording_time = DEFAULT_RECORDING_TIME  # default recording duration
-        elif recording_time>MAX_RECORDING_TIME:
-            recording_time=MAX_RECORDING_TIME
         
-        #--- Recording id and path
-        now = datetime.now()
-        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
-        recording_path=RECORDING_FOLDER+recording_id+".wav" 
-        self.log.info("Recording path:"+recording_path)
-       
-        #---check if has free disk space#TODO: add free disk space later on
-        has_free_disk_space=self.has_free_disk_space()
+        #--- Preliminary for recordings:
+        recording_time, recording_id, recording_path, has_free_disk_space=self.recording_preliminary()
 
         self.log.info("=======================================================")
         self.log.info("==========step 1: Start Recording=======")
@@ -134,7 +114,6 @@ class CollectiveMemorySkill(MycroftSkill):
         wait_while_speaking()
 
         if has_free_disk_space:
-            recording_time=int(recording_time)
             #record_for = nice_duration(int(recording_time),
             #                            lang=self.lang)
             #self.log.info("record for: " + str(record_for))                            
@@ -164,6 +143,30 @@ class CollectiveMemorySkill(MycroftSkill):
       
         self.speak("Thanks for sharing it to the Collective Memory.") #TODO: Replace by messages
        
+
+
+    def recording_preliminary(self):
+        #--- Calculate how long to record
+        self.start_time = now_local()
+        # Extract time, if missing default to 30 seconds
+        stop_time, _ = (
+            (now_local() + timedelta(seconds=self.settings["duration"]), None)
+        )
+        recording_time = (stop_time -self.start_time).total_seconds()
+        #-- check time betweem min and max bound                            
+        if (recording_time <= 0) or (recording_time>MAX_RECORDING_TIME):
+            recording_time = DEFAULT_RECORDING_TIME  # default recording duration
+        #--- Recording id and path
+        now = datetime.now()
+        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
+        recording_path=COLLECTIVE_MEMORY_FOLDER+recording_id+".wav" 
+        self.log.info("Recording path:"+recording_path)
+       
+        #---check if has free disk space# TODO: add free disk space later on
+        has_free_disk_space=self.has_free_disk_space()
+
+        recording_time=int(recording_time)
+        return recording_time, recording_id, recording_path, has_free_disk_space
 
     def has_free_disk_space(self):
         #TODO: add free disk space later on
