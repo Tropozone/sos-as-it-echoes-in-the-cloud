@@ -1,0 +1,8 @@
+
+
+
+Try to trigger it for instance with:
+Listen to me.
+I would like to share something with you.
+Or anything which match the vocab/share.intent file of the skill
+
