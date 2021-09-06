@@ -1,17 +1,21 @@
 ########################  ABOUT THIS SKILL
 
 
-
-
 # =============================================
 # --------------TODO---------------
 # ======================================
 
+#--- Checks // Tunes
+# TODO: Messages, and Ending.
 
 #--- SOON:
-# TODO: Other functionality? Play back?
+# TODO: CAN RECORD until silence ? Or put max time and cut silence?
+# TODO: Sound EFfects on playback?
 
-# and small TODO in text
+#--- LATER
+#TODO: CHECK FURTHER if memory disk full etc
+#https://github.com/MycroftAI/skill-audio-record/blob/21.02/__init__.py
+
 
 # =============================================
 # --------------INITIALIZATION---------------
@@ -49,8 +53,20 @@ DEFAULT_RECORDING_TIME=10
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#TODO: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory" #NOTE: REPLACE IF ON A SERVER
 #.mycroft/skills/Collective Memory Skill/"
+
+
+
+
+def load_data_txt(filename, path_folder="", mode="r"):
+    """
+    for messages in skill, load txt
+    """
+    with open(path_folder+filename,  mode=mode) as f:
+        data = f.readlines()
+    return data
+
 
 # =============================================
 # --------------SKILL---------------
@@ -72,6 +88,12 @@ class CollectiveMemorySkill(MycroftSkill):
 
         self.init_settings()
 
+       # load message
+        path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
+        self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
+        self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
+        
+
     def init_settings(self):
         # min free diskspace (MB)
         self.settings.setdefault("min_free_disk", 100)
@@ -80,6 +102,8 @@ class CollectiveMemorySkill(MycroftSkill):
         self.settings.setdefault("file_folder", COLLECTIVE_MEMORY_FOLDER)
         self.settings.setdefault("duration", DEFAULT_RECORDING_TIME)
 
+
+
     def initialize(self):
         """ Perform any final setup needed for the skill here.
         This function is invoked after the skill is fully constructed and
@@ -87,15 +111,13 @@ class CollectiveMemorySkill(MycroftSkill):
         settings will be available."""
         # my_setting = self.settings.get('my_setting') #not needed yet
 
-        self.init_settings()
+        # self.init_settings() #TODO: Needed here or above ?
 
 
     #What happen when detect like Intent. PADATIOUS: use .intent file
     @intent_handler('share.intent')
     def handle_share_intent(self, message):
-        #TODO: CHECK FURTHER  how record etc if memory disk full etc
-        #https://github.com/MycroftAI/skill-audio-record/blob/21.02/__init__.py
-        #TODO: CAN RECORD until silence? but max time?
+
         self.log.info("=======================================================")
         self.log.info("=========SKILL COLLECTIVE MEMORY TRIGGERED=======")
         utterance = message.data.get('utterance')
@@ -111,7 +133,9 @@ class CollectiveMemorySkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("==========step 1: Start Recording=======")
         self.log.info("=======================================================")
-        self.speak("Tell me, we are curious about it.") #TODO: Replace by messages ? We or they ?
+
+        text=random.choice(self.MSG_LISTEN)
+        self.speak(text)
         wait_while_speaking()
 
         if has_free_disk_space:
@@ -141,8 +165,8 @@ class CollectiveMemorySkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("==========step 2: End Recording=======")
         self.log.info("=======================================================")
-      
-        self.speak("Thanks for sharing it to the Collective Memory.") #TODO: Replace by messages
+        closing_text=random.choice(self.MSG_END)
+        self.speak(closing_text)
        
 
 

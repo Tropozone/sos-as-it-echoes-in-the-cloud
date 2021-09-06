@@ -13,12 +13,10 @@
 
 
 #--- Checks
-# TODO: Triggers
 # TODO: What happens at end: ask opinion ?
-
-
-#--- Tunes
+# TODO: Triggers, Message Transition
 #TODO: Parameters Max/Min Length
+
 
 #--- LATER
 # TODO: Keep special characters?
