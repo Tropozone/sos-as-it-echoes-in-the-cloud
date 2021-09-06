@@ -11,12 +11,17 @@
 # ------------------TODO-----------------------
 # =============================================
 
-#--- NOW
+
+#--- Checks
+# TODO: Triggers
 # TODO: What happens at end: ask opinion ?
 
+
+#--- Tunes
+#TODO: Parameters Max/Min Length
+
 #--- LATER
-# TODO: Other triggers.
-# TODO: Say special characters ? Test filtering
+# TODO: Keep special characters?
 
 
 
@@ -25,7 +30,7 @@
 # ======================================
 
 # --------------PARAMETERS to tune----------------------
-MAX_LENGTH=1000 #TODO: here max length with special characters...So upper bound
+MAX_LENGTH=1000
 MIN_LENGTH=100
 
 # --------------IMPORTS----------------------
@@ -130,7 +135,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("==========step 4: Clean & Cut extract=======")
         self.log.info("=======================================================")
         # 4----clean & cut extract of what found online
-        final_extract= cut_extract(scraped_data, MAX_LENGTH)#TODO: issue with cut extract for now with unconventional format
+        final_extract= cut_extract(scraped_data, MAX_LENGTH)
         final_extract = clean_text(final_extract)
 
         self.log.info("=======================================================")

@@ -30,12 +30,13 @@ def load_data_txt(filename, path_folder="", mode="r"):
 def clean_text(data):
     # Text Cleanup
     sent = nltk.sent_tokenize(data)
+    #remove last sentence in case not finish
     if len(sent) > 1:
         sent.pop()
     cut = TreebankWordDetokenizer().detokenize(sent)
 
+    #remove punctuations strange characters...
     punct = """()-[]{};:'"\<>/@#$%^&*_~"""
-
     stripped = ''
     for char in cut:
         if char not in punct:
