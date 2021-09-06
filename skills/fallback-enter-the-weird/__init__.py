@@ -5,14 +5,12 @@
 ######Description############
 
 #--- NOW
-#TODO: Clean this skill, as it is an old skill
-# TODO: question Query TimeOut
-# TODO: Too human filter
-# TODO: Test with different versions homemade gpt2
-# TODO: Use PERSONNA !
+# TODO: ENTER THE WEIRD Too human filter
+# TODO: ENTER THE WEIRD: Test with different versions homemade gpt2
+# TODO: ENTER THE WEIRD: Use PERSONNA !
 
-#--- LATER
-#TODO: Use differentr seeds ?
+#--- SOON
+#TODO: ENTER THE WEIRD: Use differentr seeds ?
 
 
 # =============================================
@@ -36,7 +34,7 @@ import pathlib
 # from nltk.corpus import wordnet
 # from nltk.stem.wordnet import WordNetLemmatizer
 # lemmatizer = WordNetLemmatizer()
-#TOKENIZERS_PARALLELISM=False #TODO Check tokenizer parallelism hugging face. May need this.?
+#TOKENIZERS_PARALLELISM=False #NOTE Check tokenizer parallelism hugging face. May need this.?
 
 # --------------PARAMETERS to TUNE---------------------
 MAX_LENGTH = 150
@@ -100,7 +98,7 @@ class MLdriftFallback(FallbackSkill):
         # self.pickMoodySeed()
         # blabla=blabla+ " " + self.moodySeed
 
-        seed="" #TODO: May want to change context
+        seed="" 
         context = utterance + seed
 
         self.log.info("=======================================================")
@@ -120,7 +118,6 @@ class MLdriftFallback(FallbackSkill):
         self.log.info("=======================================================") 
 
         #step 3--- Check if too Human, if so regenerate
-        #TODO: too_human filter
         if too_human:
             self.log.info("=======================================================")
             self.log.info("Step 3 bis--gpt2 re generation as first one was too human....")
@@ -132,7 +129,7 @@ class MLdriftFallback(FallbackSkill):
             self.log.info("=======================================================") 
         
         #step 5--- Filter the Drift i?
-        # #TODO: Filter // Clean
+        # #TODO: Filter // Clean ?
         filtered_drift=drift
 
         #step 6 --- Say the drift out loud

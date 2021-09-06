@@ -13,12 +13,10 @@ Keep running in loop in background
 # TODO
 # =============================================================================
 # NOW 
-# TODO: Informatipn about other node  LIVE or NOT LIVE ? GOOGÖE?>>>>>
-# TODO: More things that trigger spontaneously like tgis.
-# TODO: Share folder collective memory: dropbox ?
+# TODO: More things that trigger spontaneously like tgis. or Trigger when mycroft recognize a sound lound enough? or what?
 
-# LATER
-# TODO: Trigger when mycroft recognize a sound lound enough? or what?
+# SOON
+# TODO: Informatipn about other node  LIVE or NOT LIVE ? GOOGÖE?>>>>>
 
 
 # =============================================================================

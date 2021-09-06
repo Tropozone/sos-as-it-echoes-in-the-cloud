@@ -35,44 +35,66 @@ from datetime import datetime
 from datetime import timedelta
 
 
-from .utils import load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, clean_text
+from .utils import load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, clean_text
 
-# --------PARAMETERS TO TUNE-----------------------
-WAITING_TIME=5 #waiting time in seconds where will wait for human...
+
+
+# ============================================
+# ------------------TODO-----------------------
+# =============================================
+
+#--- CHECKS//TUNES
+# TODO: Hello Socket : Object//Events
+# TODO: ENTER THE WEIRD: Tune ML Param
+#TODO: What if we bucket:
+
+#--SOON:
+#TODO: Hello Socket: Recording Time ? Fix or ? Can make longer and cut sound?
+# TODO: Hello Socket : Replace in EventsLocation and Temporalities and objects to fit Expo in Public space
+# TODO: ENTER THE WEIRD Too human filter
+# TODO: ENTER THE WEIRD: Test with different versions homemade gpt2
+# TODO: ENTER THE WEIRD: Use PERSONNA !
+# TODO: ENTER THE WEIRD: Manipulation audio
+# TODO: Elsewhere Tunes: SHARE MORE ABOUT NODES?
+
+#--- LATER
+#TODO: ENTER THE WEIRD: Use differentr seeds ?
+# TODO: Hello SOcket Event asking for successive interaction as conversation
+
+# --------------PARAMETERS to TUNE---------------------
+
+#FOR HELLO SOCKET
+WAITING_TIME=5 
+
+#FOR WHAT IF WE BUCKET:
+MAX_LENGTH = 80
+TEMPERATURE = 0.8
+REPETITION_PENALTY = 1.4
+
+#FOR ENTER THE WEIRD:
+MAX_LENGTH_WEIRD = 100
+VARIANCE_LENGTH_WEIRD = 20
+TEMPERATURE_WEIRD = 0.8
+VARIANCE_TEMPERATURE_WEIRD = 0.4
+REPETITION_PENALTY_WEIRD = 1.4
+NUM_DRIFTS_WEIRD=1
+
+#for Recording (hello socket and elsewhere tunes)
+DEFAULT_RECORDING_TIME=10 
+MAX_RECORDING_TIME=60
 
 # -------------OTHER PARAMETERS----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
-
-# --------------PARAMETERS to TUNE---------------------
-#FOR ML GENERATION
-MAX_LENGTH = 80
-TEMPERATURE = 0.8
-REPETITION_PENALTY = 1.4
-
-# --------------PARAMETERS ---------------------
+# --FOR ML MODEL
 my_ML_model = False  # If do have a fine-tuned model, set to True
 my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
 
 
-#TODO: OTHER PARAM FOR ENTER THE WEIRD...
-MAX_LENGTH_WEIRD = 100
-VARIANCE_LENGTH_WEIRD = 20
-TEMPERATURE_WEIRD = 0.8
-REPETITION_PENALTY_WEIRD = 1.4
-NUM_DRIFTS=1
-
-
-#memory_folder=os.path.dirname(os.path.realpath(__file__)) +"/memory/"
-
-#-----------  PARAMETERS to TUNE ---------
-DEFAULT_RECORDING_TIME=10 #TODO: PUT MORE AND HOW CUT FILE THEN IF LONGER ?
-MAX_RECORDING_TIME=60
-
-#----------- OTHER PARAMETERS --------
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#TODO: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#NOTE: REPLACE IF ON A SERVER
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
+
 
 
 # =============================================
@@ -86,7 +108,6 @@ class MergeFallback(FallbackSkill):
         self.log.info("*****INIT FALLBACK MERGE ****")
         #Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the ")
         self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
-        #TODO: ADD elsewhere tunes...
 
         self.init_hello_socket()
         self.init_what_if_we_bucket()
@@ -99,9 +120,17 @@ class MergeFallback(FallbackSkill):
         self.start_time = 0
         self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
 
+        self.load_messages()
     
+    def load_messages(self):
+        # load message
+        path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
+        self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
+        self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
+        
 
     def init_recording_settings(self):
+
         # min free diskspace (MB)
         self.log.info("Init Recording Settings - in fallback-merge")
         self.settings.setdefault("min_free_disk", 100)
@@ -145,7 +174,6 @@ class MergeFallback(FallbackSkill):
         
     def init_enter_the_weird(self):
         self.log.info("Init Enter the Void - in fallback-merge")
-        #TODO: DIFFERENT VALUES
         # min free diskspace (MB)
         self.settings.setdefault("repetition_penalty_weird", REPETITION_PENALTY_WEIRD)  
         self.settings.setdefault("temperature_weird", TEMPERATURE_WEIRD)  # recording channels (1 = mono)
@@ -270,14 +298,12 @@ class MergeFallback(FallbackSkill):
                 #                                name='RecordingFeedback')
             else:
                 self.speak_dialog("audio.record.disk.full")
-            time.sleep(recording_time)#TODO: NEEDED? 
-            self.log.info("***RECORDING ENDED***")      
-            self.speak("Thanks for sharing it with the Collective.") #TODO: Replace by messages
+            time.sleep(recording_time) #NOTE: NEEDED? 
+            self.log.info("***RECORDING ENDED***")
+            text=random.choice(self.MSG_END)
+            self.speak(text)
     
-        else:
-            self.log.info("******Interaction Ended******")
         
-
 
     def what_if(self, message):
         """
@@ -335,19 +361,19 @@ class MergeFallback(FallbackSkill):
         self.log.info("=======================================================")
         self.log.info("Step 2--gpt2 generation....")
         encoded_context= self.tokenizer.encode(context, return_tensors = "pt")
-        max_length= self.settings["max_length"]+random.randint(-self.settings["variance_length"], self.settings["variance_length"])
-        generated = self.model.generate(encoded_context, max_length = max_length , temperature= self.settings["temperature"], repetition_penalty = self.settings["repetition_penalty"], do_sample=True, top_k=10)
+        max_length_weird= self.settings["max_length_weird"]+random.randint(-self.settings["variance_length_weird"], self.settings["variance_length_weird"])
+        temperature_weird=self.settings["temperature_weird"]+self.settings["variance_temperature_weird"]* (2*random.random()-1)
+        generated = self.model.generate(encoded_context, max_length = max_length_weird , temperature= temperature_weird, repetition_penalty = self.settings["repetition_penalty_weird"], do_sample=True, top_k=10)
         self.log.info("Step 3--gpt2 generation....")
         drift = self.tokenizer.decode(generated.tolist()[0])
         self.log.info("gpt2 Response: "+ drift)
         self.log.info("=======================================================") 
 
         #step 3--- Check if too Human, if so regenerate
-        #TODO: too_human filter
         if too_human:
             self.log.info("=======================================================")
             self.log.info("Step 3 bis--gpt2 re generation as first one was too human....")
-            generated = self.model.generate(encoded_context, max_length = max_length ,temperature= self.settings["temperature"], repetition_penalty = self.settings["repetition_penalty"], do_sample=True, top_k=10)
+            generated = self.model.generate(encoded_context, max_length = max_length_weird ,temperature= temperature_weird, repetition_penalty = self.settings["repetition_penalty_weird"], do_sample=True, top_k=10)
             drift = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
             #replace what human said if still there:
             drift = drift.replace(str(utterance), "", 1)
@@ -388,8 +414,8 @@ class MergeFallback(FallbackSkill):
         # # step 2: wait, in case skill triggered
         # sleep(15)
         
-        # step 3: catch attention
-        message="Listen."#TODO: Shall add a message for transition?
+        # step 3: catch attention ?
+        message="Listen"#TODO: Shall keep it or nor?
         self.log.info(message)
         self.speak(message)
 
