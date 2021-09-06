@@ -1,6 +1,5 @@
 ########################  ABOUT THIS SKILL
 
-
 # =============================================
 # --------------TODO---------------
 # ======================================
@@ -9,7 +8,7 @@
 # TODO: Messages, and Ending.
 
 #--- SOON:
-# TODO: CAN RECORD until silence ? Or put max time and cut silence?
+# TODO: CAN RECORD until silence ? Or put max time and cut silence? But beware as here may record sounds...
 # TODO: Sound EFfects on playback?
 
 #--- LATER
