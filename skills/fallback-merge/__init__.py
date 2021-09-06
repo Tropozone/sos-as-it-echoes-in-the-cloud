@@ -57,8 +57,9 @@ from .utils import load_data_txt, load_makingkin, load_objects, read_event, extr
 # TODO: ENTER THE WEIRD: Manipulation audio
 # TODO: Elsewhere Tunes: SHARE MORE ABOUT NODES?
 
+
 #--- LATER
-#TODO: ENTER THE WEIRD: Use differentr seeds ?
+# TODO: ENTER THE WEIRD: Use differentr seeds ?
 # TODO: Hello SOcket Event asking for successive interaction as conversation
 
 # --------------PARAMETERS to TUNE---------------------
@@ -349,7 +350,7 @@ class MergeFallback(FallbackSkill):
         # self.pickMoodySeed()
         # blabla=blabla+ " " + self.moodySeed
 
-        seed="" #TODO: May want to change context
+        seed="" 
         context = utterance + seed
 
         self.log.info("=======================================================")
