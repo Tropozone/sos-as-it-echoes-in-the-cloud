@@ -51,6 +51,9 @@ def read_event(event_score, agent, dico):
     event=""
     for line in event_lines:
         neue_line=""
+        #in case there is a // in the line: choose one of them
+        possible=line.split("//")
+        line=random.choice(possible)
         line=line.replace("  ", " ")#in case double space by accident.
         line=line.replace("xxx", agent)
         units=line.split(" ")#split into units
@@ -61,7 +64,6 @@ def read_event(event_score, agent, dico):
         neue_line=neue_line.replace(" ,", ",")
         neue_line=gingerParser.parse(neue_line)['result']  #grammar check
         event+=neue_line+"\n"
-    #TODO: more variation, generations...
     return event
 
 def readUnit(unit, dico):
@@ -69,6 +71,9 @@ def readUnit(unit, dico):
         neue=random.choice(dico[unit])#choose one randomly
     elif unit=="Vg" or unit=="Vtg":
         neue=random.choice(dico[unit.replace("g", "")])
+    elif "/" in unit:
+        possible=unit.split("/")
+        neue=readUnit(random.choice(possible), dico)
     else:
         neue=unit
     return neue

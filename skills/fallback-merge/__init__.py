@@ -46,6 +46,7 @@ WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "
 
 
 # --------------PARAMETERS to TUNE---------------------
+#FOR ML GENERATION
 MAX_LENGTH = 80
 TEMPERATURE = 0.8
 REPETITION_PENALTY = 1.4
@@ -56,10 +57,10 @@ my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallba
 
 
 #TODO: OTHER PARAM FOR ENTER THE WEIRD...
-MAX_LENGTH = 100
-VARIANCE_LENGTH = 20
-TEMPERATURE = 0.8
-REPETITION_PENALTY = 1.4
+MAX_LENGTH_WEIRD = 100
+VARIANCE_LENGTH_WEIRD = 20
+TEMPERATURE_WEIRD = 0.8
+REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS=1
 
 
@@ -146,11 +147,12 @@ class MergeFallback(FallbackSkill):
         self.log.info("Init Enter the Void - in fallback-merge")
         #TODO: DIFFERENT VALUES
         # min free diskspace (MB)
-        self.settings.setdefault("repetition_penalty", REPETITION_PENALTY)  
-        self.settings.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
-        self.settings.setdefault("max_length", MAX_LENGTH)
-        self.settings.setdefault("variance_length", VARIANCE_LENGTH)
-        self.settings.setdefault("num_drifts", NUM_DRIFTS)
+        self.settings.setdefault("repetition_penalty_weird", REPETITION_PENALTY_WEIRD)  
+        self.settings.setdefault("temperature_weird", TEMPERATURE_WEIRD)  # recording channels (1 = mono)
+        self.settings.setdefault("max_length_weird", MAX_LENGTH_WEIRD)
+        self.settings.setdefault("variance_length_weird", VARIANCE_LENGTH_WEIRD)
+        self.settings.setdefault("variance_temperature_weird", VARIANCE_TEMPERATURE_WEIRD)
+        self.settings.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
 
         
     def init_elsewhere_tunes(self):

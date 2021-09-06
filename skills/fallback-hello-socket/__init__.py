@@ -10,18 +10,16 @@
 # ------------------TODO-----------------------
 # =============================================
 
-#--- NOW
-# TODO: RECORD for some events
-# TODO: What trigger it ? Spontaneously when movement or sound detected ? "hey, come here..."
-# TODO: Replace Location and Temporalities and objects to fit Expo in Public space
-# TODO: use regex for reading text file ? ore 
-#https://github.com/galaxykate/tracery
-#https://github.com/aparrish/pytracery
+#--- CHECKS//TUNES
+# TODO: Replace in EventsLocation and Temporalities and objects to fit Expo in Public space
+# TODO: Object//Events
+
+#--SOON:
+#TODO: Recording Time ? Fix or ?
+
 
 #--- LATER
 # TODO: Event asking for successive interaction as conversation
-# TODO: More objects?
-# TODO: More events
 
 # =============================================
 # --------------INITIALIZATION---------------
@@ -55,11 +53,11 @@ WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "
 
 
 #-----------  PARAMETERS to TUNE ---------
-DEFAULT_RECORDING_TIME=10 #TODO: PUT MORE AND HOW CUT FILE THEN IF LONGER ?
+DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#TODO: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#NOTE: REPLACE IF ON A SERVER
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 
 
@@ -105,16 +103,13 @@ class HelloSocketFallback(FallbackSkill):
             to tell Mycroft how 'sensitively' this particular skill should be triggered.
             Lower number means higher priority, however number 1-4 are bypassing other skills.
         """
-        self.register_fallback(self.handle_make_kin, 6) #NOTE: change priority of other fallback when want to test so no conflict?
+        self.register_fallback(self.handle_make_kin, 6)
 
     def handle_make_kin(self, message):
         """
             Make Kin practices
         """
-     
-        #TODO: here would change so may be triggered by other sound
         utterance = message.data.get("utterance")
-
 
         self.log.info("=======================================================")
         self.log.info("step 1---Extract object ")
@@ -166,7 +161,7 @@ class HelloSocketFallback(FallbackSkill):
                 #                                name='RecordingFeedback')
             else:
                 self.speak_dialog("audio.record.disk.full")
-            time.sleep(recording_time)#TODO: NEEDED? 
+            time.sleep(recording_time)#NOTE: NEEDED? 
             self.log.info("***Recording Ended***")      
             self.speak("Thanks for sharing it with the Collective.") #TODO: Replace by messages
         
@@ -189,11 +184,11 @@ class HelloSocketFallback(FallbackSkill):
             recording_time = DEFAULT_RECORDING_TIME  # default recording duration
         #--- Recording id and path
         now = datetime.now()
-        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
+        recording_id = now.strftime("%H:%M:%S")
         recording_path=COLLECTIVE_MEMORY_FOLDER+recording_id+".wav" 
         self.log.info("Recording path:"+recording_path)
        
-        #---check if has free disk space# TODO: add free disk space later on
+        #---check if has free disk space
         has_free_disk_space=self.has_free_disk_space()
 
         recording_time=int(recording_time)
