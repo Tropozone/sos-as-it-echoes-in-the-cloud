@@ -3,6 +3,8 @@ import pathlib
 from gingerit.gingerit import GingerIt
 gingerParser = GingerIt()  # for grammar
 
+import nltk
+from nltk import sent_tokenize
 import re
 from string import punctuation
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
@@ -89,7 +91,20 @@ def readUnit(unit, dico):
 # --------------STRING PROCEDURES---------------
 # ------------------------------------
 
-def clean_text(question, generated):
+
+def ending_with_punct(data):
+    punct = [";", ":", "!", ".", "?"]
+    # Text Cleanup
+    sent = nltk.sent_tokenize(data)
+    #remove last sentence in case not finished
+    if len(sent) > 1:
+        if sent[-1][-1] not in punct:
+            sent.pop()
+    final=" ".join(sent)
+    return final
+
+
+def remove_context(question, generated):
     # remove the question text from the generated answer
     output = generated.replace(question, '')
     # remove incomplete sencentes at the end, if any.
@@ -125,10 +140,7 @@ def extract_keywords(input, keyworder):
 # ---------------------------------------------
 # --------------LOAD PROCEDURE ---------------
 # ------------------------------------
-def load_whatif():
-    path_folder=str(pathlib.Path(__file__).parent.absolute())
-    #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_txt("/whatif.txt", path_folder=path_folder)
+
 
 def load_data_txt(filename, path_folder="", mode="r"):
     """
@@ -138,4 +150,31 @@ def load_data_txt(filename, path_folder="", mode="r"):
         data = f.readlines()
     return data
     
+# ---------------------------------------------
+# --------------FILTER PROCEDURE ---------------
+# ------------------------------------
 
+
+def cool_judgement_what_if(seed, text):
+    
+    text
+    cool=False
+    #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..."
+    cool_test1=
+
+    #--2--- test if "he", "she", names, Dialogue
+    #TODO: more filtering
+
+    return cool
+
+def cool_judgement_enter_the_weird(seed, text):
+    
+    text
+    cool=False
+    #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..."
+    cool_test1=
+
+    #--2--- test if "he", "she", names, Dialogue
+    #TODO: more filtering
+
+    return cool

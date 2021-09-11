@@ -26,7 +26,7 @@ import time
 import re
 import os
 from os.path import exists
-#import spacy #Temporarily desactivate spacy
+import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4
 import torch
 import transformers 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -35,7 +35,10 @@ from datetime import datetime
 from datetime import timedelta
 
 
-from .utils import load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, clean_text
+# for grammar
+from gingerit.gingerit import GingerIt
+
+from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -44,23 +47,21 @@ from .utils import load_data_txt, load_makingkin, load_objects, read_event, extr
 # =============================================
 
 #--- CHECKS//TUNES
-# TODO: Hello Socket : Object//Events
-# TODO: ENTER THE WEIRD: Tune ML Param
-#TODO: What if we bucket:
+# TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, HomeMade gpt2
+# TODO: ENTER THE WEIRD: Test with different versions homemade gpt2
 
 #--SOON:
-#TODO: Hello Socket: Recording Time ? Fix or ? Can make longer and cut sound?
+# TODO: Hello Socket : Object//Events
+# TODO: Tune Grammar & Filters for skills
+# TODO: Hello Socket: Recording Time ? Fix or ? Can make longer and cut sound?
 # TODO: Hello Socket : Replace in EventsLocation and Temporalities and objects to fit Expo in Public space
-# TODO: ENTER THE WEIRD Too human filter
-# TODO: ENTER THE WEIRD: Test with different versions homemade gpt2
-# TODO: ENTER THE WEIRD: Use PERSONNA !
+# TODO: Hello SOcket Event asking for successive interaction as conversation
+# TODO: ENTER THE WEIRD:  different seeds ?// Use PERSONNA gpt2! 
 # TODO: ENTER THE WEIRD: Manipulation audio
 # TODO: Elsewhere Tunes: SHARE MORE ABOUT NODES?
-
-
-#--- LATER
-# TODO: ENTER THE WEIRD: Use differentr seeds ?
-# TODO: Hello SOcket Event asking for successive interaction as conversation
+# TODO: What if: Structure of a fabulation instead, query only gpt2 for words?  or use generator without ML?
+# TODO: What if: More interaction with human? Ask its reaction, opintion ? and RECORD ?
+# TODO: What If: Rework a lot the counterfactuals, history, etc. Add some grammar etc
 
 # --------------PARAMETERS to TUNE---------------------
 
@@ -78,6 +79,7 @@ WAITING_TIME=5
 MAX_LENGTH = 80
 TEMPERATURE = 0.8
 REPETITION_PENALTY = 1.4
+TOP_K=4
 
 #FOR ENTER THE WEIRD:
 MAX_LENGTH_WEIRD = 100
@@ -86,6 +88,7 @@ TEMPERATURE_WEIRD = 0.8
 VARIANCE_TEMPERATURE_WEIRD = 0.4
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
+TOP_K_WEIRD=10
 
 #for Recording (hello socket and elsewhere tunes)
 DEFAULT_RECORDING_TIME=10 
@@ -103,7 +106,7 @@ my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallba
 COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#NOTE: REPLACE IF ON A SERVER
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 
-
+SONOR=True #NOTE: For a text-based VA, put false !
 
 # =============================================
 # ------------------SKILL---------------
@@ -117,11 +120,15 @@ class MergeFallback(FallbackSkill):
         #Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the ")
         self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
         self.NUM_SUBSKILLS=len(self.SUBSKILLS)
+        self.settings_what_if=dict()
+        self.settings_enter_the_weird=dict()
         self.init_hello_socket()
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
         self.init_elsewhere_tunes()
         self.init_recording_settings()
+
+        self.gingerParser = GingerIt()
 
         #FOR RECORDINGS
         self.record_process = None
@@ -133,8 +140,9 @@ class MergeFallback(FallbackSkill):
     def load_messages(self):
         # load message
         path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
+        self.MSG_TELL=load_data_txt("message_tell.txt", path_folder=path_folder)
         self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
-        self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
+        self.MSG_THANKS=load_data_txt("message_thanks.txt", path_folder=path_folder)
         
 
     def init_recording_settings(self):
@@ -171,24 +179,28 @@ class MergeFallback(FallbackSkill):
         # Initialise a tokenizer
         self.tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
         # initialise keyworder
-        # self.keyworder = spacy.load("en_core_web_sm") #temporarily desactivated
+        self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
         # load
-        self.whatif = load_whatif()
-
-        self.settings.setdefault("repetition_penalty", REPETITION_PENALTY)  
-        self.settings.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
-        self.settings.setdefault("max_length", MAX_LENGTH)
+        path_folder=str(pathlib.Path(__file__).parent.absolute())
+        self.whatif = load_data_txt("/whatif.txt", path_folder=path_folder)
+        self.whatif_nokey = load_data_txt("/whatif_nokey.txt", path_folder=path_folder)
+        
+        self.settings_what_if.setdefault("repetition_penalty", REPETITION_PENALTY)  
+        self.settings_what_if.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
+        self.settings_what_if.setdefault("max_length", MAX_LENGTH)
+        self.settings_what_if.setdefault("top_k", TOP_K)
 
         
     def init_enter_the_weird(self):
         self.log.info("Init Enter the Void - in fallback-merge")
         # min free diskspace (MB)
-        self.settings.setdefault("repetition_penalty_weird", REPETITION_PENALTY_WEIRD)  
-        self.settings.setdefault("temperature_weird", TEMPERATURE_WEIRD)  # recording channels (1 = mono)
-        self.settings.setdefault("max_length_weird", MAX_LENGTH_WEIRD)
-        self.settings.setdefault("variance_length_weird", VARIANCE_LENGTH_WEIRD)
-        self.settings.setdefault("variance_temperature_weird", VARIANCE_TEMPERATURE_WEIRD)
-        self.settings.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
+        self.settings_enter_the_weird.setdefault("repetition_penalty", REPETITION_PENALTY_WEIRD)  
+        self.settings_enter_the_weird.setdefault("temperature", TEMPERATURE_WEIRD)  # recording channels (1 = mono)
+        self.settings_enter_the_weird.setdefault("max_length", MAX_LENGTH_WEIRD)
+        self.settings_enter_the_weird.setdefault("variance_length", VARIANCE_LENGTH_WEIRD)
+        self.settings_enter_the_weird.setdefault("variance_temperature", VARIANCE_TEMPERATURE_WEIRD)
+        self.settings_enter_the_weird.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
+        self.settings_enter_the_weird.setdefault("top_k", TOP_K_WEIRD)
 
         
     def init_elsewhere_tunes(self):
@@ -223,17 +235,22 @@ class MergeFallback(FallbackSkill):
 
 
         #------Rrerouting to skill
+        self.log.info("=======================================================")
         if rand==0:
             self.log.info("***Redirecting to Hello Socket***")
+            self.log.info("=======================================================")
             self.make_kin(message)
         elif rand==1:
             self.log.info("***Redirecting to What if We Bucket***")
+            self.log.info("=======================================================")
             self.what_if(message)
         elif rand==2:
             self.log.info("***Redirecting to Enter the Weird***")
+            self.log.info("=======================================================")
             self.enter_the_weird(message) 
         elif rand==3:
             self.log.info("***Redirecting to Elsewhere Tunes***")
+            self.log.info("=======================================================")
             self.elsewhere_tunes(message)
         else:
             raise NotImplementedError
@@ -245,36 +262,28 @@ class MergeFallback(FallbackSkill):
         return True
 
 
-
-
     def make_kin(self, message):
         """
             Make Kin practices
         """
-        utterance = message.data.get("utterance")
+        #utterance = message.data.get("utterance")
+        #TODO: Starting Message ?
 
-
-        self.log.info("=======================================================")
-        self.log.info("step 1---Extract object ")
-        self.log.info("=======================================================")
-        # step 1-- pick an object
+        self.log.info("step 1---Pick Object")
         agent= random.choice(self.objects).strip("\n")
-
-        self.log.info("=======================================================")
-        self.log.info("step 2---Created a Makin kin Event Score:")
-        self.log.info("=======================================================")
-        # step 2--- pick a seed from file and replace if xxx by keyword
+        
+        self.log.info("step 2---Create a Makin kin Event Score:")
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
-
+        
+        self.log.info("step 3---Share the Event")
         self.speak(event)
         self.log.info("Event: "+ "\n" + event)
         
-
         # step 3 -- If has asked the human to share something, then wait for answer and record...
         if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event) or ("Narrate me" in event):
             self.log.info("=======================================================")
-            self.log.info("step 3---Record what human share")
+            self.log.info("step 4---Record what human share")
             self.log.info("=======================================================")
 
             #--- Preliminary for recordings:
@@ -297,6 +306,7 @@ class MergeFallback(FallbackSkill):
                                                 int(recording_time),
                                                 self.settings["rate"],
                                                 self.settings["channels"])
+                #TODO: ERASE IF SILENCE?
                 self.enclosure.eyes_color(255, 0, 0)  # set color red #WHAT FOR ?
                 self.last_index = 24
                 #self.schedule_repeating_event(self.recording_feedback, None, 1,
@@ -305,56 +315,79 @@ class MergeFallback(FallbackSkill):
                 self.speak_dialog("audio.record.disk.full")
             time.sleep(recording_time) #NOTE: NEEDED? 
             self.log.info("***RECORDING ENDED***")
-            text=random.choice(self.MSG_END)
-            self.speak(text)
+            thanks=random.choice(self.MSG_THANKS)
+            self.speak(thanks)
+            
     
+       #TODO: Ending Message ? 
         
 
     def what_if(self, message):
         """
-            Several gpt-2 drifts from the last utterance, with a possible mode
+            What if Skill...
         """
         # step 0 --Obtain what the human said
         utterance = message.data.get("utterance")
 
          # step 1-- extract a keyword from what human said
-        # keyword= extract_keywords(utterance, self.keyworder) #TODO: Reenable this once spacy issue fine
-        keyword = "petrol"
+        keyword= extract_keywords(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 
         # step 2--- pick a seed from file and replace if xxx by keyword
-        seed = random.choice(self.whatif)
-        seed=seed.replace("xxx", keyword)#replace xxx (if exist w/ keyword)
-        encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
+        if keyword=="":
+            seed = random.choice(self.whatif_nokey)
+        else:
+            seed = random.choice(self.whatif)
+            seed=seed.replace("xxx", keyword)#replace xxx (if exist w/ keyword)
         self.log.info("step 2---Seed used"+seed)
         self.log.info("=======================================================")
 
-        # step 3--Generate machine learning text based on parameters
-        self.log.info("step 3---gpt2 generation...")
-        generated = self.model.generate(encoded_context, max_length = self.settings["max_length"], temperature=self.settings["temperature"], repetition_penalty = self.settings["repetition_penalty"], do_sample=True, top_k=20)
+        # step 3--Generate with gpt2 until okay
+        self.log.info("step 3---gpt2 generation until pass the filter")
+        cool=False
+        count=0
+
+        while ((not cool) and (count<10)): 
+            count+=1
+            raw_response = self.gpt2_generation(seed, self.settings_what_if)
+            #judge answer:
+            cool=cool_judgement_what_if(seed, raw_response)
+            if not cool:
+                self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
+               
+
+        # step 4 ---
+        self.log.info("step 4---final output")
+        #good ending for ...
+        response=ending_with_punct(raw_response)
+        #grammar check
+        response=self.gingerParser.parse(response)['result']
+        self.log.info("***COOL and filtered ***"+response)
+        self.speak(response)
+        self.log.info("=======================================================")
+        
+
+
+    def gpt2_generation(self, seed, settings):
+        #More parameters ? 
+        #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
+
+        encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
+        generated = self.model.generate(encoded_context, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
-        self.log.info(raw_response)
-        self.log.info("=======================================================")
-
-        # step 4 --- #TODO: Filter text cut ?
-        response=raw_response
-        self.speak(response)
-
-
+        return raw_response
 
     def one_drift(self, utterance):
         """
             One gpt-2 drift from the last blabla
         """
         too_human=False
-
         # step 1--- Choose the mode and possible seed and add it after the blabla
         # self.pickMoodySeed()
         # blabla=blabla+ " " + self.moodySeed
-
-        seed="" 
+        seed="" #NOTE: Could add a seed ?
         context = utterance + seed
 
         self.log.info("=======================================================")
@@ -364,33 +397,35 @@ class MergeFallback(FallbackSkill):
         
         #step 2--- ML Drift according to parameters
         self.log.info("=======================================================")
-        self.log.info("Step 2--gpt2 generation....")
-        encoded_context= self.tokenizer.encode(context, return_tensors = "pt")
-        max_length_weird= self.settings["max_length_weird"]+random.randint(-self.settings["variance_length_weird"], self.settings["variance_length_weird"])
-        temperature_weird=self.settings["temperature_weird"]+self.settings["variance_temperature_weird"]* (2*random.random()-1)
-        generated = self.model.generate(encoded_context, max_length = max_length_weird , temperature= temperature_weird, repetition_penalty = self.settings["repetition_penalty_weird"], do_sample=True, top_k=10)
-        self.log.info("Step 3--gpt2 generation....")
-        drift = self.tokenizer.decode(generated.tolist()[0])
-        self.log.info("gpt2 Response: "+ drift)
-        self.log.info("=======================================================") 
+        self.log.info("Step 2--gpt2 generation until pass filter")
+        current_settings=self.settings_enter_the_weird.copy()
+        current_settings["max_length"]+=random.randint(-current_settings["variance_length"], current_settings["variance_length"])
+        current_settings["temperature"]+=current_settings["variance_temperature"]* (2*random.random()-1)
 
-        #step 3--- Check if too Human, if so regenerate
-        if too_human:
-            self.log.info("=======================================================")
-            self.log.info("Step 3 bis--gpt2 re generation as first one was too human....")
-            generated = self.model.generate(encoded_context, max_length = max_length_weird ,temperature= temperature_weird, repetition_penalty = self.settings["repetition_penalty_weird"], do_sample=True, top_k=10)
-            drift = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
-            #replace what human said if still there:
-            drift = drift.replace(str(utterance), "", 1)
-            self.log.info("gpt2 Response: "+ drift)
-            self.log.info("=======================================================") 
+        cool=False
+        count=0
+
+        while ((not cool) and (count<10)): 
+            count+=1
+            #generate gpt2
+            raw_drift = self.gpt2_generation(context, current_settings)
+            #remove  human context 
+            raw_drift= raw_drift.replace(utterance, "", 1)
+            cool=cool_judgement_enter_the_weird(seed, raw_drift)
+            if not cool:
+                self.log.info("UNCOOL was filtered out,"+ raw_drift)
+
+        #TODO: Filter ot not?
+        #good ending with punctuation
+        drift=ending_with_punct(raw_drift)
+        #grammar check: Not for here ?
+        #drift=self.gingerParser.parse(drift)['result']
         
-        #step 5--- Filter the Drift i?
-        # #TODO: Filter // Clean
-        filtered_drift=drift
-
-        #step 6 --- Say the drift out loud
-        self.speak(filtered_drift)#
+        self.log.info("=======================================================") 
+        self.log.info("Step 3--Share the drift")
+        self.log.info("=======================================================") 
+        self.speak(drift)#
+        self.log.info("***COOL and filtered ***"+drift)
 
         return drift
     
@@ -415,12 +450,9 @@ class MergeFallback(FallbackSkill):
 
         # step 1: pick sound from collective memory
         sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER))
-
-        # # step 2: wait, in case skill triggered
-        # sleep(15)
         
-        # step 3: catch attention ?
-        message="Listen"#TODO: Shall keep it or nor?
+        # step 2: catch attention ?
+        message=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
         self.log.info(message)
         self.speak(message)
 
@@ -428,6 +460,7 @@ class MergeFallback(FallbackSkill):
         self.log.info("Playing one sound")
         self.audio_service.play(sound_path)
 
+        #TODO: Ask how make you feel?
 
 
     def has_free_disk_space(self):

@@ -2,12 +2,14 @@ socket
 chair
 pen
 monstera
-calathea
 wooden floor
 lightbulb
 keyboard
 aluminium foil
 spoon
+never-finished book
+beer opener
+cork
 carpet
 lava lamp
 coffee cup
@@ -15,11 +17,20 @@ tea bag
 bathroom moisture
 towel
 Cotton pad
+Ashtray
 soap
+tissue
+forgotten commodity
+dishwashing liquid
+sponge
 funnel
 windowsill
 candle
+Kettle
+Induction plate
 duvet
+door bell
+hole in the wall
 Bedsheet
 waterpipe
 door
@@ -31,7 +42,7 @@ door handle
 curtain
 coffee grinder
 tea pot
-ceramic plate
+dirty plate
 bathroom carpet
 USB key
 nail clipper
@@ -44,5 +55,7 @@ olive oil bottle
 onion
 coffee bean
 spiderweb
+Mustard pot
+Banana
 dust
 bucket
