@@ -155,8 +155,6 @@ def load_data_txt(filename, path_folder="", mode="r"):
 # ------------------------------------
 
 
-
-
 def cool_judgement_enter_the_weird(text, uncool_set):
     text_set=set(text.split()) #turn into set
     cool=True
@@ -170,3 +168,19 @@ def cool_judgement_enter_the_weird(text, uncool_set):
     #TODO: More filtering?
 
     return cool
+
+def cool_judgement_what_if(seed, text, uncool_set):
+    
+    #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..." or "\n"
+    stripped_text=text.replace(seed, "")
+    stripped_text=stripped_text.lstrip()#remove space beginning
+    BAD_TRANSITION=["\n", "...", ".", "?", ";", "!"]#TODO: CUrrently removing the \n too!
+    print("character look at:", stripped_text[0])
+    cool1=(not(stripped_text[0].isupper())) and (not stripped_text[0] in BAD_TRANSITION)
+
+    #--2--- test if "he", "she", names, Dialogue
+    cool2=cool_judgement_enter_the_weird(text, uncool_set)
+
+    #TODO: more filtering
+
+    return bool(cool1 and cool2)

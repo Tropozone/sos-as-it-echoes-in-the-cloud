@@ -47,8 +47,8 @@ from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_
 # =============================================
 
 #--- CHECKS//TUNES
-# TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, HomeMade gpt2
-# TODO: ENTER THE WEIRD: Test with different versions homemade gpt2
+# TODO: What if We Bucket: Tune ML Param. Too human filter, bad token, HomeMade gpt2
+# TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, bad token. HomeMade gpt2
 
 #--SOON:
 # TODO: Hello Socket : Object//Events
@@ -372,7 +372,7 @@ class MergeFallback(FallbackSkill):
             count+=1
             raw_response = self.gpt2_generation(seed, self.settings_what_if)
             #judge answer:
-            cool=cool_judgement_what_if(seed, raw_response)
+            cool=cool_judgement_what_if(seed, raw_response, self.BAD_TOKEN_SET)
             if not cool:
                 self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
                
