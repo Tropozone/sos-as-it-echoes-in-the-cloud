@@ -12,10 +12,10 @@
 # =============================================
 
 
-#--- Checks
+#--- Tune Soon
 # TODO: What happens at end: ask opinion ?
-# TODO: Triggers, Message Transition
-#TODO: Parameters Max/Min Length
+# TODO: Triggers, Message Transition & End
+# TODO: Parameters Max/Min Length, vary etc
 
 
 #--- LATER
@@ -28,8 +28,8 @@
 # ======================================
 
 # --------------PARAMETERS to tune----------------------
-MAX_LENGTH=1000
-MIN_LENGTH=100
+MAX_LENGTH=600
+MIN_LENGTH=160
 
 # --------------IMPORTS----------------------
 
@@ -80,6 +80,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         # load message
         path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
         self.MSG_WONDER=load_data_txt("message_wonder.txt", path_folder=path_folder)
+        self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
         
         # ####LOAD CONFIG PARAMETERS: only if use alternative method to scrap url but need api keys in config file
         # config = ConfigParser()
@@ -141,7 +142,16 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("=======================================================")
         #- 5--- share online extract 
         self.speak(final_extract)
-        self.log.info("Extract of what found online:"+ final_extract)        
+        self.log.info("Extract of what found online:"+ final_extract)  
+
+        self.log.info("=======================================================")
+        self.log.info("==========step 6: Ending note =======")
+        self.log.info("=======================================================")
+        #- 5--- share online extract 
+        text_end=random.choice(self.MSG_END)
+        self.speak(text_end)
+        self.log.info(text_end)
+        
 
 ######*****************************************************************************************
 ######*********************** SCRAPING PROCEDURES ***********************************************

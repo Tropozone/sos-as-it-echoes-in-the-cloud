@@ -225,25 +225,16 @@ class MergeFallback(FallbackSkill):
         #------Rrerouting to skill
         if rand==0:
             self.log.info("***Redirecting to Hello Socket***")
-            #"Hello Socket"
             self.make_kin(message)
-
         elif rand==1:
             self.log.info("***Redirecting to What if We Bucket***")
-            #"What if we bucket"
             self.what_if(message)
-
         elif rand==2:
             self.log.info("***Redirecting to Enter the Weird***")
-            #"Enter the Weird
-            self.enter_the_weird(message)
-
-            
+            self.enter_the_weird(message) 
         elif rand==3:
             self.log.info("***Redirecting to Elsewhere Tunes***")
-            #Elsewhere Tunes
             self.elsewhere_tunes(message)
-        
         else:
             raise NotImplementedError
 
