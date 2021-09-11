@@ -62,6 +62,8 @@ from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_
 # TODO: What if: Structure of a fabulation instead, query only gpt2 for words?  or use generator without ML?
 # TODO: What if: More interaction with human? Ask its reaction, opintion ? and RECORD ?
 # TODO: What If: Rework a lot the counterfactuals, history, etc. Add some grammar etc
+# TODO: Record sometimes part of text human say answer and add it to memory...
+
 
 # --------------PARAMETERS to TUNE---------------------
 
@@ -447,32 +449,48 @@ class MergeFallback(FallbackSkill):
             blabla+=bla
 
     def elsewhere_tunes(self, message):
-    
-        if self.sonor:
-            # step 1: catch attention ? or just as a burp
-            message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
-            self.log.info(message_listen)
-            self.speak(message_listen)
-
-            # step 2: pick sound from collective memory
-            sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
-
-            # step 3: playback the sound
-            self.log.info("Playing one sound...")
-            self.audio_service.play(sound_path)
-        else:
-            #pick random text file from the memory
-            text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
-
-            # step 3: say the text
-            with open(text_path, 'r') as f:
-                lines = f.readlines()
-            memory=" ".join(lines)
-            self.log.info(memory)
-            self.speak(memory)
         
+        rand=random.uniform(0, 1)
+        
+        #Even if sonor, small likelihood say text memory currently...
+
+        if self.sonor and rand<0.8:
+            self.sonor_tunes(message)
+        else:
+            self.text_tunes(message) 
+            #TODO: indicative to say it it not him?
         
         #TODO: ENDING ? Ask how make you feel?
+        #TODO: It can loop back into it and try to answer this memory
+        
+
+
+    def sonor_tunes(self, message):
+    
+        # step 1: catch attention ? or just as a burp
+        message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
+        self.log.info(message_listen)
+        self.speak(message_listen)
+
+        # step 2: pick sound from collective memory
+        sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
+
+        # step 3: playback the sound
+        self.log.info("Playing one sound...")
+        self.audio_service.play(sound_path)
+
+    def text_tunes(self, message):
+
+        #pick random text file from the memory
+        text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
+
+        # step 3: say the text
+        with open(text_path, 'r') as f:
+            lines = f.readlines()
+        memory=" ".join(lines)
+        self.log.info(memory)
+        self.speak(memory)
+
 
 
     def has_free_disk_space(self):
