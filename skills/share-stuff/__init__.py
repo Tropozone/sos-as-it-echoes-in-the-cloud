@@ -50,7 +50,7 @@ DEFAULT_RECORDING_TIME=10
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory" #NOTE: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/" #NOTE: REPLACE IF ON A SERVER
 #.mycroft/skills/Collective Memory Skill/"
 
 
@@ -181,7 +181,7 @@ class ShareStuffSkill(MycroftSkill):
         #--- Recording id and path
         now = datetime.now()
         recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
-        recording_path=COLLECTIVE_MEMORY_FOLDER+recording_id+".wav" 
+        recording_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+recording_id+".wav" 
         self.log.info("Recording path:"+recording_path)
        
         #---check if has free disk space# TODO: add free disk space later on

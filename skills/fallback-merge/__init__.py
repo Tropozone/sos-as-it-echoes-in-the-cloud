@@ -447,22 +447,29 @@ class MergeFallback(FallbackSkill):
             blabla+=bla
 
     def elsewhere_tunes(self, message):
-        
     
         if self.sonor:
             # step 1: catch attention ? or just as a burp
-            message=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
-            self.log.info(message)
-            self.speak(message)
+            message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
+            self.log.info(message_listen)
+            self.speak(message_listen)
 
             # step 2: pick sound from collective memory
-            sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER))
+            sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
 
             # step 3: playback the sound
-            self.log.info("Playing one sound")
+            self.log.info("Playing one sound...")
             self.audio_service.play(sound_path)
         else:
-            #pick a message from the text memory
+            #pick random text file from the memory
+            text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
+
+            # step 3: say the text
+            with open(text_path, 'r') as f:
+                lines = f.readlines()
+            memory=" ".join(lines)
+            self.log.info(memory)
+            self.speak(memory)
         
         
         #TODO: ENDING ? Ask how make you feel?
