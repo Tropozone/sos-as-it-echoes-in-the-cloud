@@ -103,7 +103,7 @@ my_ML_model = False  # If do have a fine-tuned model, set to True
 my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
 
 
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#NOTE: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#NOTE: Match path with where collective memory resides...
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 
 SONOR=True #NOTE: For a text-based VA, put false !
@@ -122,20 +122,20 @@ class MergeFallback(FallbackSkill):
         self.NUM_SUBSKILLS=len(self.SUBSKILLS)
         self.settings_what_if=dict()
         self.settings_enter_the_weird=dict()
+        self.gingerParser = GingerIt()    
+        self.load_messages()
         self.init_hello_socket()
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
         self.init_elsewhere_tunes()
-        self.init_recording_settings()
+        self.sonor=SONOR
+        if self.sonor:#only if sound on:
+            self.init_recording_settings()
+            self.record_process = None
+            self.start_time = 0
+            self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
 
-        self.gingerParser = GingerIt()
-
-        #FOR RECORDINGS
-        self.record_process = None
-        self.start_time = 0
-        self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
-
-        self.load_messages()
+        
     
     def load_messages(self):
         # load message
@@ -281,42 +281,43 @@ class MergeFallback(FallbackSkill):
         self.log.info("Event: "+ "\n" + event)
         
         # step 3 -- If has asked the human to share something, then wait for answer and record...
-        if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event) or ("Narrate me" in event):
-            self.log.info("=======================================================")
-            self.log.info("step 4---Record what human share")
-            self.log.info("=======================================================")
+        if self.sonor: 
+            if ("tell me" in event) or ("Tell me" in event) or ("Share your thoughts with me." in event) or ("Narrate me" in event):
+                self.log.info("=======================================================")
+                self.log.info("step 4---Record what human share")
+                self.log.info("=======================================================")
 
-            #--- Preliminary for recordings:
-            recording_time, recording_id, recording_path, has_free_disk_space=self.recording_preliminary()
+                #--- Preliminary for recordings:
+                recording_time, recording_id, recording_path, has_free_disk_space=self.recording_preliminary()
 
-            if ("Narrate me" in event):
-                #record after a lil pause to let person to think
-                self.log.info("About to record Human Answer in 5 seconds")
-                time.sleep(WAITING_TIME)
-                self.speak("Please share it with me now.")
-                self.log.info("Please share it with me now.")
+                if ("Narrate me" in event):
+                    #record after a lil pause to let person to think
+                    self.log.info("About to record Human Answer in 5 seconds")
+                    time.sleep(WAITING_TIME)
+                    self.speak("Please share it with me now.")
+                    self.log.info("Please share it with me now.")
+                
+                wait_while_speaking()
             
-            wait_while_speaking()
-        
-            if has_free_disk_space:
-                self.log.info("***Start Recording Human NOW ***")
-                # Initiate recording
-                self.start_time = now_local()   # recalc after speaking completes
-                self.record_process = record(recording_path,
-                                                int(recording_time),
-                                                self.settings["rate"],
-                                                self.settings["channels"])
-                #TODO: ERASE IF SILENCE?
-                self.enclosure.eyes_color(255, 0, 0)  # set color red #WHAT FOR ?
-                self.last_index = 24
-                #self.schedule_repeating_event(self.recording_feedback, None, 1,
-                #                                name='RecordingFeedback')
-            else:
-                self.speak_dialog("audio.record.disk.full")
-            time.sleep(recording_time) #NOTE: NEEDED? 
-            self.log.info("***RECORDING ENDED***")
-            thanks=random.choice(self.MSG_THANKS)
-            self.speak(thanks)
+                if has_free_disk_space:
+                    self.log.info("***Start Recording Human NOW ***")
+                    # Initiate recording
+                    self.start_time = now_local()   # recalc after speaking completes
+                    self.record_process = record(recording_path,
+                                                    int(recording_time),
+                                                    self.settings["rate"],
+                                                    self.settings["channels"])
+                    #TODO: ERASE IF SILENCE?
+                    self.enclosure.eyes_color(255, 0, 0)  # set color red #WHAT FOR ?
+                    self.last_index = 24
+                    #self.schedule_repeating_event(self.recording_feedback, None, 1,
+                    #                                name='RecordingFeedback')
+                else:
+                    self.speak_dialog("audio.record.disk.full")
+                time.sleep(recording_time) #NOTE: NEEDED? 
+                self.log.info("***RECORDING ENDED***")
+                thanks=random.choice(self.MSG_THANKS)
+                self.speak(thanks)
             
     
        #TODO: Ending Message ? 
@@ -446,21 +447,25 @@ class MergeFallback(FallbackSkill):
             blabla+=bla
 
     def elsewhere_tunes(self, message):
-
-
-        # step 1: pick sound from collective memory
-        sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER))
         
-        # step 2: catch attention ?
-        message=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
-        self.log.info(message)
-        self.speak(message)
+    
+        if self.sonor:
+            # step 1: catch attention ? or just as a burp
+            message=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
+            self.log.info(message)
+            self.speak(message)
 
-        # step 4: playback the sound
-        self.log.info("Playing one sound")
-        self.audio_service.play(sound_path)
+            # step 2: pick sound from collective memory
+            sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER))
 
-        #TODO: Ask how make you feel?
+            # step 3: playback the sound
+            self.log.info("Playing one sound")
+            self.audio_service.play(sound_path)
+        else:
+            #pick a message from the text memory
+        
+        
+        #TODO: ENDING ? Ask how make you feel?
 
 
     def has_free_disk_space(self):

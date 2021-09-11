@@ -1,7 +1,0 @@
-
-
-
-Try to trigger it for instance with:
-I would like to share something with you.
-Or anything which match the vocab/share.intent file of the skill
-
