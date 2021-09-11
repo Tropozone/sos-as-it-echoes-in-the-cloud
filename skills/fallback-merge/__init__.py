@@ -65,6 +65,9 @@ from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_
 # TODO: Record sometimes part of text human say answer and add it to memory...
 # TODO: But maybe etc...
 # TODO: Harmonize sound back level
+# TODO: Random eraser in memory, when above number. Older more likely get erased...
+
+
 
 # --------------PARAMETERS to TUNE---------------------
 
