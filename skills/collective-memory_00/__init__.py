@@ -8,7 +8,7 @@
 # ======================================
 
 #--- NOW
-# TODO: Test it
+# TODO: Record until silence ?
 
 #--- LATER
 # TODO: Other functionality? Play back?
@@ -67,6 +67,10 @@ class CollectiveMemorySkill(MycroftSkill):
         self.record_process = None
         self.start_time = 0
         self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
+
+        path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
+        self.MSG_WONDER=load_data_txt("message_wonder.txt", path_folder=path_folder)
+        self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
 
         self.init_settings()
 
@@ -130,7 +134,7 @@ class CollectiveMemorySkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("==========step 1: Start Recording=======")
         self.log.info("=======================================================")
-        self.speak("Tell me, we are curious about it.") #TODO: Replace by messages ? We or they ?
+        self.speak("Tell me, we are curious about it.")
         wait_while_speaking()
 
         if has_free_disk_space:
@@ -162,7 +166,7 @@ class CollectiveMemorySkill(MycroftSkill):
         self.log.info("==========step 2: End Recording=======")
         self.log.info("=======================================================")
       
-        self.speak("Thanks for sharing it to the Collective Memory.") #TODO: Replace by messages
+        self.speak("Thanks for sharing it to the Collective Memory.") 
        
 
     def has_free_disk_space(self):

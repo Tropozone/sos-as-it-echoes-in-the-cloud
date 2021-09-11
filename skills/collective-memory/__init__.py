@@ -4,15 +4,13 @@
 # --------------TODO---------------
 # ======================================
 
-#--- Checks // Tunes
+#--- Tunes
 # TODO: Messages, and Ending.
 
 #--- SOON:
 # TODO: CAN RECORD until silence ? Or put max time and cut silence? But beware as here may record sounds...
 # TODO: Sound EFfects on playback?
-
-#--- LATER
-#TODO: CHECK FURTHER if memory disk full etc
+# TODO: CHECK FURTHER if memory disk full etc
 #https://github.com/MycroftAI/skill-audio-record/blob/21.02/__init__.py
 
 
