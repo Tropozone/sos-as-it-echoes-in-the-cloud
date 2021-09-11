@@ -66,7 +66,7 @@ from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_
 # TODO: But maybe etc...
 # TODO: Harmonize sound back level
 # TODO: Random eraser in memory, when above number. Older more likely get erased...
-
+# TODO: How things are trigered
 
 
 # --------------PARAMETERS to TUNE---------------------
@@ -95,6 +95,10 @@ VARIANCE_TEMPERATURE_WEIRD = 0.4
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=10
+
+# FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
+#TODO Experiment with more filters, different for the generation and the post processing
+BAD_TOKEN=["he", "she", "I", "He", "She", "her", "his", "\"","\'", "Obama", "http"]
 
 #for Recording (hello socket and elsewhere tunes)
 DEFAULT_RECORDING_TIME=10 
@@ -141,6 +145,9 @@ class MergeFallback(FallbackSkill):
             self.start_time = 0
             self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
 
+        #
+        self.BAD_TOKEN_SET=set(BAD_TOKEN)
+        self.BAD_TOKEN_ids=self.get_bad_words_ids(BAD_TOKEN)
         
     
     def load_messages(self):
@@ -196,8 +203,14 @@ class MergeFallback(FallbackSkill):
         self.settings_what_if.setdefault("max_length", MAX_LENGTH)
         self.settings_what_if.setdefault("top_k", TOP_K)
 
-        
+    def get_bad_words_ids(self, words):
+        bad_ids=[]
+        for word in words:
+            bad_ids.append(self.tokenizer(word, add_prefix_space=True).input_ids)
+        return bad_ids
+
     def init_enter_the_weird(self):
+
         self.log.info("Init Enter the Void - in fallback-merge")
         # min free diskspace (MB)
         self.settings_enter_the_weird.setdefault("repetition_penalty", REPETITION_PENALTY_WEIRD)  
@@ -381,7 +394,8 @@ class MergeFallback(FallbackSkill):
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
 
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
-        generated = self.model.generate(encoded_context, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+        #TODO: Bad Token id for generation. Works ? but quotes too?
+        generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
         return raw_response
@@ -390,7 +404,7 @@ class MergeFallback(FallbackSkill):
         """
             One gpt-2 drift from the last blabla
         """
-        too_human=False
+        BAD=False
         # step 1--- Choose the mode and possible seed and add it after the blabla
         # self.pickMoodySeed()
         # blabla=blabla+ " " + self.moodySeed
@@ -418,7 +432,7 @@ class MergeFallback(FallbackSkill):
             raw_drift = self.gpt2_generation(context, current_settings)
             #remove  human context 
             raw_drift= raw_drift.replace(utterance, "", 1)
-            cool=cool_judgement_enter_the_weird(seed, raw_drift)
+            cool=cool_judgement_enter_the_weird(raw_drift, self.BAD_TOKEN_SET)
             if not cool:
                 self.log.info("UNCOOL was filtered out,"+ raw_drift)
 

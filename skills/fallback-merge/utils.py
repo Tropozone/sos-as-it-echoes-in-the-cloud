@@ -155,26 +155,18 @@ def load_data_txt(filename, path_folder="", mode="r"):
 # ------------------------------------
 
 
-def cool_judgement_what_if(seed, text):
-    
-    text
-    cool=False
-    #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..."
-    cool_test1=
 
-    #--2--- test if "he", "she", names, Dialogue
-    #TODO: more filtering
 
-    return cool
+def cool_judgement_enter_the_weird(text, uncool_set):
+    text_set=set(text.split()) #turn into set
+    cool=True
+    intersection=uncool_set & text_set #check intersection with uncool
+    print(intersection)
 
-def cool_judgement_enter_the_weird(seed, text):
-    
-    text
-    cool=False
-    #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..."
-    cool_test1=
+    if len(intersection)>=1:
+        cool=False
 
-    #--2--- test if "he", "she", names, Dialogue
-    #TODO: more filtering
+    #TODO Filter if proper nound or Regenerate ?
+    #TODO: More filtering?
 
     return cool
