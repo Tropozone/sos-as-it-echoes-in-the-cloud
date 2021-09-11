@@ -63,7 +63,8 @@ from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_
 # TODO: What if: More interaction with human? Ask its reaction, opintion ? and RECORD ?
 # TODO: What If: Rework a lot the counterfactuals, history, etc. Add some grammar etc
 # TODO: Record sometimes part of text human say answer and add it to memory...
-
+# TODO: But maybe etc...
+# TODO: Harmonize sound back level
 
 # --------------PARAMETERS to TUNE---------------------
 
@@ -501,14 +502,14 @@ class MergeFallback(FallbackSkill):
         #pick random text file from the memory
         text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
 
-        self.log.info("Step 2--Share the title of the file")
-        # step 3: catch name file and say it loud 
-        name_file=os.path.basename(text_path).split(".")[0]
-        name_file=name_file.replace("_", " ")
-        self.log.info("***Memory Burps*** "+name_file)
-        self.speak(name_file)
+        # self.log.info("Step 2--Share the title of the file")
+        # # step 3: catch name file and say it loud 
+        # name_file=os.path.basename(text_path).split(".")[0]
+        # name_file=name_file.replace("_", " ")
+        # self.log.info("***Memory Burps*** "+name_file)
+        # self.speak(name_file)
 
-        self.log.info("Step 3--Share the file")
+        self.log.info("Step 2--Share the text")
         # step 3: say the text
         with open(text_path, 'r') as f:
             lines = f.readlines()
