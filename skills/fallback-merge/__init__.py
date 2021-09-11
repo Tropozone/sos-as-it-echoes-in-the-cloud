@@ -453,37 +453,62 @@ class MergeFallback(FallbackSkill):
         rand=random.uniform(0, 1)
         
         #Even if sonor, small likelihood say text memory currently...
+        self.log.info("=======================================================") 
 
         if self.sonor and rand<0.8:
+            self.log.info("Sonor tunes")
+            self.log.info("=======================================================") 
             self.sonor_tunes(message)
         else:
+            self.log.info("Text tunes")
+            self.log.info("=======================================================") 
             self.text_tunes(message) 
             #TODO: indicative to say it it not him?
         
         #TODO: ENDING ? Ask how make you feel?
         #TODO: It can loop back into it and try to answer this memory
-        
+        self.log.info("=======================================================") 
 
 
     def sonor_tunes(self, message):
-    
+        
+        self.log.info("Step 1--Catch Attention")
         # step 1: catch attention ? or just as a burp
         message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
         self.log.info(message_listen)
         self.speak(message_listen)
 
+        self.log.info("Step 2--Pick the sound")
         # step 2: pick sound from collective memory
         sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
+        
+        self.log.info("Step 3--Share the title")
+        # step 3: catch name file and say it loud 
+        name_file=os.path.basename(sound_path).split(".")[0]
+        name_file=name_file.replace("_", " ")
+        self.log.info("***Memory Burps*** "+name_file)
+        self.speak(name_file)
 
-        # step 3: playback the sound
+        # step 4: playback the sound
+        self.log.info("Step 4--Play the sound")
         self.log.info("Playing one sound...")
         self.audio_service.play(sound_path)
+        
 
     def text_tunes(self, message):
 
+        self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory
         text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
 
+        self.log.info("Step 2--Share the title of the file")
+        # step 3: catch name file and say it loud 
+        name_file=os.path.basename(text_path).split(".")[0]
+        name_file=name_file.replace("_", " ")
+        self.log.info("***Memory Burps*** "+name_file)
+        self.speak(name_file)
+
+        self.log.info("Step 3--Share the file")
         # step 3: say the text
         with open(text_path, 'r') as f:
             lines = f.readlines()
