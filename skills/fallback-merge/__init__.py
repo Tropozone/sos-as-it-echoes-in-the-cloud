@@ -64,6 +64,13 @@ from .utils import load_data_txt, load_makingkin, load_objects, read_event, extr
 
 # --------------PARAMETERS to TUNE---------------------
 
+#Likelihood different skills
+#0--->Hello Socket
+#1----> What if we Bucket
+#2----> Enter the Weird
+#3----> Elsewhere Tunes
+LIKELIHOOD_SKILLS=[15,20,50,15]
+
 #FOR HELLO SOCKET
 WAITING_TIME=5 
 
@@ -109,7 +116,7 @@ class MergeFallback(FallbackSkill):
         self.log.info("*****INIT FALLBACK MERGE ****")
         #Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the ")
         self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
-
+        self.NUM_SUBSKILLS=len(self.SUBSKILLS)
         self.init_hello_socket()
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
@@ -209,7 +216,13 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 0---Randomly redirect to other skills")
         self.log.info("=======================================================")
         
-        rand= random.randint(0,3)
+        #-------Sampling
+        #NOTE: weighted random sampling so some skills mlore likely than other
+
+        rand=random.choices(range(self.NUM_SUBSKILLS), weights=LIKELIHOOD_SKILLS, k=1)[0]
+
+
+        #------Rrerouting to skill
         if rand==0:
             self.log.info("***Redirecting to Hello Socket***")
             #"Hello Socket"
