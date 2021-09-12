@@ -52,6 +52,7 @@ from .utils import cut_extract, retrieve_google_urls, clean_text, load_data_txt
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
 #from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with where collective memory resides...
 
 # =============================================
 # -------------- SKILL ---------------
@@ -151,9 +152,9 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("---Saving the data---")
         output=init_text+ final_extract+text_end
         today = date.today()
-        d1 = today.strftime("%d/%m/%Y") # dd/mm/YY
+        today_str = today.strftime("%d/%m/%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
-        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today+".txt"
+        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today_str+".txt"
         with open(log_file, 'a+') as f:
             f.write("\n")
             f.write(utterance)

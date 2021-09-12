@@ -276,9 +276,9 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("---Saving the data---")
         today = date.today()
-        d1 = today.strftime("%d/%m/%Y") # dd/mm/YY
+        today_str = today.strftime("%d/%m/%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
-        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today+".txt"
+        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today_str+".txt"
         with open(log_file, 'a+') as f:
             f.write("\n")
             f.write(utterance)
