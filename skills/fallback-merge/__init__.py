@@ -31,7 +31,7 @@ import torch
 import transformers 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 
-from datetime import datetime
+from datetime import datetime, date
 from datetime import timedelta
 
 
@@ -81,13 +81,13 @@ LIKELIHOOD_SKILLS=[15,20,50,15]
 #FOR HELLO SOCKET
 WAITING_TIME=5 
 
-#FOR WHAT IF WE BUCKET:
+#FOR WHAT IF WE BUCKET gpt2 param
 MAX_LENGTH = 80
 TEMPERATURE = 0.8
 REPETITION_PENALTY = 1.4
 TOP_K=4
 
-#FOR ENTER THE WEIRD:
+#FOR ENTER THE WEIRD gpt2 generation param
 MAX_LENGTH_WEIRD = 100
 VARIANCE_LENGTH_WEIRD = 20
 TEMPERATURE_WEIRD = 0.8
@@ -109,11 +109,11 @@ WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merg
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
 # --FOR ML MODEL
-my_ML_model = False  # If do have a fine-tuned model, set to True
+my_ML_model = True  # If do have a fine-tuned model, set to True
 my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
 
 
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory"#NOTE: Match path with where collective memory resides...
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with where collective memory resides...
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 
 SONOR=True #NOTE: For a text-based VA, put false !
@@ -258,22 +258,33 @@ class MergeFallback(FallbackSkill):
         if rand==0:
             self.log.info("***Redirecting to Hello Socket***")
             self.log.info("=======================================================")
-            self.make_kin(message)
+            output=self.make_kin(message)
         elif rand==1:
             self.log.info("***Redirecting to What if We Bucket***")
             self.log.info("=======================================================")
-            self.what_if(message)
+            output=self.what_if(message)
         elif rand==2:
             self.log.info("***Redirecting to Enter the Weird***")
             self.log.info("=======================================================")
-            self.enter_the_weird(message) 
+            output=self.enter_the_weird(message) 
         elif rand==3:
             self.log.info("***Redirecting to Elsewhere Tunes***")
             self.log.info("=======================================================")
-            self.elsewhere_tunes(message)
+            output=self.elsewhere_tunes(message)
         else:
             raise NotImplementedError
 
+        self.log.info("---Saving the data---")
+        today = date.today()
+        d1 = today.strftime("%d/%m/%Y") # dd/mm/YY
+        #save output and message in text file #NOTE: here separate log file per day
+        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today+".txt"
+        with open(log_file, 'a+') as f:
+            f.write("\n")
+            f.write(utterance)
+            f.write("\n")
+            f.write(output)
+            f.write("\n")
         self.log.info("=======================================================")
         self.log.info("---END of this INTERACTION")
         self.log.info("=======================================================")
@@ -285,7 +296,6 @@ class MergeFallback(FallbackSkill):
         """
             Make Kin practices
         """
-        #utterance = message.data.get("utterance")
         #TODO: Starting Message ?
 
         self.log.info("step 1---Pick Object")
@@ -294,7 +304,9 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 2---Create a Makin kin Event Score:")
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
-        
+        #grammar correction
+        event=self.gingerParser.parse(event)['result']
+
         self.log.info("step 3---Share the Event")
         self.speak(event)
         self.log.info("Event: "+ "\n" + event)
@@ -333,12 +345,13 @@ class MergeFallback(FallbackSkill):
                     #                                name='RecordingFeedback')
                 else:
                     self.speak_dialog("audio.record.disk.full")
-                time.sleep(recording_time) #NOTE: NEEDED? 
+                time.sleep(recording_time) #NOTE: NEEDED?  #TODO: RECORD TRANSCRIPTION STILL!, as converse do
                 self.log.info("***RECORDING ENDED***")
                 thanks=random.choice(self.MSG_THANKS)
                 self.speak(thanks)
             
-    
+        return event
+
        #TODO: Ending Message ? 
         
 
@@ -387,7 +400,7 @@ class MergeFallback(FallbackSkill):
         self.speak(response)
         self.log.info("=======================================================")
         
-
+        return response
 
     def gpt2_generation(self, seed, settings):
         #More parameters ? 
@@ -465,13 +478,15 @@ class MergeFallback(FallbackSkill):
             bla=self.one_drift(bla) #Only keep last part as context else too big? >>>
             blabla+=bla
 
+        return blabla
+
     def elsewhere_tunes(self, message):
         
         rand=random.uniform(0, 1)
         
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
-
+        output=""
         if self.sonor and rand<0.8:
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
@@ -479,13 +494,15 @@ class MergeFallback(FallbackSkill):
         else:
             self.log.info("Text tunes")
             self.log.info("=======================================================") 
-            self.text_tunes(message) 
-            #TODO: indicative to say it it not him?
+            output=self.text_tunes(message) 
         
+            #TODO: indicative to say it it not him?
+            
+        self.log.info("=======================================================") 
         #TODO: ENDING ? Ask how make you feel?
         #TODO: It can loop back into it and try to answer this memory
-        self.log.info("=======================================================") 
-
+        return output
+        
 
     def sonor_tunes(self, message):
         
@@ -533,7 +550,7 @@ class MergeFallback(FallbackSkill):
         self.log.info(memory)
         self.speak(memory)
 
-
+        return memory
 
     def has_free_disk_space(self):
         #TODO: add free disk space later on

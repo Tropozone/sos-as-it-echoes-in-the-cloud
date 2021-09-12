@@ -38,6 +38,7 @@ from adapt.intent import IntentBuilder # adapt intent parser
 from mycroft import MycroftSkill, intent_handler #padatious intent parser
 from mycroft.skills.audioservice import AudioService
 from mycroft.audio import wait_while_speaking
+from datetime import datetime, date
 
 ###Other imports
 import newspaper
@@ -82,11 +83,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.MSG_WONDER=load_data_txt("message_wonder.txt", path_folder=path_folder)
         self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
         
-        # ####LOAD CONFIG PARAMETERS: only if use alternative method to scrap url but need api keys in config file
-        # config = ConfigParser()
-        # config.read(str(pathlib.Path(__file__).parent.absolute())+'/data/config.ini') 
-        # my_api_key = config.get('auth', 'my_api_key')
-        # my_cse_id = config.get('auth', 'my_cse_id')
+
 
     #What happen when detect like Intent. PADATIOUS: use .intent file
     @intent_handler('classic.intent')
@@ -94,13 +91,12 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("=======================================================")
         self.log.info("==========step 0: Caught Human utterance and Extract Keyword=======")
         self.log.info("=======================================================")
-        # -- caight what human asked 
-        human_said = str(message.data.get("utterance"))
-        self.log.info(f'Human said {human_said}')
+        # -- caught what human asked 
+        utterance = str(message.data.get("utterance"))
+        self.log.info(f'Human said {utterance}')
         # -- extract keyword
         keyword = str(message.data.get('stuff')) #catch what human was talking about
         self.log.info(f'Stuff human talking about {keyword}')
-        #keyword=extract_keywords(str(human_said))  # Dont need this now, but alternatively could use it
         
         self.log.info("=======================================================")
         self.log.info("==========step 1: Share concern=======")
@@ -108,11 +104,11 @@ class QuinoaCollapseSkill(MycroftSkill):
         # - pick search_context picked randomly among concerns
         search_context=random.choice(self.gaia_concerns)
         # -- share what will look for online 
-        text=random.choice(self.MSG_WONDER)
-        text=text.replace("stuff",keyword)
-        text=text.replace("concern",search_context)
-        self.speak(text)
-        self.log.info(text)
+        init_text=random.choice(self.MSG_WONDER)
+        init_text=init_text.replace("stuff",keyword)
+        init_text=init_text.replace("concern",search_context)
+        self.speak(init_text)
+        self.log.info(init_text)
 
         self.log.info("=======================================================")
         self.log.info("==========step 2: Retrieve urls from Google=======")
@@ -142,7 +138,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("=======================================================")
         #- 5--- share online extract 
         self.speak(final_extract)
-        self.log.info("Extract of what found online:"+ final_extract)  
+        self.log.info("Extract of what found online:"+ final_extract) 
 
         self.log.info("=======================================================")
         self.log.info("==========step 6: Ending note =======")
@@ -151,6 +147,19 @@ class QuinoaCollapseSkill(MycroftSkill):
         text_end=random.choice(self.MSG_END)
         self.speak(text_end)
         self.log.info(text_end)
+
+        self.log.info("---Saving the data---")
+        output=init_text+ final_extract+text_end
+        today = date.today()
+        d1 = today.strftime("%d/%m/%Y") # dd/mm/YY
+        #save output and message in text file #NOTE: here separate log file per day
+        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today+".txt"
+        with open(log_file, 'a+') as f:
+            f.write("\n")
+            f.write(utterance)
+            f.write("\n")
+            f.write(output)
+            f.write("\n")
         
 
 ######*****************************************************************************************
