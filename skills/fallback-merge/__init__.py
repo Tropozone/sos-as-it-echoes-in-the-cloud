@@ -38,7 +38,7 @@ from datetime import timedelta
 # for grammar
 from gingerit.gingerit import GingerIt
 
-from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, load_whatif, cut_one_sentence, remove_context, ending_with_punct
+from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -392,7 +392,6 @@ class MergeFallback(FallbackSkill):
     def gpt2_generation(self, seed, settings):
         #More parameters ? 
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
-
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
         #TODO: Bad Token id for generation. Works ? but quotes too?
         generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
