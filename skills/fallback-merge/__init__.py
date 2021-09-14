@@ -99,7 +99,6 @@ TOP_K_WEIRD=10
 # FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
 #TODO Experiment with more filters, different for the generation and the post processing
 BAD_TOKEN=["he", "she", "I", "He", "She", "her", "his", "\"","\'", "Obama", "http"]
-
 #for Recording (hello socket and elsewhere tunes)
 DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
