@@ -87,7 +87,7 @@ TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
 TOP_K=100
 TOP_P=0.3
-NUCLEUS_SAMPLING=True
+SAMPLING="nucleus"# betweem nucleus, or topk, or default sampling (not greedy)
 
 #FOR ENTER THE WEIRD gpt2 generation param
 MAX_LENGTH_WEIRD = 100
@@ -98,7 +98,7 @@ REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=200
 TOP_P_WEIRD=0.3
-NUCLEUS_SAMPLING_WEIRD=True
+SAMPLING_WEIRD="nucleus" # between nucleus, topk, or default sampling
 
 ##FOR COLLECTIVE MEMORY
 
@@ -106,10 +106,13 @@ NUCLEUS_SAMPLING_WEIRD=True
 # FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
 #TODO Experiment with more filters, different for the generation and the post processing
 #TODO: Do several words may be forbodden ?
-QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
-ALL_QUOTE_TOKEN=['"', "'", "'s", 'Ġ"', "'t", '."', ',"', "Ġ'", "'re", "'ve", "'m", "'ll", '":', "'d", '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
+SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
+MORE_QUOTE_TOKEN=['"', "'", "'s", 'Ġ"', "'t", '."', ',"', "Ġ'", "'re", "'ve", "'m", "'ll", '":', "'d", '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
+TOO_HUMAN_TOKEN=["he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","she","blog"]
+BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
+FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
+#TODO: COULD replace some token by others >>>
 
-BAD_TOKEN=QUOTE_TOKEN+["he", "she", "He", "She", "her", "his", "Obama", "http", "boy", "girl", "woman", "in this book", "in this chapter", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 #for Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
@@ -158,8 +161,8 @@ class MergeFallback(FallbackSkill):
             self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
 
         #
-        self.BAD_TOKEN_SET=set(BAD_TOKEN)
-        self.BAD_TOKEN_ids=self.get_bad_words_ids(BAD_TOKEN)
+        self.FORBIDDEN_TOKEN_SET=set(FORBIDDEN_TOKEN)
+        self.FORBIDDEN_TOKEN_ids=self.get_bad_words_ids(FORBIDDEN_TOKEN)
         
     
     def load_messages(self):
@@ -216,7 +219,7 @@ class MergeFallback(FallbackSkill):
         self.settings_what_if.setdefault("max_length", MAX_LENGTH)
         self.settings_what_if.setdefault("top_k", TOP_K)
         self.settings_what_if.setdefault("top_p", TOP_P)
-        self.settings_what_if.setdefault("nucleus_sampling", NUCLEUS_SAMPLING)
+        self.settings_what_if.setdefault("sampling", SAMPLING)
 
     def get_bad_words_ids(self, words):
         bad_ids=[]
@@ -236,7 +239,7 @@ class MergeFallback(FallbackSkill):
         self.settings_enter_the_weird.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
         self.settings_enter_the_weird.setdefault("top_k", TOP_K_WEIRD)
         self.settings_enter_the_weird.setdefault("top_p", TOP_P_WEIRD)
-        self.settings_enter_the_weird.setdefault("nucleus_sampling", NUCLEUS_SAMPLING_WEIRD)
+        self.settings_enter_the_weird.setdefault("sampling", SAMPLING_WEIRD)
 
         
     def init_elsewhere_tunes(self):
@@ -402,7 +405,7 @@ class MergeFallback(FallbackSkill):
             count+=1
             raw_response = self.gpt2_generation(seed, self.settings_what_if)
             #judge answer:
-            cool=cool_judgement_what_if(seed, raw_response, self.BAD_TOKEN_SET)
+            cool=cool_judgement_what_if(seed, raw_response, self.FORBIDDEN_TOKEN_SET)
             if not cool:
                 self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
                
@@ -425,10 +428,12 @@ class MergeFallback(FallbackSkill):
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
         #TODO: Bad Token id for generation. Works ? but quotes too?
         #different sampling:
-        if settings["nucleus_sampling"]:
-            generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
-        else:
-            generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+        if settings["sampling"]=="nucleus":
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
+        elif settings["sampling"]=="topk":#top k sampling
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+        else:#base sampling
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
         return raw_response
@@ -466,7 +471,7 @@ class MergeFallback(FallbackSkill):
             raw_drift = self.gpt2_generation(context, current_settings)
             #remove  human context 
             raw_drift= raw_drift.replace(utterance, "", 1)
-            cool=cool_judgement_enter_the_weird(raw_drift, self.BAD_TOKEN_SET)
+            cool=cool_judgement_enter_the_weird(raw_drift, self.FORBIDDEN_TOKEN_SET)
             if not cool:
                 self.log.info("UNCOOL{} was filtered out,".format(count)+ raw_drift)
 

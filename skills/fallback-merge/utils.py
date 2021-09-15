@@ -159,7 +159,7 @@ def cool_judgement_enter_the_weird(text, uncool_set):
     text_set=set(text.split()) #turn into set
     cool=True
     intersection=uncool_set & text_set #check intersection with uncool
-    print(intersection)
+    #print(intersection)
 
     if len(intersection)>=1:
         cool=False
@@ -175,7 +175,7 @@ def cool_judgement_what_if(seed, text, uncool_set):
     stripped_text=text.replace(seed, "")
     stripped_text=stripped_text.lstrip()#remove space beginning
     BAD_TRANSITION=["\n", "...", ".", "?", ";", "!"]#TODO: CUrrently removing the \n too!
-    print("character look at:", stripped_text[0])
+    #print("character look at:", stripped_text[0])
     cool1=(not(stripped_text[0].isupper())) and (not stripped_text[0] in BAD_TRANSITION)
 
     #--2--- test if "he", "she", names, Dialogue
