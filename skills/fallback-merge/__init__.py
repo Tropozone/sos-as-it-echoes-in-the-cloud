@@ -96,12 +96,19 @@ REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=10
 
+##FOR COLLECTIVE MEMORY
+
+
 # FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
 #TODO Experiment with more filters, different for the generation and the post processing
-BAD_TOKEN=["he", "she", "I", "He", "She", "her", "his", "\"","\'", "Obama", "http"]
-#for Recording (hello socket and elsewhere tunes)
+#TODO: Do several words may be forbodden ?
+QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
+BAD_TOKEN=QUOTE_TOKEN+["he", "she", "He", "She", "her", "his", "Obama", "http", "boy", "girl", "woman", "in this book", "in this chapter", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
+#for Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
+
+TEXT_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
 
 # -------------OTHER PARAMETERS----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/"
@@ -155,6 +162,7 @@ class MergeFallback(FallbackSkill):
         self.MSG_TELL=load_data_txt("message_tell.txt", path_folder=path_folder)
         self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
         self.MSG_THANKS=load_data_txt("message_thanks.txt", path_folder=path_folder)
+        self.MSG_TRAVEL=load_data_txt("message_travel.txt", path_folder=path_folder)
         
 
     def init_recording_settings(self):
@@ -222,7 +230,7 @@ class MergeFallback(FallbackSkill):
 
         
     def init_elsewhere_tunes(self):
-        pass
+        self.text_likelihood=TEXT_LIKELIHOOD
 
     def initialize(self):
         """
@@ -275,9 +283,9 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("---Saving the data---")
         today = date.today()
-        today_str = today.strftime("%d/%m/%Y") # dd/mm/YY
+        today_str = today.strftime("%d%m%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
-        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today_str+".txt"
+        log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
         with open(log_file, 'a+') as f:
             f.write("\n")
             f.write(utterance)
@@ -436,8 +444,9 @@ class MergeFallback(FallbackSkill):
 
         cool=False
         count=0
+        MAX_TRY=3#TODO: adjust this
 
-        while ((not cool) and (count<10)): 
+        while ((not cool) and (count<MAX_TRY)): 
             count+=1
             #generate gpt2
             raw_drift = self.gpt2_generation(context, current_settings)
@@ -445,7 +454,7 @@ class MergeFallback(FallbackSkill):
             raw_drift= raw_drift.replace(utterance, "", 1)
             cool=cool_judgement_enter_the_weird(raw_drift, self.BAD_TOKEN_SET)
             if not cool:
-                self.log.info("UNCOOL was filtered out,"+ raw_drift)
+                self.log.info("UNCOOL{} was filtered out,".format(count)+ raw_drift)
 
         #TODO: Filter ot not?
         #good ending with punctuation
@@ -486,7 +495,7 @@ class MergeFallback(FallbackSkill):
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
-        if self.sonor and rand<0.8:
+        if self.sonor and rand<(1-self.text_likelihood):
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes(message)
@@ -533,7 +542,12 @@ class MergeFallback(FallbackSkill):
         self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory
         text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
-
+        
+        #little message
+        travel=random.choice(self.MSG_TRAVEL)
+        self.speak(travel)
+        self.log.info(travel)
+        
         # self.log.info("Step 2--Share the title of the file")
         # # step 3: catch name file and say it loud 
         # name_file=os.path.basename(text_path).split(".")[0]
