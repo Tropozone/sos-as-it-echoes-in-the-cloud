@@ -86,7 +86,7 @@ MAX_LENGTH = 80
 TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
 TOP_K=100
-TOP_P=0.5
+TOP_P=0.3
 NUCLEUS_SAMPLING=True
 
 #FOR ENTER THE WEIRD gpt2 generation param
@@ -97,7 +97,7 @@ VARIANCE_TEMPERATURE_WEIRD = 0.4
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=200
-TOP_P_WEIRD=0.5
+TOP_P_WEIRD=0.3
 NUCLEUS_SAMPLING_WEIRD=True
 
 ##FOR COLLECTIVE MEMORY
@@ -107,6 +107,8 @@ NUCLEUS_SAMPLING_WEIRD=True
 #TODO Experiment with more filters, different for the generation and the post processing
 #TODO: Do several words may be forbodden ?
 QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
+ALL_QUOTE_TOKEN=['"', "'", "'s", 'Ġ"', "'t", '."', ',"', "Ġ'", "'re", "'ve", "'m", "'ll", '":', "'d", '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
+
 BAD_TOKEN=QUOTE_TOKEN+["he", "she", "He", "She", "her", "his", "Obama", "http", "boy", "girl", "woman", "in this book", "in this chapter", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 #for Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 
