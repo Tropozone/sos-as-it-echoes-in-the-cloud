@@ -83,18 +83,22 @@ WAITING_TIME=5
 
 #FOR WHAT IF WE BUCKET gpt2 param
 MAX_LENGTH = 80
-TEMPERATURE = 0.8
+TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
-TOP_K=4
+TOP_K=100
+TOP_P=0.5
+NUCLEUS_SAMPLING=True
 
 #FOR ENTER THE WEIRD gpt2 generation param
 MAX_LENGTH_WEIRD = 100
 VARIANCE_LENGTH_WEIRD = 20
-TEMPERATURE_WEIRD = 0.8
+TEMPERATURE_WEIRD = 0.9
 VARIANCE_TEMPERATURE_WEIRD = 0.4
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
-TOP_K_WEIRD=10
+TOP_K_WEIRD=200
+TOP_P_WEIRD=0.5
+NUCLEUS_SAMPLING_WEIRD=True
 
 ##FOR COLLECTIVE MEMORY
 
@@ -209,6 +213,8 @@ class MergeFallback(FallbackSkill):
         self.settings_what_if.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
         self.settings_what_if.setdefault("max_length", MAX_LENGTH)
         self.settings_what_if.setdefault("top_k", TOP_K)
+        self.settings_what_if.setdefault("top_p", TOP_P)
+        self.settings_what_if.setdefault("nucleus_sampling", NUCLEUS_SAMPLING)
 
     def get_bad_words_ids(self, words):
         bad_ids=[]
@@ -227,6 +233,8 @@ class MergeFallback(FallbackSkill):
         self.settings_enter_the_weird.setdefault("variance_temperature", VARIANCE_TEMPERATURE_WEIRD)
         self.settings_enter_the_weird.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
         self.settings_enter_the_weird.setdefault("top_k", TOP_K_WEIRD)
+        self.settings_enter_the_weird.setdefault("top_p", TOP_P_WEIRD)
+        self.settings_enter_the_weird.setdefault("nucleus_sampling", NUCLEUS_SAMPLING_WEIRD)
 
         
     def init_elsewhere_tunes(self):
@@ -414,7 +422,11 @@ class MergeFallback(FallbackSkill):
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
         #TODO: Bad Token id for generation. Works ? but quotes too?
-        generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+        #different sampling:
+        if settings["nucleus_sampling"]:
+            generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
+        else:
+            generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
         return raw_response
