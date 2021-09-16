@@ -551,12 +551,14 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("Step 2--Pick the sound")
         # step 2: pick sound from collective memory
-        sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
-        
+        sound_file_name=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
+        sound_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+sound_file_name
+
         self.log.info("Step 3--Share the title")
         # step 3: catch name file and say it loud 
-        name_file=os.path.basename(sound_path).split(".")[0]
-        name_file=name_file.replace("_", " ")
+        #name_file=os.path.basename(sound_path).split(".")[0]
+        name_file=sound_file_name.split(".")[0]#remove extension
+        name_file=name_file.replace("_", " ")#replace space
         self.log.info("***Memory Burps*** "+name_file)
         self.speak(name_file)
 
@@ -570,7 +572,8 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory
-        text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
+        text_file_name=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
+        text_path=COLLECTIVE_MEMORY_FOLDER+"text/"+text_file_name
         
         #little message
         travel=random.choice(self.MSG_TRAVEL)
