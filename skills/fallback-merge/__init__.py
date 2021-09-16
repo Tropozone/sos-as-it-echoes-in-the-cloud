@@ -38,7 +38,7 @@ from datetime import timedelta
 # for grammar
 from gingerit.gingerit import GingerIt
 
-from .utils import ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -329,7 +329,10 @@ class MergeFallback(FallbackSkill):
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
         #grammar correction #TODO: Split into smaller if too long
-        event=self.gingerParser.parse(event)['result']
+        split=split_into_sentences(event)
+        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        event=" ".join(split)
+        #event=self.gingerParser.parse(event)['result']
 
         self.log.info("step 3---Share the Event")
         self.speak(event)
@@ -423,8 +426,12 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 4---final output")
         #good ending for ...
         response=ending_with_punct_manual(raw_response)
-        #grammar check #TODO: SPLIT IN SMALLER
-        response=self.gingerParser.parse(response)['result']
+        #grammar check
+        split=split_into_sentences(response)
+        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        response=" ".join(split)
+        #response=self.gingerParser.parse(response)['result']
+
         self.log.info("***COOL and filtered ***"+response)
         self.speak(response)
         self.log.info("=======================================================")
@@ -487,9 +494,12 @@ class MergeFallback(FallbackSkill):
         #TODO: Filter ot not?
         #good ending with punctuation
         drift=ending_with_punct_manual(raw_drift)
-        #grammar check: #TODO: split into smaller bits
+        #grammar check:
         #drift=self.gingerParser.parse(drift)['result']
-        
+        split=split_into_sentences(drift)
+        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        drift=" ".join(split)
+
         self.log.info("=======================================================") 
         self.log.info("Step 3--Share the drift")
         self.log.info("=======================================================") 
@@ -535,6 +545,7 @@ class MergeFallback(FallbackSkill):
             self.log.info("Text tunes")
             self.log.info("=======================================================") 
             output=self.text_tunes(message) 
+            
         
             #TODO: indicative to say it it not him?
             
@@ -596,6 +607,10 @@ class MergeFallback(FallbackSkill):
             lines = f.readlines()
         memory=" ".join(lines)[:self.MAX_CHAR_MEMORY]
         memory=ending_with_punct_manual(memory)
+        #grammar check
+        split=split_into_sentences(memory)
+        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        memory=" ".join(split)
 
         self.log.info(memory)
         self.speak(memory)
