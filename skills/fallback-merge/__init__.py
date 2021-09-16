@@ -90,8 +90,8 @@ TOP_P=0.3
 SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 
 #FOR ENTER THE WEIRD gpt2 generation param
-MAX_LENGTH_WEIRD = 320
-VARIANCE_LENGTH_WEIRD = 60
+MAX_LENGTH_WEIRD = 180
+VARIANCE_LENGTH_WEIRD = 40
 TEMPERATURE_WEIRD = 0.9
 VARIANCE_TEMPERATURE_WEIRD = 0.2
 REPETITION_PENALTY_WEIRD = 1.4
@@ -108,7 +108,7 @@ SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 #TODO: Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=["he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog"] #TODO but remove words including he and she...
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant"] #TODO but remove words including he and she...
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 #TODO: COULD replace some token by others >>>
@@ -118,6 +118,8 @@ DEFAULT_RECORDING_TIME=10
 MAX_RECORDING_TIME=60
 
 TEXT_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
+
+MAX_CHAR_MEMORY=280
 
 # -------------OTHER PARAMETERS----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/"
@@ -245,6 +247,7 @@ class MergeFallback(FallbackSkill):
         
     def init_elsewhere_tunes(self):
         self.text_likelihood=TEXT_LIKELIHOOD
+        self.MAX_CHAR_MEMORY=MAX_CHAR_MEMORY
 
     def initialize(self):
         """
@@ -591,7 +594,9 @@ class MergeFallback(FallbackSkill):
         # step 3: say the text
         with open(text_path, 'r') as f:
             lines = f.readlines()
-        memory=" ".join(lines)
+        memory=" ".join(lines)[:self.MAX_CHAR_MEMORY]
+        memory=ending_with_punct_manual(memory)
+
         self.log.info(memory)
         self.speak(memory)
 
