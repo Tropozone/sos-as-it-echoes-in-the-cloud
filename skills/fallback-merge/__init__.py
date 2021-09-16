@@ -87,18 +87,18 @@ TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
 TOP_K=100
 TOP_P=0.3
-SAMPLING="nucleus"# betweem nucleus, or topk, or default sampling (not greedy)
+SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 
 #FOR ENTER THE WEIRD gpt2 generation param
-MAX_LENGTH_WEIRD = 100
-VARIANCE_LENGTH_WEIRD = 20
+MAX_LENGTH_WEIRD = 200
+VARIANCE_LENGTH_WEIRD = 40
 TEMPERATURE_WEIRD = 0.9
 VARIANCE_TEMPERATURE_WEIRD = 0.4
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
-TOP_K_WEIRD=200
+TOP_K_WEIRD=500
 TOP_P_WEIRD=0.3
-SAMPLING_WEIRD="nucleus" # between nucleus, topk, or default sampling
+SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 
 ##FOR COLLECTIVE MEMORY
 
