@@ -172,6 +172,7 @@ class MergeFallback(FallbackSkill):
         self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
         self.MSG_THANKS=load_data_txt("message_thanks.txt", path_folder=path_folder)
         self.MSG_TRAVEL=load_data_txt("message_travel.txt", path_folder=path_folder)
+        self.MSG_PATIENT=load_data_txt("message_patient.txt", path_folder=path_folder)
         
 
     def init_recording_settings(self):
@@ -379,6 +380,10 @@ class MergeFallback(FallbackSkill):
         """
             What if Skill...
         """
+        #---patience
+        be_patient=random.choice(self.MSG_PATIENT)
+        self.speak(be_patient)
+
         # step 0 --Obtain what the human said
         utterance = message.data.get("utterance")
 
@@ -493,6 +498,10 @@ class MergeFallback(FallbackSkill):
         """
             Several gpt-2 drifts from the last utterance
         """
+        #---patience
+        be_patient=random.choice(self.MSG_PATIENT)
+        self.speak(be_patient)
+
         #(0) Get the human utterance
         utterance = message.data.get("utterance")
         #(1) Choose the mode and possible seed and add it
