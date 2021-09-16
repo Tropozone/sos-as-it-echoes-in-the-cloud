@@ -38,7 +38,7 @@ from datetime import timedelta
 # for grammar
 from gingerit.gingerit import GingerIt
 
-from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -76,32 +76,48 @@ from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_
 #1----> What if we Bucket
 #2----> Enter the Weird
 #3----> Elsewhere Tunes
-LIKELIHOOD_SKILLS=[15,20,50,15]
+LIKELIHOOD_SKILLS=[20,10,50,20]
 
 #FOR HELLO SOCKET
 WAITING_TIME=5 
 
 #FOR WHAT IF WE BUCKET gpt2 param
-MAX_LENGTH = 80
-TEMPERATURE = 0.8
+MAX_LENGTH = 100
+TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
-TOP_K=4
+TOP_K=100
+TOP_P=0.3
+SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 
 #FOR ENTER THE WEIRD gpt2 generation param
-MAX_LENGTH_WEIRD = 100
-VARIANCE_LENGTH_WEIRD = 20
-TEMPERATURE_WEIRD = 0.8
-VARIANCE_TEMPERATURE_WEIRD = 0.4
+MAX_LENGTH_WEIRD = 320
+VARIANCE_LENGTH_WEIRD = 60
+TEMPERATURE_WEIRD = 0.9
+VARIANCE_TEMPERATURE_WEIRD = 0.2
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
-TOP_K_WEIRD=10
+TOP_K_WEIRD=500
+TOP_P_WEIRD=0.3
+SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
+
+##FOR COLLECTIVE MEMORY
+
 
 # FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
 #TODO Experiment with more filters, different for the generation and the post processing
-BAD_TOKEN=["he", "she", "I", "He", "She", "her", "his", "\"","\'", "Obama", "http"]
-#for Recording (hello socket and elsewhere tunes)
+#TODO: Do several words may be forbodden ?
+SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
+MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
+TOO_HUMAN_TOKEN=["he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog"] #TODO but remove words including he and she...
+BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
+FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
+#TODO: COULD replace some token by others >>>
+
+#for Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
+
+TEXT_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
 
 # -------------OTHER PARAMETERS----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/"
@@ -145,8 +161,8 @@ class MergeFallback(FallbackSkill):
             self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
 
         #
-        self.BAD_TOKEN_SET=set(BAD_TOKEN)
-        self.BAD_TOKEN_ids=self.get_bad_words_ids(BAD_TOKEN)
+        self.FORBIDDEN_TOKEN_SET=set(FORBIDDEN_TOKEN)
+        self.FORBIDDEN_TOKEN_ids=self.get_bad_words_ids(FORBIDDEN_TOKEN)
         
     
     def load_messages(self):
@@ -155,6 +171,8 @@ class MergeFallback(FallbackSkill):
         self.MSG_TELL=load_data_txt("message_tell.txt", path_folder=path_folder)
         self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
         self.MSG_THANKS=load_data_txt("message_thanks.txt", path_folder=path_folder)
+        self.MSG_TRAVEL=load_data_txt("message_travel.txt", path_folder=path_folder)
+        self.MSG_PATIENT=load_data_txt("message_patient.txt", path_folder=path_folder)
         
 
     def init_recording_settings(self):
@@ -201,6 +219,8 @@ class MergeFallback(FallbackSkill):
         self.settings_what_if.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
         self.settings_what_if.setdefault("max_length", MAX_LENGTH)
         self.settings_what_if.setdefault("top_k", TOP_K)
+        self.settings_what_if.setdefault("top_p", TOP_P)
+        self.settings_what_if.setdefault("sampling", SAMPLING)
 
     def get_bad_words_ids(self, words):
         bad_ids=[]
@@ -219,10 +239,12 @@ class MergeFallback(FallbackSkill):
         self.settings_enter_the_weird.setdefault("variance_temperature", VARIANCE_TEMPERATURE_WEIRD)
         self.settings_enter_the_weird.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
         self.settings_enter_the_weird.setdefault("top_k", TOP_K_WEIRD)
+        self.settings_enter_the_weird.setdefault("top_p", TOP_P_WEIRD)
+        self.settings_enter_the_weird.setdefault("sampling", SAMPLING_WEIRD)
 
         
     def init_elsewhere_tunes(self):
-        pass
+        self.text_likelihood=TEXT_LIKELIHOOD
 
     def initialize(self):
         """
@@ -275,9 +297,9 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("---Saving the data---")
         today = date.today()
-        today_str = today.strftime("%d/%m/%Y") # dd/mm/YY
+        today_str = today.strftime("%d%m%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
-        log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today_str+".txt"
+        log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
         with open(log_file, 'a+') as f:
             f.write("\n")
             f.write(utterance)
@@ -303,7 +325,7 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 2---Create a Makin kin Event Score:")
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
-        #grammar correction
+        #grammar correction #TODO: Split into smaller if too long
         event=self.gingerParser.parse(event)['result']
 
         self.log.info("step 3---Share the Event")
@@ -358,6 +380,10 @@ class MergeFallback(FallbackSkill):
         """
             What if Skill...
         """
+        #---patience
+        be_patient=random.choice(self.MSG_PATIENT)
+        self.speak(be_patient)
+
         # step 0 --Obtain what the human said
         utterance = message.data.get("utterance")
 
@@ -379,12 +405,13 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 3---gpt2 generation until pass the filter")
         cool=False
         count=0
+        MAX_TRY=3
 
-        while ((not cool) and (count<10)): 
+        while ((not cool) and (count<MAX_TRY)): 
             count+=1
             raw_response = self.gpt2_generation(seed, self.settings_what_if)
             #judge answer:
-            cool=cool_judgement_what_if(seed, raw_response, self.BAD_TOKEN_SET)
+            cool=cool_judgement_what_if(seed, raw_response, self.FORBIDDEN_TOKEN_SET)
             if not cool:
                 self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
                
@@ -392,8 +419,8 @@ class MergeFallback(FallbackSkill):
         # step 4 ---
         self.log.info("step 4---final output")
         #good ending for ...
-        response=ending_with_punct(raw_response)
-        #grammar check
+        response=ending_with_punct_manual(raw_response)
+        #grammar check #TODO: SPLIT IN SMALLER
         response=self.gingerParser.parse(response)['result']
         self.log.info("***COOL and filtered ***"+response)
         self.speak(response)
@@ -406,7 +433,13 @@ class MergeFallback(FallbackSkill):
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
         #TODO: Bad Token id for generation. Works ? but quotes too?
-        generated = self.model.generate(encoded_context,bad_words_ids=self.BAD_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+        #different sampling:
+        if settings["sampling"]=="nucleus":
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
+        elif settings["sampling"]=="topk":#top k sampling
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+        else:#base sampling
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
         return raw_response
@@ -436,21 +469,22 @@ class MergeFallback(FallbackSkill):
 
         cool=False
         count=0
+        MAX_TRY=3#TODO: adjust this
 
-        while ((not cool) and (count<10)): 
+        while ((not cool) and (count<MAX_TRY)): 
             count+=1
             #generate gpt2
             raw_drift = self.gpt2_generation(context, current_settings)
             #remove  human context 
             raw_drift= raw_drift.replace(utterance, "", 1)
-            cool=cool_judgement_enter_the_weird(raw_drift, self.BAD_TOKEN_SET)
+            cool=cool_judgement_enter_the_weird(raw_drift, self.FORBIDDEN_TOKEN_SET)
             if not cool:
-                self.log.info("UNCOOL was filtered out,"+ raw_drift)
+                self.log.info("UNCOOL{} was filtered out,".format(count)+ raw_drift)
 
         #TODO: Filter ot not?
         #good ending with punctuation
-        drift=ending_with_punct(raw_drift)
-        #grammar check: Not for here ?
+        drift=ending_with_punct_manual(raw_drift)
+        #grammar check: #TODO: split into smaller bits
         #drift=self.gingerParser.parse(drift)['result']
         
         self.log.info("=======================================================") 
@@ -465,6 +499,10 @@ class MergeFallback(FallbackSkill):
         """
             Several gpt-2 drifts from the last utterance
         """
+        #---patience
+        be_patient=random.choice(self.MSG_PATIENT)
+        self.speak(be_patient)
+
         #(0) Get the human utterance
         utterance = message.data.get("utterance")
         #(1) Choose the mode and possible seed and add it
@@ -486,7 +524,7 @@ class MergeFallback(FallbackSkill):
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
-        if self.sonor and rand<0.8:
+        if self.sonor and rand<(1-self.text_likelihood):
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes(message)
@@ -513,12 +551,14 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("Step 2--Pick the sound")
         # step 2: pick sound from collective memory
-        sound_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
-        
+        sound_file_name=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
+        sound_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+sound_file_name
+
         self.log.info("Step 3--Share the title")
         # step 3: catch name file and say it loud 
-        name_file=os.path.basename(sound_path).split(".")[0]
-        name_file=name_file.replace("_", " ")
+        #name_file=os.path.basename(sound_path).split(".")[0]
+        name_file=sound_file_name.split(".")[0]#remove extension
+        name_file=name_file.replace("_", " ")#replace space
         self.log.info("***Memory Burps*** "+name_file)
         self.speak(name_file)
 
@@ -532,8 +572,14 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory
-        text_path=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
+        text_file_name=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
+        text_path=COLLECTIVE_MEMORY_FOLDER+"text/"+text_file_name
 
+        #little message
+        travel=random.choice(self.MSG_TRAVEL)
+        self.speak(travel)
+        self.log.info(travel)
+        
         # self.log.info("Step 2--Share the title of the file")
         # # step 3: catch name file and say it loud 
         # name_file=os.path.basename(text_path).split(".")[0]

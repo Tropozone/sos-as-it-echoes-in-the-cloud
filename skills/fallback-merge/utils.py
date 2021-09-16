@@ -103,6 +103,19 @@ def ending_with_punct(data):
     final=" ".join(sent)
     return final
 
+def ending_with_punct_manual(data):
+    punct = [";", ":", "!", ".", "?"]
+    idx_last=0
+    #if not 
+    #    str.endswith(data)
+    for sign in punct:
+        idx_temp=data.rfind(sign) #last occurence sign on the righ
+        idx_last=max(idx_last,idx_temp)
+
+    if idx_last==0:#case no punctuation
+        return data
+    else: 
+        return data[:idx_last+1]
 
 def remove_context(question, generated):
     # remove the question text from the generated answer
@@ -159,7 +172,7 @@ def cool_judgement_enter_the_weird(text, uncool_set):
     text_set=set(text.split()) #turn into set
     cool=True
     intersection=uncool_set & text_set #check intersection with uncool
-    print(intersection)
+    #print(intersection)
 
     if len(intersection)>=1:
         cool=False
@@ -175,12 +188,12 @@ def cool_judgement_what_if(seed, text, uncool_set):
     stripped_text=text.replace(seed, "")
     stripped_text=stripped_text.lstrip()#remove space beginning
     BAD_TRANSITION=["\n", "...", ".", "?", ";", "!"]#TODO: CUrrently removing the \n too!
-    print("character look at:", stripped_text[0])
+    #print("character look at:", stripped_text[0])
     cool1=(not(stripped_text[0].isupper())) and (not stripped_text[0] in BAD_TRANSITION)
 
-    #--2--- test if "he", "she", names, Dialogue
-    cool2=cool_judgement_enter_the_weird(text, uncool_set)
+    #--2--- test if "he", "she", names, Dialogue#TODO: Keep this ?
+    #cool2=cool_judgement_enter_the_weird(text, uncool_set)
 
     #TODO: more filtering
 
-    return bool(cool1 and cool2)
+    return cool1 #bool(cool1 and cool2)
