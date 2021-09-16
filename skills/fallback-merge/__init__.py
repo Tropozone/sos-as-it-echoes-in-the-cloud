@@ -76,13 +76,13 @@ from .utils import ending_with_punct_manual, cool_judgement_enter_the_weird, coo
 #1----> What if we Bucket
 #2----> Enter the Weird
 #3----> Elsewhere Tunes
-LIKELIHOOD_SKILLS=[15,20,50,15]
+LIKELIHOOD_SKILLS=[20,10,50,20]
 
 #FOR HELLO SOCKET
 WAITING_TIME=5 
 
 #FOR WHAT IF WE BUCKET gpt2 param
-MAX_LENGTH = 80
+MAX_LENGTH = 100
 TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
 TOP_K=100
