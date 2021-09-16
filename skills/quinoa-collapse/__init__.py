@@ -152,7 +152,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("---Saving the data---")
         output=init_text+ final_extract+text_end
         today = date.today()
-        today_str = today.strftime("%d/%m/%Y") # dd/mm/YY
+        today_str = today.strftime("%d%m%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
         log_file=COLLECTIVE_MEMORY_FOLDER+"logs/"+today_str+".txt"
         with open(log_file, 'a+') as f:
