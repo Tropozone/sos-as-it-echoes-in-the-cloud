@@ -191,9 +191,9 @@ def cool_judgement_what_if(seed, text, uncool_set):
     #print("character look at:", stripped_text[0])
     cool1=(not(stripped_text[0].isupper())) and (not stripped_text[0] in BAD_TRANSITION)
 
-    #--2--- test if "he", "she", names, Dialogue
-    cool2=cool_judgement_enter_the_weird(text, uncool_set)
+    #--2--- test if "he", "she", names, Dialogue#TODO: Keep this ?
+    #cool2=cool_judgement_enter_the_weird(text, uncool_set)
 
     #TODO: more filtering
 
-    return bool(cool1 and cool2)
+    return cool1 #bool(cool1 and cool2)

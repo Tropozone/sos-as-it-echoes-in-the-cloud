@@ -325,7 +325,7 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 2---Create a Makin kin Event Score:")
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
-        #grammar correction
+        #grammar correction #TODO: Split into smaller if too long
         event=self.gingerParser.parse(event)['result']
 
         self.log.info("step 3---Share the Event")
@@ -405,8 +405,9 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 3---gpt2 generation until pass the filter")
         cool=False
         count=0
+        MAX_TRY=3
 
-        while ((not cool) and (count<10)): 
+        while ((not cool) and (count<MAX_TRY)): 
             count+=1
             raw_response = self.gpt2_generation(seed, self.settings_what_if)
             #judge answer:
@@ -419,7 +420,7 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 4---final output")
         #good ending for ...
         response=ending_with_punct_manual(raw_response)
-        #grammar check
+        #grammar check #TODO: SPLIT IN SMALLER
         response=self.gingerParser.parse(response)['result']
         self.log.info("***COOL and filtered ***"+response)
         self.speak(response)
@@ -483,7 +484,7 @@ class MergeFallback(FallbackSkill):
         #TODO: Filter ot not?
         #good ending with punctuation
         drift=ending_with_punct_manual(raw_drift)
-        #grammar check: Not for here ?
+        #grammar check: #TODO: split into smaller bits
         #drift=self.gingerParser.parse(drift)['result']
         
         self.log.info("=======================================================") 
