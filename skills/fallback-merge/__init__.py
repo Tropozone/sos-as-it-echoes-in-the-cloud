@@ -93,7 +93,7 @@ SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 MAX_LENGTH_WEIRD = 200
 VARIANCE_LENGTH_WEIRD = 40
 TEMPERATURE_WEIRD = 0.9
-VARIANCE_TEMPERATURE_WEIRD = 0.4
+VARIANCE_TEMPERATURE_WEIRD = 0.2
 REPETITION_PENALTY_WEIRD = 1.4
 NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=500
@@ -574,7 +574,7 @@ class MergeFallback(FallbackSkill):
         #pick random text file from the memory
         text_file_name=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"text/"))
         text_path=COLLECTIVE_MEMORY_FOLDER+"text/"+text_file_name
-        
+
         #little message
         travel=random.choice(self.MSG_TRAVEL)
         self.speak(travel)
