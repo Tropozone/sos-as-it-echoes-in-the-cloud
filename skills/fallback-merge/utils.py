@@ -103,6 +103,19 @@ def ending_with_punct(data):
     final=" ".join(sent)
     return final
 
+def ending_with_punct_manual(data):
+    punct = [";", ":", "!", ".", "?"]
+    idx_last=0
+    #if not 
+    #    str.endswith(data)
+    for sign in punct:
+        idx_temp=data.rfind(sign) #last occurence sign on the righ
+        idx_last=max(idx_last,idx_temp)
+
+    if idx_last==0:#case no punctuation
+        return data
+    else: 
+        return data[:idx_last+1]
 
 def remove_context(question, generated):
     # remove the question text from the generated answer

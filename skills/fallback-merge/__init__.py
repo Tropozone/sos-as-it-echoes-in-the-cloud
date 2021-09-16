@@ -38,7 +38,7 @@ from datetime import timedelta
 # for grammar
 from gingerit.gingerit import GingerIt
 
-from .utils import cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -418,7 +418,7 @@ class MergeFallback(FallbackSkill):
         # step 4 ---
         self.log.info("step 4---final output")
         #good ending for ...
-        response=ending_with_punct(raw_response)
+        response=ending_with_punct_manual(raw_response)
         #grammar check
         response=self.gingerParser.parse(response)['result']
         self.log.info("***COOL and filtered ***"+response)
@@ -482,7 +482,7 @@ class MergeFallback(FallbackSkill):
 
         #TODO: Filter ot not?
         #good ending with punctuation
-        drift=ending_with_punct(raw_drift)
+        drift=ending_with_punct_manual(raw_drift)
         #grammar check: Not for here ?
         #drift=self.gingerParser.parse(drift)['result']
         
