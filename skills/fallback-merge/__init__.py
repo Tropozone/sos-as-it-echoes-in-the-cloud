@@ -38,7 +38,7 @@ from datetime import timedelta
 # for grammar
 from gingerit.gingerit import GingerIt
 
-from .utils import split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -67,6 +67,20 @@ from .utils import split_into_sentences, ending_with_punct_manual, cool_judgemen
 # TODO: Harmonize sound back level
 # TODO: Random eraser in memory, when above number. Older more likely get erased...
 # TODO: How things are trigered
+
+
+#TODO: SOund distortion: Replace file by distorted version so more and mnore distorted ?
+#TODO: SOUND Distortion: integrate main script? Apply also Quinoa COllapse ?
+#TODO: SOUND Distortion: More fade in and out accross time
+#TODO  SOUND Distortion:Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
+#TODO: SOUND Distortion:Could overlay with another file ?
+#TODO: SOUND Distortion: Add more effects such as: (and the ones commented out below)
+# equalizer(frequency, q=1.0, db=-3.0)  #"frequency in Hz, q or band-width (default=1.0)"
+# bandpass(frequency, q=1.0)  #"frequency in Hz, q or band-width (default=1.0)"
+# bandreject(frequency, q=1.0) #"frequency in Hz, q or band-width (default=1.0)"
+# compand(self, attack=0.2, decay=1, soft_knee=2.0, threshold=-20, db_from=-20.0, db_to=-20.0) #"""compand takes 6 parameters: attack (seconds), decay (seconds), soft_knee (ex. 6 results  in 6:1 compression ratio), threshold (a negative value  in dB), the level below which the signal will NOT be companded  (a negative value in dB), the level above which the signal will    NOT be companded (a negative value in dB). This effect   manipulates dynamic range of the input file.
+# #delay(self, gain_in=0.8, gain_out=0.5, delays=None,decays=None, parallel=False)         #"delay takes 4 parameters: input gain (max 1), output gain and then two lists, delays and decays . Each list is a pair of comma seperated values within parenthesis.
+# speed(self, factor, use_semitones=False)# s"speed takes 2 parameters: factor and use-semitones (True or False).When use-semitones = False, a factor of 2 doubles the speed and raises the pitch an octave. The same result is achieved with factor = 1200 and use semitones = True.
 
 
 # --------------PARAMETERS to TUNE---------------------
@@ -567,7 +581,7 @@ class MergeFallback(FallbackSkill):
         # step 2: pick sound from collective memory
         sound_file_name=random.choice(os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/"))
         sound_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+sound_file_name
-
+        
         self.log.info("Step 3--Share the title")
         # step 3: catch name file and say it loud 
         #name_file=os.path.basename(sound_path).split(".")[0]
@@ -576,10 +590,16 @@ class MergeFallback(FallbackSkill):
         self.log.info("***Memory Burps*** "+name_file)
         self.speak(name_file)
 
-        # step 4: playback the sound
+
+        # step 4: Distort the sound
+        output_path= COLLECTIVE_MEMORY_FOLDER+"temp.wav" #here just a temporary path
+        #TODO: Max length
+        random_distortion(sound_path, output_path, proba_overlay=0.8, min_gain_drop=4, max_gain_drop=8, max_length=0)
+
+        # step 5: playback the sound
         self.log.info("Step 4--Play the sound")
         self.log.info("Playing one sound...")
-        self.audio_service.play(sound_path)
+        self.audio_service.play(output_path)
         
 
     def text_tunes(self, message):
