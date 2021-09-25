@@ -1,25 +1,34 @@
+# !/usr/local/bin/python3
+# -*- coding: utf-8 -*-
 
 
+######Description############
+
+
+
+# =============================================
+# --------------INITIALIZATION---------------
+# ======================================
+
+# --------------IMPORTS----------------------
 
 
 import random
 import pathlib
-# sound_path=str(pathlib.Path(__file__).parent.parent.absolute())+"/collective_memory/text/"
-
-from pysndfx import AudioEffectsChain
-
-
-from pydub import AudioSegment #JUST FOR OVERLAY...
+#Main sound library used, #cf https://github.com/carlthome/python-audio-effects
+from pysndfx import AudioEffectsChain 
+#Second library in use currently, for overlay
+from pydub import AudioSegment 
 
 
+# ============================================
+# ------------------TODO-----------------------
+# =============================================
 
-sound_path1=str(pathlib.Path(__file__).parent.absolute())+"/voice.wav"
-sound_path2=str(pathlib.Path(__file__).parent.absolute())+"/taiyuan.wav"
-outfile=str(pathlib.Path(__file__).parent.absolute())+"/temp.wav"
-
-#cf https://github.com/carlthome/python-audio-effects
-
-#TODO: Add more effects such as:
+#TODO:More fade in and out accross time
+#TODO  Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
+#TODO: Could overlay with another file ?
+#TODO: Add more effects such as: (and the ones commented out below)
 # equalizer(frequency, q=1.0, db=-3.0)  #"frequency in Hz, q or band-width (default=1.0)"
 # bandpass(frequency, q=1.0)  #"frequency in Hz, q or band-width (default=1.0)"
 # bandreject(frequency, q=1.0) #"frequency in Hz, q or band-width (default=1.0)"
@@ -27,35 +36,46 @@ outfile=str(pathlib.Path(__file__).parent.absolute())+"/temp.wav"
 # #delay(self, gain_in=0.8, gain_out=0.5, delays=None,decays=None, parallel=False)         #"delay takes 4 parameters: input gain (max 1), output gain and then two lists, delays and decays . Each list is a pair of comma seperated values within parenthesis.
 # speed(self, factor, use_semitones=False)# s"speed takes 2 parameters: factor and use-semitones (True or False).When use-semitones = False, a factor of 2 doubles the speed and raises the pitch an octave. The same result is achieved with factor = 1200 and use semitones = True.
 
+# --------------PARAMETERS to TUNE---------------------
 
-#TODO: may overlay with original at the end , and volume...other could be very small
-#TODO: Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
-#TODO proba origian pure sound?
 
-def random_distortion(infile, infile2=None):
+EFFECTS={
+    "lowpass": 0.3,
+    "highpass": 0.3,
+    "reverb": 0.4,
+    "phaser": 0.2,
+    "chorus": 0.3,
+    "overdrive": 0.2,
+    "pitch": 0.2,
+    "tempo": 0.3,
+    "tremolo": 0.3,
+    "reverse": 0.4
+
+}
+
+
+# -------------OTHER PARAMETERS----------------------
+
+sound_path1=str(pathlib.Path(__file__).parent.absolute())+"/input/voice.wav"
+sound_path2=str(pathlib.Path(__file__).parent.absolute())+"/input/taiyuan.wav"
+outfile=str(pathlib.Path(__file__).parent.absolute())+"/output/out.wav"
+
+
+
+# =============================================
+# -----------------MAIN PROCEDURE ---------------
+# =============================================
+
+def random_distortion(infile, infile2=None, proba_overlay=0.8, min_gain_drop=4, max_length=0):
     """
+    infile: adress of sound file 
+    proba_overlay: probability of overlaying original sound with distored (when want to still hear...)
+    gain: gain applied to distorted sound if overlay
+    max_length: cut to a max length if not 0
 
     """
-
-    #Effects: low pass filter, reverse, pan. Overlay with itself?
-    EFFECTS={
-        "lowpass": 0.3,
-        "highpass": 0.3,
-        "reverb": 0.4,
-        "phaser": 0.2,
-        "chorus": 0.3,
-        "overdrive": 0.2,
-        "pitch": 0.2,
-        "tempo": 0.3,
-        "tremolo": 0.3,
-        "reverse": 0.4,
-        "overlay": 0.8
-
-    }
 
     fx = AudioEffectsChain()
-
-
 
     if random.random()<EFFECTS["lowpass"]:
         # lowshelf(gain=-20.0, frequency=100, slope=0.5) # "lowshelf takes 3 parameters: a signed number for gain or attenuation in dB, filter frequency in Hz and slope (default=0.5, maximum=1.0)."
@@ -64,13 +84,13 @@ def random_distortion(infile, infile2=None):
         fx=fx.lowshelf(frequency=freq)
        
     if random.random()<EFFECTS["highpass"]:
-        #    highshelf(self, gain=-20.0, frequency=3000, slope=0.5) 
+        #highshelf(self, gain=-20.0, frequency=3000, slope=0.5) 
         freq=random.randint(1000, 4000)
         print("Highpass at {}".format(freq))
         fx=fx.highshelf(frequency=freq)
     
     if random.random()<EFFECTS["reverb"]:
-        #    reverb(self, reverberance=50, hf_damping=50, room_scale=100, stereo_depth=100, pre_delay=20, wet_gain=0, wet_only=False) #reverb takes 7 parameters: reverberance, high-freqnency damping, room scale, stereo depth, pre-delay, wet gain and wet only (True orFalse)"""
+        # reverb(self, reverberance=50, hf_damping=50, room_scale=100, stereo_depth=100, pre_delay=20, wet_gain=0, wet_only=False) #reverb takes 7 parameters: reverberance, high-freqnency damping, room scale, stereo depth, pre-delay, wet gain and wet only (True orFalse)"""
         room_scale=random.randint(20, 100)
         reverberance=random.randint(20, 50)
         print("Reverb")
@@ -88,8 +108,6 @@ def random_distortion(infile, infile2=None):
     #     #    chorus(self, gain_in, gain_out, decays)
     #     fx=fx.chorus(gain_in=0.2, gain_out=0.2, decays=[[2], [10], [6]])
 
-#TODO: More fade in and out..cut ?
-#TODO: CUt to a maximum length
 
     if random.random()<EFFECTS["overdrive"]:
         print("Overdrive")
@@ -123,15 +141,23 @@ def random_distortion(infile, infile2=None):
     # Apply phaser and reverb directly to an audio file.
     fx(infile, outfile)
 
-    if random.random()<EFFECTS["overlay"]:
+    if random.random()<proba_overlay:
         print("Overlay")
         original = AudioSegment.from_file(infile)
         distorted = AudioSegment.from_file(outfile)
         length = min(len(original), len(distorted))
-        original=original-1
-        combined = original[:length].overlay(distorted[:length]- random.randrange(2, 8), loop=True)
+        if max_length>0:
+            length=min(length, max_length)
+        original=original-2
+        min_gain_drop=max(min_gain_drop, 2)
+        combined = original[:length].overlay(distorted[:length]- random.randrange(2, min_gain_drop), loop=True)
         combined.export(outfile, format='wav')
-
+    elif max_length>0:
+        print("Cut file to max length")
+        distorted = AudioSegment.from_file(outfile)
+        combined = distorted[:max_length]-2#also attenuate a bit
+        combined.export(outfile, format='wav')
+        
     # Mix loop2 with a reversed, panned version
     #loop2.reverse().pan(-0.5).overlay(loop2.pan(0.5))
 
@@ -140,4 +166,7 @@ def random_distortion(infile, infile2=None):
 
 
 
-random_distortion(sound_path1, sound_path2)
+# =============================================
+# -----------------TEST---------------
+# =============================================
+random_distortion(sound_path1, sound_path2, proba_overlay=0.8, min_gain_drop=4, max_length=0)
