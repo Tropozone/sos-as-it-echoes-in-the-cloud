@@ -3,6 +3,7 @@
 
 
 ######Description############
+# Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the Wweird... ")
 
 # =============================================
 # --------------INITIALIZATION---------------
@@ -19,7 +20,6 @@ from mycroft.util import record, play_wav
 from mycroft.util.parse import extract_datetime
 from mycroft.util.format import nice_duration
 from mycroft.util.time import now_local
-
 import random
 import pathlib
 import time
@@ -27,17 +27,15 @@ import re
 import os
 from os.path import exists
 import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4
+#for gpt2
 import torch
 import transformers 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
-
 from datetime import datetime, date
 from datetime import timedelta
-
-
 # for grammar
 from gingerit.gingerit import GingerIt
-
+# other scrips in utils
 from .utils import random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
@@ -82,20 +80,31 @@ from .utils import random_distortion, split_into_sentences, ending_with_punct_ma
 # #delay(self, gain_in=0.8, gain_out=0.5, delays=None,decays=None, parallel=False)         #"delay takes 4 parameters: input gain (max 1), output gain and then two lists, delays and decays . Each list is a pair of comma seperated values within parenthesis.
 # speed(self, factor, use_semitones=False)# s"speed takes 2 parameters: factor and use-semitones (True or False).When use-semitones = False, a factor of 2 doubles the speed and raises the pitch an octave. The same result is achieved with factor = 1200 and use semitones = True.
 
+# -------------PARAMETERS to check----------------------
+# --FOR ML MODEL
+my_ML_model = True  # If do have a fine-tuned model, set to True
+my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
+#----Folder Collective Memory
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with where collective memory resides...
+#"/home/pi/.mycroft/skills/Collective Memory Skill/
+#---- If can Use sound with VA:
+SONOR=True #NOTE: For a text-based VA, put false !
+
+
 
 # --------------PARAMETERS to TUNE---------------------
 
-#Likelihood different skills
+##----For MERGE: Likelihood different skills
 #0--->Hello Socket
 #1----> What if we Bucket
 #2----> Enter the Weird
 #3----> Elsewhere Tunes
 LIKELIHOOD_SKILLS=[20,10,50,20]
 
-#FOR HELLO SOCKET
+#----OR HELLO SOCKET
 WAITING_TIME=5 
 
-#FOR WHAT IF WE BUCKET gpt2 param
+#----FOR WHAT IF WE BUCKET gpt2 param
 MAX_LENGTH = 100
 TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
@@ -103,7 +112,7 @@ TOP_K=100
 TOP_P=0.3
 SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 
-#FOR ENTER THE WEIRD gpt2 generation param
+#----FOR ENTER THE WEIRD gpt2 generation param
 MAX_LENGTH_WEIRD = 180
 VARIANCE_LENGTH_WEIRD = 40
 TEMPERATURE_WEIRD = 0.9
@@ -117,7 +126,7 @@ SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 ##FOR COLLECTIVE MEMORY
 
 
-# FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
+#--- FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
 #TODO Experiment with more filters, different for the generation and the post processing
 #TODO: Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
@@ -127,30 +136,23 @@ BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", 
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 #TODO: COULD replace some token by others >>>
 
-#for Recording (hello socket and elsewhere tunesY
+#---- For Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
 
-TEXT_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
+TEXT_LIKELIHOOD=0.3#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
+SISTER_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
+
 
 MAX_CHAR_MEMORY=280
 
-# -------------OTHER PARAMETERS----------------------
-WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/"
+# -------------OTHER PARAMETERS ----------------------
+WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/words/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
-# --FOR ML MODEL
-my_ML_model = True  # If do have a fine-tuned model, set to True
-my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
-
-
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with where collective memory resides...
-#"/home/pi/.mycroft/skills/Collective Memory Skill/
-
-SONOR=True #NOTE: For a text-based VA, put false !
 
 # =============================================
-# ------------------SKILL---------------
+# ------------------MERGE FALLBACK---------------
 # =============================================
 
 class MergeFallback(FallbackSkill):
@@ -158,7 +160,6 @@ class MergeFallback(FallbackSkill):
     def __init__(self):
         super(MergeFallback, self).__init__(name='Merge Fallback Skill')    
         self.log.info("*****INIT FALLBACK MERGE ****")
-        #Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the ")
         self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
         self.NUM_SUBSKILLS=len(self.SUBSKILLS)
         self.settings_what_if=dict()
@@ -182,18 +183,21 @@ class MergeFallback(FallbackSkill):
         
     
     def load_messages(self):
-        # load message
+        """
+        Load Messages to speak out for transitions.
+        """
         path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
         self.MSG_TELL=load_data_txt("message_tell.txt", path_folder=path_folder)
         self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
         self.MSG_THANKS=load_data_txt("message_thanks.txt", path_folder=path_folder)
         self.MSG_TRAVEL=load_data_txt("message_travel.txt", path_folder=path_folder)
         self.MSG_PATIENT=load_data_txt("message_patient.txt", path_folder=path_folder)
+        self.MSG_RITUAL=load_data_txt("message_ritual.txt", path_folder=path_folder)
+        self.MSG_SISTER_START=load_data_txt("message_sister_start.txt", path_folder=path_folder)
         
 
     def init_recording_settings(self):
-
-        # min free diskspace (MB)
+        # TODO: Add min free diskspace (MB) ?
         self.log.info("Init Recording Settings - in fallback-merge")
         self.settings.setdefault("min_free_disk", 100)
         self.settings.setdefault("rate", 16000)  # sample rate, hertz
@@ -228,8 +232,8 @@ class MergeFallback(FallbackSkill):
         self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
         # load
         path_folder=str(pathlib.Path(__file__).parent.absolute())
-        self.whatif = load_data_txt("/whatif.txt", path_folder=path_folder)
-        self.whatif_nokey = load_data_txt("/whatif_nokey.txt", path_folder=path_folder)
+        self.whatif = load_data_txt("/data/whatif.txt", path_folder=path_folder)
+        self.whatif_nokey = load_data_txt("/data/whatif_nokey.txt", path_folder=path_folder)
         
         self.settings_what_if.setdefault("repetition_penalty", REPETITION_PENALTY)  
         self.settings_what_if.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
@@ -261,6 +265,7 @@ class MergeFallback(FallbackSkill):
         
     def init_elsewhere_tunes(self):
         self.text_likelihood=TEXT_LIKELIHOOD
+        self.sister_likelihood=SISTER_LIKELIHOOD
         self.MAX_CHAR_MEMORY=MAX_CHAR_MEMORY
 
     def initialize(self):
@@ -334,7 +339,10 @@ class MergeFallback(FallbackSkill):
         """
             Make Kin practices
         """
-        #TODO: Starting Message ?
+        
+        # start message
+        ritual_start=random.choice(self.MSG_RITUAL)
+        self.speak(ritual_start)
 
         self.log.info("step 1---Pick Object")
         agent= random.choice(self.objects).strip("\n")
@@ -342,10 +350,18 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 2---Create a Makin kin Event Score:")
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
-        #grammar correction #TODO: Split into smaller if too long
+        #grammar correction #TODO: Weekly limit ginger ???
         split=split_into_sentences(event)
-        split=[self.gingerParser.parse(_)['result'] for _ in split]
-        event=" ".join(split)
+        corrected=[]
+        for sentence in split:
+            if len(sentence)>280: #300 char limit ginger parser? when free
+                sentence1=sentence[:290]
+                sentence2=sentence[290:]
+                neue=self.gingerParser.parse(sentence1)['result']+self.gingerParser.parse(sentence2)['result']
+            else:
+                neue=self.gingerParser.parse(sentence)['result']
+            corrected.append(neue)
+        event=" ".join(corrected)
         #event=self.gingerParser.parse(event)['result']
 
         self.log.info("step 3---Share the Event")
@@ -545,16 +561,18 @@ class MergeFallback(FallbackSkill):
         return blabla
 
     def elsewhere_tunes(self, message):
-        
-        rand=random.uniform(0, 1)
-        
+                
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
-        if self.sonor and rand<(1-self.text_likelihood):
+        if self.sonor and random.uniform(0, 1)<(1-self.text_likelihood):
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes(message)
+        elif random.uniform(0, 1)<self.sister_likelihood:
+            self.log.info("Sister Node tunes")
+            self.log.info("=======================================================") 
+            self.sister_node_tunes(message) 
         else:
             self.log.info("Text tunes")
             self.log.info("=======================================================") 
@@ -573,8 +591,9 @@ class MergeFallback(FallbackSkill):
         
         self.log.info("Step 1--Catch Attention")
         # step 1: catch attention ? or just as a burp
+        travel=random.choice(self.MSG_TRAVEL)
+        self.speak(travel)
         message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
-        self.log.info(message_listen)
         self.speak(message_listen)
 
         self.log.info("Step 2--Pick the sound")
@@ -603,6 +622,7 @@ class MergeFallback(FallbackSkill):
         
 
     def text_tunes(self, message):
+        #TODO: Turn them into sounds>>>
 
         self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory
@@ -612,14 +632,6 @@ class MergeFallback(FallbackSkill):
         #little message
         travel=random.choice(self.MSG_TRAVEL)
         self.speak(travel)
-        self.log.info(travel)
-        
-        # self.log.info("Step 2--Share the title of the file")
-        # # step 3: catch name file and say it loud 
-        # name_file=os.path.basename(text_path).split(".")[0]
-        # name_file=name_file.replace("_", " ")
-        # self.log.info("***Memory Burps*** "+name_file)
-        # self.speak(name_file)
 
         self.log.info("Step 2--Share the text")
         # step 3: say the text
@@ -636,6 +648,38 @@ class MergeFallback(FallbackSkill):
         self.speak(memory)
 
         return memory
+
+
+    def sister_node_tunes(self, message):
+
+        NODES=["1", "2", "3", "666"]
+
+        #pick a node and load data
+        #TODO: Shall check not same node ?
+        sister_node=random.choice(NODES)
+        sister_node_path=str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/nodes/"+sister_node+"/"
+        with open(sister_node_path+"id.json","r") as json:
+            sister_node_id=json.load()
+        with open(sister_node_path+"about.txt","r") as f:
+            sister_node_about=f.read()
+        sister_node_about.split("/n")
+
+        #little message
+        sister_start=random.choice(self.MSG_SISTER_START)
+        self.speak(sister_start)
+
+        #say something about the node
+        #TODO: say more about id ? List species?
+        about=""
+        while len(about)<10: #to avoid emnoty
+            about=random.choice(sister_node_about)
+        self.speak(about)
+        self.log.info(about)
+
+
+        #TODO: Ask opinion?
+
+
 
     def has_free_disk_space(self):
         #TODO: add free disk space later on

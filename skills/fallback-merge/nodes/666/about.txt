@@ -1,0 +1,5 @@
+The most prominent component of the Internet model is the Internet Protocol (IP). IP enables internetworking and, in essence, establishes the Internet itself. Two versions of the Internet Protocol exist, IPV4 and IPV6.
+
+From 2000 to 2009, the number of Internet users globally rose from 394 million to 1.858 billion.
+
+Steady advances in semiconductor technology and optical networking created new economic opportunities for commercial involvement in the expansion of the network in its core and for delivering services to the public. In mid-1989, MCI Mail and Compuserve established connections to the Internet, delivering email and public access products to the half million users of the Internet.

@@ -188,7 +188,7 @@ def load_data_kin(filename, path_folder="", mode="r"):
 def load_objects():
     path_folder=str(pathlib.Path(__file__).parent.absolute())
     #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_txt("/objects.txt", path_folder=path_folder)
+    return load_data_txt("/data/objects.txt", path_folder=path_folder)
 
 def load_data_txt(filename, path_folder="", mode="r"):
     """
@@ -201,7 +201,7 @@ def load_data_txt(filename, path_folder="", mode="r"):
 def load_makingkin():
     path_folder=str(pathlib.Path(__file__).parent.absolute())
     #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_kin("/yoko.txt", path_folder=path_folder)
+    return load_data_kin("/data/yoko.txt", path_folder=path_folder)
 
 
 
