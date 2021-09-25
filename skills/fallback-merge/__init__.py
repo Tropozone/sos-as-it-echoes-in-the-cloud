@@ -36,7 +36,7 @@ from datetime import timedelta
 # for grammar
 from gingerit.gingerit import GingerIt
 # other scrips in utils
-from .utils import random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -44,34 +44,18 @@ from .utils import random_distortion, split_into_sentences, ending_with_punct_ma
 # ------------------TODO-----------------------
 # =============================================
 
-#--- CHECKS//TUNES
 # TODO: What if We Bucket: Tune ML Param. Too human filter, bad token, HomeMade gpt2
 # TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, bad token. HomeMade gpt2
-
-#--SOON:
-# TODO: Hello Socket : Object//Events
+# TODO: Hello Socket : Add Object//Events
 # TODO: Tune Grammar & Filters for skills
 # TODO: Hello Socket: Recording Time ? Fix or ? Can make longer and cut sound?
 # TODO: Hello Socket : Replace in EventsLocation and Temporalities and objects to fit Expo in Public space
-# TODO: Hello SOcket Event asking for successive interaction as conversation
-# TODO: ENTER THE WEIRD:  different seeds ?// Use PERSONNA gpt2! 
-# TODO: ENTER THE WEIRD: Manipulation audio
-# TODO: Elsewhere Tunes: SHARE MORE ABOUT NODES?
-# TODO: What if: Structure of a fabulation instead, query only gpt2 for words?  or use generator without ML?
-# TODO: What if: More interaction with human? Ask its reaction, opintion ? and RECORD ?
-# TODO: What If: Rework a lot the counterfactuals, history, etc. Add some grammar etc
+# TODO: ENTER THE WEIRD: Different seeds ?// Use PERSONNA gpt2! 
 # TODO: Record sometimes part of text human say answer and add it to memory...
-# TODO: But maybe etc...
-# TODO: Harmonize sound back level
-# TODO: Random eraser in memory, when above number. Older more likely get erased...
-# TODO: How things are trigered
-
-
 #TODO: SOund distortion: Replace file by distorted version so more and mnore distorted ?
-#TODO: SOUND Distortion: integrate main script? Apply also Quinoa COllapse ?
+#TODO: SOUND Distortion: need integrate main script? Apply also Quinoa COllapse ?
 #TODO: SOUND Distortion: More fade in and out accross time
-#TODO  SOUND Distortion:Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
-#TODO: SOUND Distortion:Could overlay with another file ?
+#TODO  SOUND Distortion: Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
 #TODO: SOUND Distortion: Add more effects such as: (and the ones commented out below)
 # equalizer(frequency, q=1.0, db=-3.0)  #"frequency in Hz, q or band-width (default=1.0)"
 # bandpass(frequency, q=1.0)  #"frequency in Hz, q or band-width (default=1.0)"
@@ -124,14 +108,14 @@ TOP_P_WEIRD=0.3
 SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 
 ##FOR COLLECTIVE MEMORY
-
+MAX_MEMORY=100
 
 #--- FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
 #TODO Experiment with more filters, different for the generation and the post processing
 #TODO: Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant"] #TODO but remove words including he and she...
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "God"] #TODO but remove words including he and she...
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 #TODO: COULD replace some token by others >>>

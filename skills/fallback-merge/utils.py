@@ -10,10 +10,47 @@ from string import punctuation
 import re
 
 
+
 #Main sound library used, #cf https://github.com/carlthome/python-audio-effects
 from pysndfx import AudioEffectsChain 
 #Second library in use currently, for overlay
 from pydub import AudioSegment 
+
+import os
+import os.path, time
+import numpy as np
+
+######*****************************************************************************************
+######*********************** AGE MEMORY ***********************************************
+######*****************************************************************************************
+
+def age_memory(folder_memory):
+    ages=[]
+
+    memory_paths=os.listdir(folder_memory+"sound/")#TODOfolder_memory
+
+    for file_name in memory_paths:
+        ages.append(os.path.getctime(folder_memory+"sound/"+file_name))
+        #print("Created: %s" % time.ctime(os.path.getctime("requirements.txt")))
+
+    return memory_paths, np.array(ages)
+
+
+def forget_one_memory(folder_memory):
+
+    #compute age element memory
+    memory_paths, ages=age_memory(folder_memory)
+
+    #compute probability: normalise such that sum is 1; here, linear ? 
+    ages=ages / np.sum(ages)
+
+    #sample file along probability
+    forgotten=np.random.choice(memory_paths, 1, p=ages)
+
+    #delete it
+    os.remove(folder_memory+"sound/"+forgotten)
+    
+
 
 
 ######*****************************************************************************************
