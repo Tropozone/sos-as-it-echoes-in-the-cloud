@@ -34,7 +34,9 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from datetime import datetime, date
 from datetime import timedelta
 # for grammar
-from gingerit.gingerit import GingerIt
+#from gingerit.gingerit import GingerIt
+import language_tool_python
+
 # other scrips in utils
 from .utils import forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
@@ -44,14 +46,12 @@ from .utils import forget_one_memory, random_distortion, split_into_sentences, e
 # ------------------TODO-----------------------
 # =============================================
 
+# TODO: Grammar test may do it once per skill
 # TODO: What if We Bucket: Tune ML Param. Too human filter, bad token, HomeMade gpt2
 # TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, bad token. HomeMade gpt2
 # TODO: Hello Socket : Add Object//Events
-# TODO: Tune Grammar & Filters for skills
 # TODO: Hello Socket: Recording Time ? Fix or ? Can make longer and cut sound?
 # TODO: Hello Socket : Replace in EventsLocation and Temporalities and objects to fit Expo in Public space
-# TODO: ENTER THE WEIRD: Different seeds ?// Use PERSONNA gpt2! 
-# TODO: Record sometimes part of text human say answer and add it to memory...
 #TODO: SOund distortion: Replace file by distorted version so more and mnore distorted ?
 #TODO: SOUND Distortion: need integrate main script? Apply also Quinoa COllapse ?
 #TODO: SOUND Distortion: More fade in and out accross time
@@ -148,7 +148,9 @@ class MergeFallback(FallbackSkill):
         self.NUM_SUBSKILLS=len(self.SUBSKILLS)
         self.settings_what_if=dict()
         self.settings_enter_the_weird=dict()
-        self.gingerParser = GingerIt()    
+        #self.gingerParser = GingerIt()
+        self.grammarParser=language_tool_python.LanguageTool('en-US')
+
         self.load_messages()
         self.init_hello_socket()
         self.init_what_if_we_bucket()
@@ -341,9 +343,13 @@ class MergeFallback(FallbackSkill):
             if len(sentence)>280: #300 char limit ginger parser? when free
                 sentence1=sentence[:290]
                 sentence2=sentence[290:]
-                neue=self.gingerParser.parse(sentence1)['result']+self.gingerParser.parse(sentence2)['result']
+                #neue=self.gingerParser.parse(sentence1)['result']+self.gingerParser.parse(sentence2)['result']
+                neue=self.grammarParser.correct(sentence1)+self.grammarParser.correct(sentence2)
+                #
             else:
-                neue=self.gingerParser.parse(sentence)['result']
+                #neue=self.gingerParser.parse(sentence)['result']
+                neue=self.grammarParser.correct(sentence)
+
             corrected.append(neue)
         event=" ".join(corrected)
         #event=self.gingerParser.parse(event)['result']
@@ -442,7 +448,8 @@ class MergeFallback(FallbackSkill):
         response=ending_with_punct_manual(raw_response)
         #grammar check
         split=split_into_sentences(response)
-        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        #split=[self.gingerParser.parse(_)['result'] for _ in split]
+        split=[self.grammarParser.correct(_) for _ in split]
         response=" ".join(split)
         #response=self.gingerParser.parse(response)['result']
 
@@ -511,7 +518,8 @@ class MergeFallback(FallbackSkill):
         #grammar check:
         #drift=self.gingerParser.parse(drift)['result']
         split=split_into_sentences(drift)
-        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        #split=[self.gingerParser.parse(_)['result'] for _ in split]
+        split=[self.grammarParser.correct(_) for _ in split]
         drift=" ".join(split)
 
         self.log.info("=======================================================") 
@@ -625,7 +633,8 @@ class MergeFallback(FallbackSkill):
         memory=ending_with_punct_manual(memory)
         #grammar check
         split=split_into_sentences(memory)
-        split=[self.gingerParser.parse(_)['result'] for _ in split]
+        #split=[self.gingerParser.parse(_)['result'] for _ in split]
+        split=[self.grammarParser.correct(_) for _ in split]
         memory=" ".join(split)
 
         self.log.info(memory)
