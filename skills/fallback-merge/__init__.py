@@ -46,7 +46,7 @@ from .utils import load_storylines, read_story, forget_one_memory, random_distor
 # ------------------TODO-----------------------
 # =============================================
 
-# TODO: Grammar test may do it once per skill. Shared procedure where cut in small; Check if grammar correct resilient bigger texts ?
+# TODO: Grammar procedure where cut in small; Check if grammar correct resilient bigger texts ?
 # TODO: What if We Bucket: Tune ML Param. Too human filter, bad token, HomeMade gpt2
 # TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, bad token. HomeMade gpt2
 # TODO: Hello Socket : Add Object//Events
@@ -90,12 +90,13 @@ WAITING_TIME=5
 MAX_LENGTH = 100
 TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
-TOP_K=100
+TOP_K=70
 TOP_P=0.3
 SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
+#TODO; Max length deprecated ? 
 
 #----FOR ENTER THE WEIRD gpt2 generation param
-MAX_LENGTH_WEIRD = 180
+MAX_LENGTH_WEIRD = 120
 VARIANCE_LENGTH_WEIRD = 40
 TEMPERATURE_WEIRD = 0.9
 VARIANCE_TEMPERATURE_WEIRD = 0.2
@@ -109,21 +110,19 @@ SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 MAX_MEMORY=100
 
 #--- FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
-#TODO Experiment with more filters, different for the generation and the post processing
-#TODO: Do several words may be forbodden ?
+#TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
 TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "God"] #TODO but remove words including he and she...
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
-#TODO: COULD replace some token by others >>>
 
 #---- For Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 
 MAX_RECORDING_TIME=60
 
-TEXT_LIKELIHOOD=0.3#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
-SISTER_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. #TODO: decrease in general, here simply because a lot of text...
+TEXT_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
+SISTER_LIKELIHOOD=0.5#percentage of text which are sister node info
 
 
 MAX_CHAR_MEMORY=280
@@ -328,30 +327,18 @@ class MergeFallback(FallbackSkill):
         ritual_start=random.choice(self.MSG_RITUAL)
         self.speak(ritual_start)
 
+        #pick object
         self.log.info("step 1---Pick Object")
         agent= random.choice(self.objects).strip("\n")
         
+        #make king event score
         self.log.info("step 2---Create a Makin kin Event Score:")
         event_score = random.choice(self.eventscores)
         event=read_event(event_score, agent, self.dico)
-        #grammar correction #TODO: Weekly limit ginger ???
-        split=split_into_sentences(event)
-        corrected=[]
-        for sentence in split:
-            if len(sentence)>280: #300 char limit ginger parser? when free
-                sentence1=sentence[:290]
-                sentence2=sentence[290:]
-                #neue=self.gingerParser.parse(sentence1)['result']+self.gingerParser.parse(sentence2)['result']
-                neue=self.grammarParser.correct(sentence1)+self.grammarParser.correct(sentence2)
-                #
-            else:
-                #neue=self.gingerParser.parse(sentence)['result']
-                neue=self.grammarParser.correct(sentence)
-
-            corrected.append(neue)
-        event=" ".join(corrected)
+        event=self.parse_text(event)
         #event=self.gingerParser.parse(event)['result']
 
+        #share event
         self.log.info("step 3---Share the Event")
         self.speak(event)
         self.log.info("Event: "+ "\n" + event)
@@ -442,15 +429,8 @@ class MergeFallback(FallbackSkill):
 
         # step 4 ---
         self.log.info("step 4---final output")
-        #good ending for ...
-        response=ending_with_punct_manual(raw_response)
-        #grammar check
-        split=split_into_sentences(response)
-        #split=[self.gingerParser.parse(_)['result'] for _ in split]
-        split=[self.grammarParser.correct(_) for _ in split]
-        response=" ".join(split)
+        response=self.parse_text(raw_response)
         #response=self.gingerParser.parse(response)['result']
-
         self.log.info("***COOL and filtered ***"+response)
         self.speak(response)
         self.log.info("=======================================================")
@@ -472,15 +452,16 @@ class MergeFallback(FallbackSkill):
             #- replace xxx , yyy and cc
             line=line.replace("xxx", critter)
             line=line.replace("yyy", keyword)
-            line=line.replace("cc", str(random.randint(0,10))+str(random.randint(0,10)))
+            line=line.replace("cc", str(random.randint(0,9))+str(random.randint(0,9)))
             #--read it
-            bla=read_story(line, dico=dico)#TODO
+            bla=read_line(line, dico=dico)#TODO
 
-            #---complete with gpt2#TODO
+            #---complete with gpt2  a few sentences
+            #TODO: Try feed whole context? TEST!
+            raw=self.gpt2_generation(bla, self.settings_what_if)
             
-            #--- cut it to a sentence #TODO
-
-            #---correct it with grammar#TODO
+            #--- cut it to a sentence 
+            bla=self.parse_text(raw)
 
             #--- add it to story
             story+=bla + "\n"
@@ -543,15 +524,6 @@ class MergeFallback(FallbackSkill):
                 self.log.info("UNCOOL{} was filtered out,".format(count)+ raw_drift)
 
         #TODO: Filter ot not?
-        #good ending with punctuation
-        drift=ending_with_punct_manual(raw_drift)
-        #grammar check:
-        #drift=self.gingerParser.parse(drift)['result']
-        split=split_into_sentences(drift)
-        #split=[self.gingerParser.parse(_)['result'] for _ in split]
-        split=[self.grammarParser.correct(_) for _ in split]
-        drift=" ".join(split)
-
         self.log.info("=======================================================") 
         self.log.info("Step 3--Share the drift")
         self.log.info("=======================================================") 
@@ -559,7 +531,19 @@ class MergeFallback(FallbackSkill):
         self.log.info("***COOL and filtered ***"+drift)
 
         return drift
-    
+
+
+    def parse_text(self, bla):
+        #good ending with punctuation
+        bla=ending_with_punct_manual(bla)
+        #grammar check:
+        #drift=self.gingerParser.parse(drift)['result']
+        split=split_into_sentences(bla)
+        #split=[self.gingerParser.parse(_)['result'] for _ in split]
+        split=[self.grammarParser.correct(_) for _ in split]
+
+        return " ".join(split)
+   
     def enter_the_weird(self, message):
         """
             Several gpt-2 drifts from the last utterance
@@ -660,12 +644,7 @@ class MergeFallback(FallbackSkill):
         with open(text_path, 'r') as f:
             lines = f.readlines()
         memory=" ".join(lines)[:self.MAX_CHAR_MEMORY]
-        memory=ending_with_punct_manual(memory)
-        #grammar check
-        split=split_into_sentences(memory)
-        #split=[self.gingerParser.parse(_)['result'] for _ in split]
-        split=[self.grammarParser.correct(_) for _ in split]
-        memory=" ".join(split)
+        memory=self.parse_text(memory)
 
         self.log.info(memory)
         self.speak(memory)
