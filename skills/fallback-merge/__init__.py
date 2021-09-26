@@ -38,7 +38,7 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, read_story, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -46,7 +46,7 @@ from .utils import forget_one_memory, random_distortion, split_into_sentences, e
 # ------------------TODO-----------------------
 # =============================================
 
-# TODO: Grammar test may do it once per skill
+# TODO: Grammar test may do it once per skill. Shared procedure where cut in small; Check if grammar correct resilient bigger texts ?
 # TODO: What if We Bucket: Tune ML Param. Too human filter, bad token, HomeMade gpt2
 # TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, bad token. HomeMade gpt2
 # TODO: Hello Socket : Add Object//Events
@@ -73,8 +73,6 @@ COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with whe
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 #---- If can Use sound with VA:
 SONOR=True #NOTE: For a text-based VA, put false !
-
-
 
 # --------------PARAMETERS to TUNE---------------------
 
@@ -220,7 +218,7 @@ class MergeFallback(FallbackSkill):
         path_folder=str(pathlib.Path(__file__).parent.absolute())
         self.whatif = load_data_txt("/data/whatif.txt", path_folder=path_folder)
         self.whatif_nokey = load_data_txt("/data/whatif_nokey.txt", path_folder=path_folder)
-        
+        self.storylines = load_storylines("/data/fabulations.txt", path_folder=path_folder)
         self.settings_what_if.setdefault("repetition_penalty", REPETITION_PENALTY)  
         self.settings_what_if.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
         self.settings_what_if.setdefault("max_length", MAX_LENGTH)
@@ -458,6 +456,38 @@ class MergeFallback(FallbackSkill):
         self.log.info("=======================================================")
         
         return response
+
+    def fabulate(self, critter, keyword):
+
+        """
+        Args: 
+            
+        """
+        
+        #---generate Story line by line
+        story=""
+        for lines in self.storylines:
+            #-pick a story line 
+            line=random.choices(lines.split("\n"))
+            #- replace xxx , yyy and cc
+            line=line.replace("xxx", critter)
+            line=line.replace("yyy", keyword)
+            line=line.replace("cc", str(random.randint(0,10))+str(random.randint(0,10)))
+            #--read it
+            bla=read_story(line, dico=dico)#TODO
+
+            #---complete with gpt2#TODO
+            
+            #--- cut it to a sentence #TODO
+
+            #---correct it with grammar#TODO
+
+            #--- add it to story
+            story+=bla + "\n"
+        self.log.info("Generated Story: \n"+ story)
+
+        return story
+
 
     def gpt2_generation(self, seed, settings):
         #More parameters ? 

@@ -1,7 +1,7 @@
 import random
 import pathlib
-from gingerit.gingerit import GingerIt
-gingerParser = GingerIt()  # for grammar
+#from gingerit.gingerit import GingerIt
+#gingerParser = GingerIt()  # for grammar
 
 import nltk
 from nltk import sent_tokenize
@@ -263,7 +263,7 @@ def read_event(event_score, agent, dico):
             neue_line+=neue_unit+" "
         neue_line=neue_line.replace(" .", ".")
         neue_line=neue_line.replace(" ,", ",")
-        neue_line=gingerParser.parse(neue_line)['result']  #grammar check
+        #neue_line=gingerParser.parse(neue_line)['result']  #grammar check
         event+=neue_line+"\n"
     return event
 
@@ -278,6 +278,96 @@ def readUnit(unit, dico):
     else:
         neue=unit
     return neue
+
+######*****************************************************************************************
+######*********************** READ PROCEDURES to GENERATE STORY***********************************************
+######*****************************************************************************************
+
+def read(line, seeds=[], dico=None):
+    sentence=""
+    things=line.split(" ")
+    for thg in things:
+        elements=thg.split("//")#// means an or
+        element=random.choice(elements)
+        units=element.split("/")#/ means an AND
+        for unit in units:
+            bla, seeds=readUnit(unit.strip(), seeds=seeds, dico=dico)
+            try: 
+                sentence+=" "+ bla.strip()#Strip to remove if spaces
+            except:
+                print(bla)
+    return sentence, seeds
+
+def readUnit(unit, seeds=[], dico=None):
+    #-----may use seeds----
+    if unit in ["S", "N","N2", "Ns", "N2s", "N2p", "Np"]:
+        #NOTE: here dont caree about plural !
+        if len(seeds)>0:
+            bla=seeds[0]
+            seeds.pop(0)
+        else:
+            unit=unit.replace("s","")
+            unit=unit.replace("p","")
+            bla, w=read(random.choice(dico[unit]), dico=dico)
+    #---------composite structures
+    elif unit=="X" or unit=="Xs" or unit=="Xp":
+        #has removed Duo//Duoa// compoared to old haiku
+        bla, seeds=read("N//Na//Na/N2//N/and/N//N2/P0/N//Pf/Na//Na/P0/N//A/A/N//A/N//Ns/N2//N2//N//A/N//Ns/N2//N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//A/N2//A/N2//A/N2", seeds=seeds, dico=dico)
+    elif unit=="X+":#to add to "the X ""...Ex: which...
+        bla, seeds=read("whose/Na/W0//which/W//better/Vtd/that/W0//than/Vtd//which/have/been/PR1a//which/have/been/PR1//which/W0//the/X/PR1//thought/as/Nfa//we/are/trying/to/Vt//that/W0//that/we/allow/to/W0//we/are/Vtg//that/Ad2/W0//that/V+//that/have/become/A//that/do/not/W0//that/you/should/not/Vt", seeds=seeds, dico=dico)
+    elif unit=="Y":
+        bla, seeds=read("Y0//Y0//Y0//Y0//Y0/PR1//Y0/PR1a//all/what/W//the/X/X+//everyone/X+//anything/X+//each/X/X+//X/Wg", seeds=seeds, dico=dico)
+    elif unit=="Y0":
+        bla, seeds=read("Nf//Nfa//Nf//Nfa//Nfa//Nfa//the/A/N//the/Na/P/N//the/Na/P/X//the/Ns/N2//the/A/Ns/N2//the/X/P/X//the/X/P0/X//the/Vg/X//X/,/X/and/X//both/X/and/X//the/X/that/W0", seeds=seeds, dico=dico)
+    elif unit=="W":
+        bla, seeds=read("W0//W0//W0//W0//W0//V+//V+//V+//could/W0//should/W0//would/W0//could/V+//Ad2/W0//Ad2/W0", seeds=seeds, dico=dico)
+    elif unit=="W0":
+        bla, seeds=read("V//V//Vt/X//Va//Va//V2//Vt/Y//Vt/Nfa", seeds=seeds, dico=dico)
+    elif unit=="WA":
+        bla, seeds=read("Ad2/V//Ad2/Vt/X//V/Ad3//Vt/X/Ad3", seeds=seeds, dico=dico)
+    elif unit=="Wd":
+        bla, seeds=read("Vd//Vd//Vtd/X//Vad//Vad//V2d//Vtd/Y//Vtd/Nfa", seeds=seeds, dico=dico)
+    elif unit=="Wg":
+        bla, seeds=read("Vg//Vg//Vtg/X//Vag//Vag//V2g//Vtg/Y//Vtg/Nfa", seeds=seeds, dico=dico)
+    elif unit=="XWg": #NEED ?
+        bla, seeds=read("X/Wg", seeds=seeds, dico=dico)
+    elif unit=="PRO":
+        bla, seeds=read("S/V//S/Vt/X//X/V//N/Vt/X//S/V/P0/X", seeds=seeds, dico=dico)
+
+    #---not affecting seeds
+    elif unit=="A":#removed A0//A0/A0//A0/A0//A0/A0/A0//
+        bla, w=read("A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//A0//Ad2/A0//A0//Ad2/A0//Ad2/A0//still/A0//A0/yet/A0//yet/A0//soon/A0//somehow/A0//already/A0", dico=dico)
+    elif unit=="A0":
+        bla, w=read(random.choice(dico["A"]), dico=dico)
+    elif unit=="PR10":
+        bla, w=read(random.choice(dico["PR1"]), dico=dico)
+    elif unit=="PR1":
+        bla, w=read("PR10//PR10//PR10//PR10//PR10//PR10//Ad1/PR10//Ad2/PR10//Ad2/PR10", dico=dico)
+    #--------verbs
+    elif unit=="Vd" or unit=="Vad" or unit=="Vtd" or unit=="V2d":
+        verb=random.choice(dico[unit.replace("d", "")]).split(" ")
+        bla=verb[0]+"ed" #okay as after use grammar corrector
+        if len(verb)>0:
+            bla+=" "+' '.join(verb[1:])
+        #NOTE: Previous library Python issue ? 3.6 or 2.7... find replacement...
+        # bla=lexeme(verb[0])[4] #past
+    elif unit=="Vag" or unit=="Vg" or unit=="Vtg" or  unit=="V2g":
+        verb=random.choice(dico[unit.replace("g", "")]).split(" ")
+        bla=verb[0]+"ing" #okay as after use grammar corrector
+        if len(verb)>0:
+            bla+=" "+' '.join(verb[1:])
+        ## bla=lexeme(verb[0])[2] #present participe
+        # #conjugate(verb[0], tense = "present",  person = 3,  number = "singular",  mood = "indicative", aspect = "progressive",negated = False)
+    #----remaining stuff
+    elif unit in dico.keys():
+        bla, w=read(random.choice(dico[unit]), dico=dico)
+
+    else:#mean just a word
+        bla=unit
+
+    return bla, seeds
+
+
 
 ######*****************************************************************************************
 ######*********************** LOAD PROCEDURES ***********************************************
@@ -359,6 +449,16 @@ def load_data_txt(filename, path_folder="", mode="r"):
     with open(path_folder+filename,  mode=mode) as f:
         data = f.readlines()
     return data
+
+def load_storylines(filename, path_folder="", mode="r"):
+    """
+    for messages in skill, load txt
+    """
+    with open(path_folder+filename,  mode=mode) as f:
+        data = f.read()
+    storylines=data.split("\n\n")
+    return storylines
+
     
 # ---------------------------------------------
 # --------------FILTER PROCEDURE ---------------

@@ -11,16 +11,10 @@
 # ------------------TODO-----------------------
 # =============================================
 
-
-#--- Tune Soon
 # TODO: What happens at end: ask opinion ?
 # TODO: Triggers, Message Transition & End
 # TODO: Parameters Max/Min Length, vary etc
-
-
-#--- LATER
-# TODO: Keep special characters?
-# TODO: Grammar test ?
+# TODO: Grammar test ? vs Keep special characters?
 
 
 # =============================================
