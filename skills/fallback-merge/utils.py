@@ -291,7 +291,7 @@ def read_line(line, seeds=[], dico=None):
         element=random.choice(elements)
         units=element.split("/")#/ means an AND
         for unit in units:
-            bla =readUnit(unit.strip(), seeds=seeds, dico=dico)
+            bla =read_one(unit.strip(), seeds=seeds, dico=dico)
             try: 
                 sentence+=" "+ bla.strip()#Strip to remove if spaces
             except:
@@ -303,27 +303,31 @@ def read_one(unit, seeds=[], dico=None):
 
     if unit in WORDS_LISTS:
         neue=random.choice(dico[unit])#choose one randomly
+    
     #VERBS
-    elif unit=="Vg" or unit=="Vtg":
+    elif unit=="Vg" or unit=="Vag" or unit=="Vtg" or unit=="V2g":
         verb=random.choice(dico[unit.replace("g", "")]).split(" ")
         neue=verb[0]+"ing" #okay as after use grammar corrector
         if len(verb)>0:
             neue+=" "+' '.join(verb[1:])
 
-    elif unit=="Vd" or unit=="Vtd" or unit=="V2d":
+    elif unit=="Vd" or unit=="Vad" or unit=="Vtd" or unit=="V2d":
         verb=random.choice(dico[unit.replace("d", "")]).split(" ")
         neue=verb[0]+"ed" #okay as after use grammar corrector
         if len(verb)>0:
             neue+=" "+' '.join(verb[1:])
-    #CHOICE
-    elif "/" in unit:
-        possible=unit.split("//")
-        neue=read_one(random.choice(possible), dico)
+    
     #Other SPECIALS
-    if unit=="X" or unit=="Xs" or unit=="Xp":
+    elif unit=="X" or unit=="Xs" or unit=="Xp":
         neue, seeds=read_line("N//Na//Na/N2//N/and/N//N2/P0/N//Pf/Na//Na/P0/N//A/A/N//A/N//Ns/N2//N2//N//A/N//Ns/N2//N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//N//A/N//Ns/N2//A/N2//A/N2//A/N2", seeds=seeds, dico=dico)
     elif unit=="Y":
-        neue, seeds=read_line("Y0//Y0//Y0//Y0//Y0/PR1//Y0/PR1a//all/what/W//the/X/X+//everyone/X+//anything/X+//each/X/X+//X/Wg", seeds=seeds, dico=dico)
+        neue, seeds=read_line("Y0//Y0//Y0//Y0//Y0/PR1//all/what/W//the/X//each/X//X/Wg", seeds=seeds, dico=dico)
+    elif unit=="Y0":
+        bla, seeds=read_line("Nf//Nfa//Nf//Nfa//Nfa//Nfa//the/A/N//the/Na/P/N//the/Na/P/X//the/Ns/N2//the/A/Ns/N2//the/X/P/X//the/X/P0/X//the/Vg/X//X/,/X/and/X//both/X/and/X", seeds=seeds, dico=dico)
+    elif unit=="Wd":
+        bla, seeds=read_line("Vd//Vd//Vtd/X//Vad//Vad//V2d//Vtd/Y//Vtd/Nfa", seeds=seeds, dico=dico)
+    elif unit=="Wg":
+        bla, seeds=read_line("Vg//Vg//Vtg/X//Vag//Vag//V2g//Vtg/Y//Vtg/Nfa", seeds=seeds, dico=dico)
 
     else:
         neue=unit

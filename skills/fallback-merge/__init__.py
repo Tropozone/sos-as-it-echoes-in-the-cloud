@@ -38,7 +38,7 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, read_story, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, read_line, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -441,7 +441,7 @@ class MergeFallback(FallbackSkill):
 
         """
         Args: 
-            
+            #TODO: TEST!!, integrate what if
         """
         
         #---generate Story line by line
@@ -454,7 +454,7 @@ class MergeFallback(FallbackSkill):
             line=line.replace("yyy", keyword)
             line=line.replace("cc", str(random.randint(0,9))+str(random.randint(0,9)))
             #--read it
-            bla=read_line(line, dico=dico)#TODO
+            bla=read_line(line, dico=self.dico)
 
             #---complete with gpt2  a few sentences
             #TODO: Try feed whole context? TEST!
