@@ -1,9 +1,19 @@
 # !/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
+# =============================================
+# --------------ABOUT ---------------
+# ======================================
+# 
+# Fallback skill developped by Tropozone Collective.
+# This Fallback is merging different other subskills,
+# such as: Hello socket, what if we bucket, ElsewhereTunes, Enter the Weird
+# 
+# tbc
+#
+# 
 
-######Description############
-# Merge Fallback reroute to the following skills: hello socket, what if we bucket, ELsewhereTunes, Enter the Wweird... ")
+
 
 # =============================================
 # --------------INITIALIZATION---------------

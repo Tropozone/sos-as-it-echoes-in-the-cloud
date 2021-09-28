@@ -1,11 +1,17 @@
-########################  ABOUT THIS SKILL
 
-##### Will reformulate your request with a ecological concern and scrape the web.
-
+# =============================================
+# --------------ABOUT ---------------
+# ======================================
+# 
+# Skill developped by Tropozone Collective.
+# The skill reformulate your request with a ecological concern,
+# and scrape the web with this concern, before sharing some results with you.
+# 
 # May be tested by asking stuff like "how to cook quinoa".
-# To see the other triggers, cf vocab file.
-
-
+# 
+# tbc
+#
+#
 
 # ============================================
 # ------------------TODO-----------------------

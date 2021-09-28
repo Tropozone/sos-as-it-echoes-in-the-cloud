@@ -1,4 +1,14 @@
-########################  ABOUT THIS SKILL
+# =============================================
+# --------------ABOUT ---------------
+# ======================================
+# 
+# Skill developped by Tropozone Collective.
+# The skill initiate a sound recording.
+# 
+# tbc
+#
+# May be tested by asking stuff like "Listen to me".
+
 
 # =============================================
 # --------------TODO---------------
