@@ -568,7 +568,7 @@ class MergeFallback(FallbackSkill):
         loopCount=0
         bla=utterance
         blabla=""
-        while loopCount<self.settings["num_drifts"]:
+        while loopCount<self.settings_enter_the_weird["num_drifts"]:
             loopCount+=1
             self.log.info("Drift n° {loopCount}")
             bla=self.one_drift(bla) #Only keep last part as context else too big? >>>
