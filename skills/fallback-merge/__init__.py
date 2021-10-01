@@ -56,16 +56,11 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 # ------------------TODO-----------------------
 # =============================================
 
-# TODO: Grammar procedure where cut in small; Check if grammar correct resilient bigger texts ?
-# TODO: What if We Bucket: Tune ML Param. Too human filter, bad token, HomeMade gpt2
-# TODO: ENTER THE WEIRD: Tune ML Param. Too human filter, bad token. HomeMade gpt2
-# TODO: Hello Socket : Add Object//Events
-# TODO: Hello Socket: Recording Time ? Fix or ? Can make longer and cut sound?
-# TODO: Hello Socket : Replace in EventsLocation and Temporalities and objects to fit Expo in Public space
-#TODO: SOund distortion: Replace file by distorted version so more and mnore distorted ?
+# TODO: What if We Bucket // ENTER THE WEIRD Tune ML Param. Too human filter, bad token, HomeMade gpt2
+# TODO: Hello Socket: Recording Time ? Fixed  ? Can make longer and cut sound?
+# TODO: Hello Socket : Replace in Events Location and Temporalities and objects to fit Expo in Public space
+#TODO: SOund distortion: Replace file by distorted version in memory so more and mnore distorted ?
 #TODO: SOUND Distortion: need integrate main script? Apply also Quinoa COllapse ?
-#TODO: SOUND Distortion: More fade in and out accross time
-#TODO  SOUND Distortion: Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
 #TODO: SOUND Distortion: Add more effects such as: (and the ones commented out below)
 # equalizer(frequency, q=1.0, db=-3.0)  #"frequency in Hz, q or band-width (default=1.0)"
 # bandpass(frequency, q=1.0)  #"frequency in Hz, q or band-width (default=1.0)"
@@ -73,6 +68,13 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 # compand(self, attack=0.2, decay=1, soft_knee=2.0, threshold=-20, db_from=-20.0, db_to=-20.0) #"""compand takes 6 parameters: attack (seconds), decay (seconds), soft_knee (ex. 6 results  in 6:1 compression ratio), threshold (a negative value  in dB), the level below which the signal will NOT be companded  (a negative value in dB), the level above which the signal will    NOT be companded (a negative value in dB). This effect   manipulates dynamic range of the input file.
 # #delay(self, gain_in=0.8, gain_out=0.5, delays=None,decays=None, parallel=False)         #"delay takes 4 parameters: input gain (max 1), output gain and then two lists, delays and decays . Each list is a pair of comma seperated values within parenthesis.
 # speed(self, factor, use_semitones=False)# s"speed takes 2 parameters: factor and use-semitones (True or False).When use-semitones = False, a factor of 2 doubles the speed and raises the pitch an octave. The same result is achieved with factor = 1200 and use semitones = True.
+
+
+
+#####LATER ?
+#TODO  SOUND Distortion: Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
+#TODO: SOUND Distortion: More fade in and out accross time
+##TODO: Hello Socket : Add Object//Events
 
 # -------------PARAMETERS to check----------------------
 # --FOR ML MODEL
@@ -128,12 +130,11 @@ BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", 
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 
 #---- For Recording (hello socket and elsewhere tunesY
-DEFAULT_RECORDING_TIME=10 
-MAX_RECORDING_TIME=60
+DEFAULT_RECORDING_TIME=10 #in seconds
 
 TEXT_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
 SISTER_LIKELIHOOD=0.5#percentage of text which are sister node info
-
+MAX_PLAY_SOUND=20000#in ms for pydub
 
 MAX_CHAR_MEMORY=280
 
@@ -533,10 +534,11 @@ class MergeFallback(FallbackSkill):
             if not cool:
                 self.log.info("UNCOOL{} was filtered out,".format(count)+ raw_drift)
 
-        #TODO: Filter ot not?
+
         self.log.info("=======================================================") 
         self.log.info("Step 3--Share the drift")
         self.log.info("=======================================================") 
+        drift=self.parse_text(raw_drift)
         self.speak(drift)#
         self.log.info("***COOL and filtered ***"+drift)
 
@@ -625,20 +627,16 @@ class MergeFallback(FallbackSkill):
         self.log.info("***Memory Burps*** "+name_file)
         self.speak(name_file)
 
-
         # step 4: Distort the sound
         output_path= COLLECTIVE_MEMORY_FOLDER+"temp.wav" #here just a temporary path
-        #TODO: Max length
-        random_distortion(sound_path, output_path, proba_overlay=0.8, min_gain_drop=4, max_gain_drop=8, max_length=0)
+        random_distortion(sound_path, output_path, proba_overlay=0.8, min_gain_drop=4, max_gain_drop=8, max_length=MAX_PLAY_SOUND)
 
         # step 5: playback the sound
         self.log.info("Step 4--Play the sound")
-        self.log.info("Playing one sound...")
         self.audio_service.play(output_path)
         
 
     def text_tunes(self, message):
-        #TODO: Turn them into sounds>>>
 
         self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory

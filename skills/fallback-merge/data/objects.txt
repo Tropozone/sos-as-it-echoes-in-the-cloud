@@ -1,11 +1,24 @@
 socket
 chair
 pen
-monstera
+plant
 calathea
 wooden floor
 lightbulb
 keyboard
+karton
+light switch
+sponge
+ash tray
+hanger
+string
+glass bottle
+cork
+blind
+washing machine
+vacuum cleaner
+broom
+Screen
 aluminium foil
 spoon
 carpet
@@ -14,13 +27,14 @@ coffee cup
 tea bag
 bathroom moisture
 towel
-Cotton pad
+toothbrush
+cotton pad
 soap
 funnel
 windowsill
 candle
 duvet
-Bedsheet
+bedsheet
 waterpipe
 door
 fridge
@@ -34,8 +48,11 @@ tea pot
 ceramic plate
 bathroom carpet
 USB key
+Shampoo
 nail clipper
 doorlock
+mailbox
+shower gel
 oven grid
 shower curtain
 fork
