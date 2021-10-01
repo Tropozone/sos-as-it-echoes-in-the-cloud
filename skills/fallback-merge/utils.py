@@ -169,7 +169,7 @@ def random_distortion(infile, outfile, infile2=None,  proba_overlay=0.8, min_gai
 ######*****************************************************************************************
 
 
-WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
+WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
 
 alphabets= "([A-Za-z])"
@@ -301,7 +301,9 @@ def read_line(line, seeds=[], dico=None):
 def read_one(unit, seeds=[], dico=None):
     #TODO: Here do not use seeds, can remove
 
-    if unit in WORDS_LISTS:
+    if unit=="PR0":
+        neue, seeds=read_line(random.choice(dico[unit]), seeds=seeds, dico=dico)
+    elif unit in WORDS_LISTS:
         neue=random.choice(dico[unit])#choose one randomly
     
     #VERBS
@@ -432,32 +434,32 @@ def load_storylines(filename, path_folder="", mode="r"):
 # ------------------------------------
 
 
-def cool_judgement_enter_the_weird(text, uncool_set):
-    text_set=set(text.split()) #turn into set
+def cool_judge(text, uncool_words=None, uncool_string=None, id_skill=""):
     cool=True
-    intersection=uncool_set & text_set #check intersection with uncool
-    #print(intersection)
+    
+    #TODO Do more specific filters depending in skills
 
-    if len(intersection)>=1:
+    #look at uncool words
+    words=set(text.split())
+    intersection=uncool_words & words #check intersection with uncool
+    uncool_score=len(intersection)
+
+    #look at uncool strings
+    for st in uncool_string:
+        if st in text:
+            uncool_score+=1
+
+    if uncool_score > 1:
         cool=False
 
-    #TODO Filter if proper nound or Regenerate ?
-    #TODO: More filtering?
+    if id_skill=="what_if":
+        #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..." or "\n"
+        stripped_text=text.lstrip()#remove space beginning
+        BAD_TRANSITION=["\n", "  ", "...", ".", "?", ";", "!"]#TODO: CUrrently removing the \n too!
+        #print("character look at:", stripped_text[0])
+        cool_=(not(stripped_text[0].isupper())) and (not stripped_text[0] in BAD_TRANSITION)
 
-    return cool
+        cool= bool(cool and cool_)
 
-def cool_judgement_what_if(seed, text, uncool_set):
-    
-    #--1---test if seed is well integrated in sentence, ie not followed by capital letter, or "..." or "\n"
-    stripped_text=text.replace(seed, "")
-    stripped_text=stripped_text.lstrip()#remove space beginning
-    BAD_TRANSITION=["\n", "...", ".", "?", ";", "!"]#TODO: CUrrently removing the \n too!
-    #print("character look at:", stripped_text[0])
-    cool1=(not(stripped_text[0].isupper())) and (not stripped_text[0] in BAD_TRANSITION)
+    return cool, uncool_score
 
-    #--2--- test if "he", "she", names, Dialogue#TODO: Keep this ?
-    #cool2=cool_judgement_enter_the_weird(text, uncool_set)
-
-    #TODO: more filtering
-
-    return cool1 #bool(cool1 and cool2)

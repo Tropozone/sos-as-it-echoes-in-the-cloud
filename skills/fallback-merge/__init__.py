@@ -48,13 +48,15 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, read_line, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judgement_enter_the_weird, cool_judgement_what_if, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, read_line, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
 # ============================================
 # ------------------TODO-----------------------
 # =============================================
+
+#TODO: TEST FILTRE cool_judge and when produce several take best ?
 
 # TODO: What if We Bucket // ENTER THE WEIRD Tune ML Param. Too human filter, bad token, HomeMade gpt2
 # TODO: Hello Socket: Recording Time ? Fixed  ? Can make longer and cut sound?
@@ -125,9 +127,12 @@ MAX_MEMORY=100
 #TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "God"] #TODO but remove words including he and she...
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "muslim", "christian"] #TODO but remove words including he and she...
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
+UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian"]
+UNCOOL_WORDS_SET=set(UNCOOL_WORDS)
+UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X", "Fig.", "in Fig.", "Photograph by", "http"]
 
 #---- For Recording (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 #in seconds
@@ -140,7 +145,7 @@ MAX_CHAR_MEMORY=280
 
 # -------------OTHER PARAMETERS ----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/words/"
-WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
+WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "PR0", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
 
 # =============================================
@@ -431,16 +436,16 @@ class MergeFallback(FallbackSkill):
 
         while ((not cool) and (count<MAX_TRY)): 
             count+=1
-            raw_response = self.gpt2_generation(seed, self.settings_what_if)
+            raw_response = self.gpt2_generation(seed, self.settings_what_if, remove_context=True)
             #judge answer:
-            cool=cool_judgement_what_if(seed, raw_response, self.FORBIDDEN_TOKEN_SET)
+            cool, uncool_score=cool_judge(raw_response, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING, id_skill="what_if")
             if not cool:
                 self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
                
 
         # step 4 ---
         self.log.info("step 4---final output")
-        response=self.parse_text(raw_response)
+        response=self.parse_text(seed+raw_response)
         #response=self.gingerParser.parse(response)['result']
         self.log.info("***COOL and filtered ***"+response)
         self.speak(response)
@@ -454,23 +459,39 @@ class MergeFallback(FallbackSkill):
         Args: 
             #TODO: TEST!!, integrate what if
         """
-        
+
+
         #---generate Story line by line
         story=""
+        bla=""
         for lines in self.storylines:
             #-pick a story line 
-            line=random.choices(lines.split("\n"))
+            line=random.choice(lines.split("\n"))
             #- replace xxx , yyy and cc
             line=line.replace("xxx", critter)
             line=line.replace("yyy", keyword)
             line=line.replace("cc", str(random.randint(0,9))+str(random.randint(0,9)))
             #--read it
-            bla=read_line(line, dico=self.dico)
+            seed, w=read_line(line, dico=self.dico)
 
             #---complete with gpt2  a few sentences
-            #TODO: Try feed whole context? TEST!
-            raw=self.gpt2_generation(bla, self.settings_what_if)
+            cool=False
+            count=0
+            if i==1:
+                MAX_TRY=3#TODO: adjust this
+            else:
+                MAX_TRY=1
+            context=bla+seed #NOTE: Feed previous bla as context + seed
             
+            while ((not cool) and (count<MAX_TRY)): 
+                count+=1
+                #generate gpt2
+                raw=self.gpt2_generation(context, self.settings_what_if)
+                #if cool generation
+                cool, uncool_score=cool_judge(raw, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
+
+            raw=raw.replace(bla, "")
+
             #--- cut it to a sentence 
             bla=self.parse_text(raw)
 
@@ -481,7 +502,7 @@ class MergeFallback(FallbackSkill):
         return story
 
 
-    def gpt2_generation(self, seed, settings):
+    def gpt2_generation(self, seed, settings, remove_context=False):
         #More parameters ? 
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
@@ -495,7 +516,10 @@ class MergeFallback(FallbackSkill):
             generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
-        return raw_response
+        if remove_context:
+            return raw_response.replace(seed, "")
+        else:
+            return raw_response
 
     def one_drift(self, utterance):
         """
@@ -527,10 +551,9 @@ class MergeFallback(FallbackSkill):
         while ((not cool) and (count<MAX_TRY)): 
             count+=1
             #generate gpt2
-            raw_drift = self.gpt2_generation(context, current_settings)
-            #remove  human context 
-            raw_drift= raw_drift.replace(utterance, "", 1)
-            cool=cool_judgement_enter_the_weird(raw_drift, self.FORBIDDEN_TOKEN_SET)
+            raw_drift = self.gpt2_generation(context, current_settings, remove_context=True)
+            #if cool generation
+            cool, uncool_score=cool_judge(raw_drift, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
             if not cool:
                 self.log.info("UNCOOL{} was filtered out,".format(count)+ raw_drift)
 
