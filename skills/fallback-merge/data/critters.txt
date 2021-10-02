@@ -1,60 +1,129 @@
-####ANIMAL
-Buffalo
-####ECOLOGY
 
-####OBJECTS
-
-####ATMOSPHERIC
-Zephyr
-Tsunami
-
-#####BACTERIA CELLS PROTIST
-
-
-##### CHEMICAL
-
-
-####COSMOS
-Supernova
-Neutron star
-
-####ECOSYSTEM SYMBIOSIS
+buffalo
+snake
+crocodile
+bee
+ant
+dragonfly
+ladybug
+beetle
+zebra
+termite
+raven
+seagull
+salamander
+mammal
+reptilian
+lynx
 
 
-#####FICTION
 
 
-#####FUNGHI
-Mycorrhizal network
+quantumscale magnets
+plumbers
+cotton
+bonobos
+sandstone
+musket buckshot
+gypsum
+Capsicum pepper
+Water pipe
+redwoods
+silicon
+cathode ray tubes
+LCD displays
+conductive cabling
+microprocessor
+jigsaw puzzle
+single-malt scotch
+lychee fruit
+yogurt
+shipping containers
+hydraulic rams
+Levi’s 501
+asphalt
 
 
-#####MACHINES
+zephyr
+tsunami
+stratosphere
+
+
+bacteria
+cell
+protist
+mitochondria
+virus
+
+
+hydrogen
+carbon
+
+supernova
+neutron star
+black hole
+Universe expansion
+
+parasite
+symbiont
+lychee
+Algae
+
+monster
+ghost
+
+
+mycorrhizal network
+
+
 Vacuum cleaner
 Freezer
+space shuttles
+DVD players
+disc drives
+Lawnmower
 
-#########MARINE
-Octopus
-
-
-#########OOO// POSTHUMAN
-
-
-####PLANTS
-Capsicum pepper
-
-########QUANTUM
-Photon
-Superconductors
+jellyfish
+octopus
+whale
 
 
-##########SCIFICTION
+capsicum pepper
+calathea
+baobab
+nettle
+ivy
+oak tree
+palm tree
+cabbage
+nutmeg
+unrefined salt
+ripped peaches
+aloe vera
+rubber
 
 
-#####TERRESTRIAL MINERAL
+Mushroom pore
+Nutrient
+
+Spinal cord
+
+photon
+semiconductors
+Higgs bozon
+
+Gravity wave detectors
+Monosodium glutamate
+Catnip
+Psilocybin
+
+
+
 Soil
 Magnesium
 Earthquake
+oil
 
-####WAVE PROPAGATUOINB ELECTROMAGNETIC
 Electromagnetic field
+
 
