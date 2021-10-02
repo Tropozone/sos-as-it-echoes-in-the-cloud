@@ -1,4 +1,3 @@
-
 buffalo
 snake
 crocodile
@@ -15,20 +14,55 @@ salamander
 mammal
 reptilian
 lynx
-
-
-
-
+enzyme
+polymers
+cellulose
+oil drilling rig
+fertiliser
+pesticide
+pipeline
+vector space
+manifold
+Infrastructure
+greenhouse
+sulphur dioxide
+uranium
+plutonium
+tritium
+cyanobacteria
+nitrogen
+solar wind
+cosmic ray
+X-ray
+amino acids
+troposphere
+helium
+worm
+boreal forest
+meteorite
+crater
+green flashes
+twilight
+cyclone
+cirrostratus clouds
+Hot air balloon
+mojave desert
+cyanometer
+rainforest
+basaltic lava
+greenhouse gas
+colloid
+silica layer
 quantumscale magnets
 plumbers
 cotton
-bonobos
+bonobo
 sandstone
-musket buckshot
 gypsum
 Capsicum pepper
-Water pipe
+water pipe
 redwoods
+matsutake
 silicon
 cathode ray tubes
 LCD displays
@@ -42,52 +76,36 @@ shipping containers
 hydraulic rams
 Levi’s 501
 asphalt
-
-
 zephyr
 tsunami
 stratosphere
-
-
 bacteria
 cell
 protist
 mitochondria
 virus
-
-
 hydrogen
 carbon
-
 supernova
 neutron star
 black hole
-Universe expansion
-
+universe expansion
 parasite
 symbiont
 lychee
-Algae
-
+algae
 monster
 ghost
-
-
 mycorrhizal network
-
-
-Vacuum cleaner
-Freezer
+vacuum cleaner
+freezer
 space shuttles
 DVD players
 disc drives
-Lawnmower
-
+lawnmower
 jellyfish
 octopus
 whale
-
-
 capsicum pepper
 calathea
 baobab
@@ -101,29 +119,36 @@ unrefined salt
 ripped peaches
 aloe vera
 rubber
-
-
-Mushroom pore
-Nutrient
-
-Spinal cord
-
+mushroom pore
+nutrient
+spinal cord
 photon
 semiconductors
 Higgs bozon
-
-Gravity wave detectors
-Monosodium glutamate
-Catnip
-Psilocybin
-
-
-
+gravity wave detectors
+monosodium glutamate
+catnip
+psilocybin
+biomass
+sand dunes
+foliage
+firefly
+aeolian process
+Himalaya
+wetland
+rock formation
+fossile
+seashell
+invertebrate
+extremophile
+fern
+yeast
+Sourdough
+Lactic acid bacteria
+kefir
+biofilm
 Soil
-Magnesium
-Earthquake
+magnesium
+earthquake
 oil
-
-Electromagnetic field
-
-
+electromagnetic field

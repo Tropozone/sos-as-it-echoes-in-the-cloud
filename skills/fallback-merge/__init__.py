@@ -95,7 +95,7 @@ SONOR=True #NOTE: For a text-based VA, put false !
 #1----> What if we Bucket
 #2----> Enter the Weird
 #3----> Elsewhere Tunes
-LIKELIHOOD_SKILLS=[20,10,50,20]
+LIKELIHOOD_SKILLS=[20,20,40,20]
 
 #----OR HELLO SOCKET
 WAITING_TIME=5 
@@ -231,6 +231,7 @@ class MergeFallback(FallbackSkill):
         self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
         # load
         path_folder=str(pathlib.Path(__file__).parent.absolute())
+        self.critters = load_data_txt("/data/critters.txt", path_folder=path_folder)
         self.whatif = load_data_txt("/data/whatif.txt", path_folder=path_folder)
         self.whatif_nokey = load_data_txt("/data/whatif_nokey.txt", path_folder=path_folder)
         self.storylines = load_storylines("/data/fabulations.txt", path_folder=path_folder)
@@ -240,6 +241,7 @@ class MergeFallback(FallbackSkill):
         self.settings_what_if.setdefault("top_k", TOP_K)
         self.settings_what_if.setdefault("top_p", TOP_P)
         self.settings_what_if.setdefault("sampling", SAMPLING)
+
 
     def get_bad_words_ids(self, words):
         bad_ids=[]
@@ -419,6 +421,22 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 
+        # step 2--- between what_if_v0 and fabulate
+        n=random.uniform(0, 1)
+        if n<0.4:
+            response=self.what_if_v0(keyword)
+        else:
+            response=self.fabulate(keyword)
+
+        
+        return response
+
+
+    def what_if_v0(self, keyword):
+        """
+            What if Skill...
+        """
+
         # step 2--- pick a seed from file and replace if xxx by keyword
         if keyword=="":
             seed = random.choice(self.whatif_nokey)
@@ -453,23 +471,30 @@ class MergeFallback(FallbackSkill):
         
         return response
 
-    def fabulate(self, critter, keyword):
+
+    def fabulate(self, keyword):
 
         """
         Args: 
-            #TODO: TEST!!, integrate what if
         """
+        # step 2-- extract critter
+        critter=random.choice(self.critters)
+        self.log.info("step 2---Extracted critter"+critter)
 
-
-        #---generate Story line by line
+        #---step 3 generate Story line by line
         story=""
         bla=""
+        i=0
         for lines in self.storylines:
+            i+=1
             #-pick a story line 
             line=random.choice(lines.split("\n"))
             #- replace xxx , yyy and cc
             line=line.replace("xxx", critter)
-            line=line.replace("yyy", keyword)
+            if keyword=="":#did not find keyword in sentence
+                line=line.replace("yyy", critter)
+            else:
+                line=line.replace("yyy", keyword)
             line=line.replace("cc", str(random.randint(0,9))+str(random.randint(0,9)))
             #--read it
             seed, w=read_line(line, dico=self.dico)
