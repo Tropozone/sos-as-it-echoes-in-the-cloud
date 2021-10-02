@@ -189,11 +189,15 @@ class MergeFallback(FallbackSkill):
         self.MSG_TELL=load_data_txt("message_tell.txt", path_folder=path_folder)
         self.MSG_LISTEN=load_data_txt("message_listen.txt", path_folder=path_folder)
         self.MSG_THANKS=load_data_txt("message_thanks.txt", path_folder=path_folder)
-        self.MSG_TRAVEL=load_data_txt("message_travel.txt", path_folder=path_folder)
+        self.MSG_ELSEWHERE_START=load_data_txt("message_elsewhere_start.txt", path_folder=path_folder)
+        self.MSG_ELSEWHERE_END=load_data_txt("message_elsewhere_end.txt", path_folder=path_folder)
         self.MSG_PATIENT=load_data_txt("message_patient.txt", path_folder=path_folder)
-        self.MSG_RITUAL=load_data_txt("message_ritual.txt", path_folder=path_folder)
+        self.MSG_RITUAL_START=load_data_txt("message_ritual_start.txt", path_folder=path_folder)
+        self.MSG_RITUAL_END=load_data_txt("message_ritual_end.txt", path_folder=path_folder)
         self.MSG_SISTER_START=load_data_txt("message_sister_start.txt", path_folder=path_folder)
-        
+        self.MSG_INTERESTING=load_data_txt("message_interesting.txt", path_folder=path_folder)
+        self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)
+
 
     def init_recording_settings(self):
         # TODO: Add min free diskspace (MB) ?
@@ -269,6 +273,7 @@ class MergeFallback(FallbackSkill):
         self.sister_likelihood=SISTER_LIKELIHOOD
         self.MAX_CHAR_MEMORY=MAX_CHAR_MEMORY
 
+
     def initialize(self):
         """
             Registers the fallback handler.
@@ -342,7 +347,7 @@ class MergeFallback(FallbackSkill):
         """
         
         # start message
-        ritual_start=random.choice(self.MSG_RITUAL)
+        ritual_start=random.choice(self.MSG_RITUAL_START)
         self.speak(ritual_start)
 
         #pick object
@@ -397,21 +402,22 @@ class MergeFallback(FallbackSkill):
                     self.speak_dialog("audio.record.disk.full")
                 time.sleep(recording_time) #NOTE: NEEDED?  #TODO: RECORD TRANSCRIPTION STILL!, as converse do
                 self.log.info("***RECORDING ENDED***")
-                thanks=random.choice(self.MSG_THANKS)
-                self.speak(thanks)
-            
+                #thanks=random.choice(self.MSG_THANKS)
+                #self.speak(thanks)
+
+        #----Ending, ask back about the agent 
+        ritual_end=random.choice(self.MSG_RITUAL_END)
+        ritual_end=ritual_end.replace("xxx", agent)
+        self.speak(ritual_end)
+
         return event
 
-       #TODO: Ending Message ? 
         
 
     def what_if(self, message):
         """
             What if Skill...
         """
-        #---patience
-        be_patient=random.choice(self.MSG_PATIENT)
-        self.speak(be_patient)
 
         # step 0 --Obtain what the human said
         utterance = message.data.get("utterance")
@@ -421,14 +427,27 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 
-        # step 2--- between what_if_v0 and fabulate
+        #---step 1 transition message
+        #TODO: split what is and fabulate
+        if keyword=="":
+            be_patient=random.choice(self.MSG_PATIENT)
+            self.speak(be_patient)
+        else:
+            interesting=random.choice(self.MSG_INTERESTING)
+            interesting=interesting.replace("xxx", keyword)
+            self.speak(interesting)
+
+        # step 3--- between what_if_v0 and fabulate
         n=random.uniform(0, 1)
         if n<0.4:
             response=self.what_if_v0(keyword)
         else:
             response=self.fabulate(keyword)
 
-        
+        #step 4---closing: ask feedback 
+        feedback=random.choice(self.MSG_FEEDBACK)
+        self.speak(feedback)
+
         return response
 
 
@@ -623,7 +642,13 @@ class MergeFallback(FallbackSkill):
             self.log.info("Drift n° {loopCount}")
             bla=self.one_drift(bla) #Only keep last part as context else too big? >>>
             blabla+=bla
+        
+        #step 4---closing: ask feedback 
+        feedback=random.choice(self.MSG_FEEDBACK)
+        self.speak(feedback)
 
+        #TODO: catching opinbion and going on dialogue?
+        
         return blabla
 
     def elsewhere_tunes(self, message):
@@ -648,8 +673,12 @@ class MergeFallback(FallbackSkill):
             #TODO: indicative to say it it not him?
             
         self.log.info("=======================================================") 
-        #TODO: ENDING ? Ask how make you feel?
-        #TODO: It can loop back into it and try to answer this memory
+        
+        #step 4---closing: ask feedback 
+        feedback=random.choice(self.MSG_ELSEWHERE_END)
+        self.speak(feedback)
+        #TODO: Do you have some memory to share too?Do you have something to share back for the assemblage ?wait for answer // record if yes...
+
         return output
         
 
@@ -657,7 +686,7 @@ class MergeFallback(FallbackSkill):
         
         self.log.info("Step 1--Catch Attention")
         # step 1: catch attention ? or just as a burp
-        travel=random.choice(self.MSG_TRAVEL)
+        travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
         message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
         self.speak(message_listen)
@@ -692,7 +721,7 @@ class MergeFallback(FallbackSkill):
         text_path=COLLECTIVE_MEMORY_FOLDER+"text/"+text_file_name
 
         #little message
-        travel=random.choice(self.MSG_TRAVEL)
+        travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
 
         self.log.info("Step 2--Share the text")
@@ -735,7 +764,7 @@ class MergeFallback(FallbackSkill):
         self.log.info(about)
 
 
-        #TODO: Ask opinion?
+        #TODO: Ask feedback?
 
 
 
