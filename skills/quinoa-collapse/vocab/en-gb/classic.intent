@@ -2,7 +2,11 @@ tell me about {stuff}
 what is {stuff}
 how to (cook | prepare | drink) {stuff}
 do you know about {stuff}
-I like {stuff}
-I wonder about {stuff}
-Where is {stuff}
-I like to (eat | drink | buy) {stuff}
+(I | we | people) like {stuff}
+(He | She) likes {stuff}
+(I | we | people) wonder about {stuff}
+where is {stuff}
+(I | we | people) like to (eat | drink | buy) {stuff}
+what do you think about {stuff}
+what is your  (opinion | take)  on {stuff}
+(I | we | people) (like | bought | ordered) {stuff}

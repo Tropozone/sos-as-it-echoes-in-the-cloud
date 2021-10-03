@@ -40,7 +40,7 @@ import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4
 #for gpt2
 import torch
 import transformers 
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoModelForCausalLM, AutoTokenizer
 from datetime import datetime, date
 from datetime import timedelta
 # for grammar
@@ -143,6 +143,11 @@ MAX_PLAY_SOUND=20000#in ms for pydub
 
 MAX_CHAR_MEMORY=280
 
+#for chatbot with historics
+MAX_TOKEN_HISTORICS=1000
+CHAT_TEMPERATURE=2.0 #https://huggingface.co/transformers/main_classes/model.html
+CHAT_TOPK=100
+
 # -------------OTHER PARAMETERS ----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/words/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "PR0", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
@@ -176,7 +181,10 @@ class MergeFallback(FallbackSkill):
             self.start_time = 0
             self.last_index = 24  # index of last pixel in countdowns #WHAT IS IT FOR ???
 
-        #
+        #for simple dialog >
+        self.dialoTokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+        self.dialoGPT = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+
         self.FORBIDDEN_TOKEN_SET=set(FORBIDDEN_TOKEN)
         self.FORBIDDEN_TOKEN_ids=self.get_bad_words_ids(FORBIDDEN_TOKEN)
         
@@ -545,6 +553,43 @@ class MergeFallback(FallbackSkill):
 
         return story
 
+
+    def chat(self, utterance, historics_id=None):
+        # encode the new user input, add the eos_token and return a tensor in Pytorch
+        new_input_ids = self.dialoTokenizer.encode(utterance + self.dialoTokenizer.eos_token, return_tensors='pt')
+
+        # append the new user input tokens to the chat history
+        if historics_id is None:
+            input_ids = new_input_ids
+        else:
+            #cut to amaximum length
+            historics_id=historics_id[:, :MAX_TOKEN_HISTORICS]
+            input_ids = torch.cat([historics_id, new_input_ids], dim=-1)
+
+        # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
+        historics_id = self.dialoGPT.generate(input_ids, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=1.2, max_length=200, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
+        #length_penalty >1 encourage generate longer sentences
+
+        output= self.dialoTokenizer.decode(historics_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
+        
+        #check if cool: #TODO: and filters
+
+        #replace I by We
+        output=output.replace("I ", "We ")
+        output=output.replace("I've", "We have")
+        output=output.replace("I'd", "We had")
+        output=output.replace("I'm", "We are")
+        output=output.replace("I'll", "We will")
+
+
+        #cut punctuation and check grammar
+        output=self.parse_text(output)
+
+    
+
+        self.log.info(output)
+
+        return output
 
     def gpt2_generation(self, seed, settings, remove_context=False):
         #More parameters ? 
