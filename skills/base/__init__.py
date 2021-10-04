@@ -82,9 +82,7 @@ class BaseSkill(MycroftSkill):
     #What happen when detect like Intent. PADATIOUS: use .intent file
     @intent_handler('classic.intent')
     def handle_classic_intent(self, message):
-        self.log.info("=======================================================")
-        self.log.info("==========step 0: Caught Human utterance and Extract Keyword=======")
-        self.log.info("=======================================================")
+
         # -- caught what human asked 
         utterance = str(message.data.get("utterance"))
         self.log.info(f'Human said {utterance}')
