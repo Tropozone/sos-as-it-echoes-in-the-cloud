@@ -46,6 +46,9 @@ from .utils import load_data_txt
 #For alternative scraper, not needed currently
 #from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
 
+
+#https://www.dreambank.net/random_sample.cgi?series=blind-f&min=50&max=300&n=100
+
 # =============================================
 # -------------- SKILL ---------------
 # ======================================

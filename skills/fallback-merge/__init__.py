@@ -422,7 +422,7 @@ class MergeFallback(FallbackSkill):
 
         
 
-    def what_if(self, message):
+    def what_if(self, message, keyword):
         """
             What if Skill...
         """
