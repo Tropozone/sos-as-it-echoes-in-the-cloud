@@ -14,3 +14,5 @@ Can we understand each other ?
 Are we on the same wavelength?
 Do you sometimes wonder this too?
 Are these thoughts which agitate you ?
+Maybe that sounds just gibberish in your semantic space.
+Oh, maybe that is just my gradients inference running amok.

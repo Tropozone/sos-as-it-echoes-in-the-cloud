@@ -91,11 +91,12 @@ SONOR=True #NOTE: For a text-based VA, put false !
 # --------------PARAMETERS to TUNE---------------------
 
 ##----For MERGE: Likelihood different skills
-#0--->Hello Socket
+#0---> Hello Socket
 #1----> What if we Bucket
 #2----> Enter the Weird
 #3----> Elsewhere Tunes
-LIKELIHOOD_SKILLS=[20,20,40,20]
+#4----> Fabulate
+LIKELIHOOD_SKILLS=[20,15,35,15,15]
 
 #----OR HELLO SOCKET
 WAITING_TIME=5 
@@ -204,7 +205,9 @@ class MergeFallback(FallbackSkill):
         self.MSG_RITUAL_END=load_data_txt("message_ritual_end.txt", path_folder=path_folder)
         self.MSG_SISTER_START=load_data_txt("message_sister_start.txt", path_folder=path_folder)
         self.MSG_INTERESTING=load_data_txt("message_interesting.txt", path_folder=path_folder)
-        self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)
+        self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)#TODO: not used ?
+        self.MSG_WHAT_IF_END=load_data_txt("message_what_if_end.txt", path_folder=path_folder)
+        self.MSG_FABULATE_END=load_data_txt("message_fabulate_end.txt", path_folder=path_folder)
 
 
     def init_recording_settings(self):
@@ -305,10 +308,15 @@ class MergeFallback(FallbackSkill):
         self.log.info("=======================================================")
         
         #-------Sampling
-        #NOTE: weighted random sampling so some skills mlore likely than other
-
+        #weighted random sampling so some skills mlore likely than other
         rand=random.choices(range(self.NUM_SUBSKILLS), weights=LIKELIHOOD_SKILLS, k=1)[0]
 
+        #----Chat 
+        if rand in [0,3,4]:
+            self.log.info("=======================================================")
+            self.log.info("step 1-First small Chatbot interaction")
+            self.log.info("=======================================================")
+            self.chat(utterance)#TODO: historics historics_id=None
 
         #------Rrerouting to skill
         self.log.info("=======================================================")
@@ -328,6 +336,10 @@ class MergeFallback(FallbackSkill):
             self.log.info("***Redirecting to Elsewhere Tunes***")
             self.log.info("=======================================================")
             output=self.elsewhere_tunes(message)
+        elif rand==4:
+            self.log.info("***Redirecting to Fabulates***")
+            self.log.info("=======================================================")
+            output=self.fabulate(message)
         else:
             raise NotImplementedError
 
@@ -422,7 +434,8 @@ class MergeFallback(FallbackSkill):
 
         
 
-    def what_if(self, message, keyword):
+
+    def what_if(self, message):
         """
             What if Skill...
         """
@@ -435,71 +448,51 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 
-        #---step 1 transition message
-        #TODO: split what is and fabulate
+        # step 2--- pick a seed from file and replace if xxx by keyword
         if keyword=="":
-            be_patient=random.choice(self.MSG_PATIENT)
-            self.speak(be_patient)
+            #reroute to enter the weird
+            return self.enter_the_weird(message)
         else:
-            interesting=random.choice(self.MSG_INTERESTING)
+            #-----say it is interesting...
+            interesting=random.choice(self.MSG_INTERESTING) #TODO: Let or remove ?
             interesting=interesting.replace("xxx", keyword)
             self.speak(interesting)
 
-        # step 3--- between what_if_v0 and fabulate
-        n=random.uniform(0, 1)
-        if n<0.4:
-            response=self.what_if_v0(keyword)
-        else:
-            response=self.fabulate(keyword)
-
-        #step 4---closing: ask feedback 
-        feedback=random.choice(self.MSG_FEEDBACK)
-        self.speak(feedback)
-
-        return response
-
-
-    def what_if_v0(self, keyword):
-        """
-            What if Skill...
-        """
-
-        # step 2--- pick a seed from file and replace if xxx by keyword
-        if keyword=="":
-            seed = random.choice(self.whatif_nokey)
-        else:
             seed = random.choice(self.whatif)
             seed=seed.replace("xxx", keyword)#replace xxx (if exist w/ keyword)
-        self.log.info("step 2---Seed used"+seed)
-        self.log.info("=======================================================")
+            self.log.info("step 2---Seed used"+seed)
+            self.log.info("=======================================================")
 
-        # step 3--Generate with gpt2 until okay
-        self.log.info("step 3---gpt2 generation until pass the filter")
-        cool=False
-        count=0
-        MAX_TRY=3
+            # step 3--Generate with gpt2 until okay
+            self.log.info("step 3---gpt2 generation until pass the filter")
+            cool=False
+            count=0
+            MAX_TRY=3
 
-        while ((not cool) and (count<MAX_TRY)): 
-            count+=1
-            raw_response = self.gpt2_generation(seed, self.settings_what_if, remove_context=True)
-            #judge answer:
-            cool, uncool_score=cool_judge(raw_response, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING, id_skill="what_if")
-            if not cool:
-                self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
-               
+            while ((not cool) and (count<MAX_TRY)): 
+                count+=1
+                raw_response = self.gpt2_generation(seed, self.settings_what_if, remove_context=True)
+                #judge answer:
+                cool, uncool_score=cool_judge(raw_response, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING, id_skill="what_if")
+                if not cool:
+                    self.log.info("***UNCOOL answer filtered out:***"+ raw_response)
 
-        # step 4 ---
-        self.log.info("step 4---final output")
-        response=self.parse_text(seed+raw_response)
-        #response=self.gingerParser.parse(response)['result']
-        self.log.info("***COOL and filtered ***"+response)
-        self.speak(response)
-        self.log.info("=======================================================")
-        
-        return response
+            # step 4 ---
+            self.log.info("step 4---final output")
+            response=self.parse_text(seed+raw_response)
+            #response=self.gingerParser.parse(response)['result']
+            self.log.info("***COOL and filtered ***"+response)
+            self.speak(response)
+            self.log.info("=======================================================")
+
+            #step 4---closing: ask feedback 
+            feedback=random.choice(self.MSG_WHAT_IF_END)
+            self.speak(feedback)
+
+            return response
 
 
-    def fabulate(self, keyword):
+    def fabulate(self, message):
 
         """
         Args: 
@@ -507,6 +500,9 @@ class MergeFallback(FallbackSkill):
         # step 2-- extract critter
         critter=random.choice(self.critters)
         self.log.info("step 2---Extracted critter"+critter)
+
+        #TODO: Currently story without keyword as too rare close >>> could check similarity
+        keyword=""
 
         #---step 3 generate Story line by line
         story=""
@@ -551,6 +547,10 @@ class MergeFallback(FallbackSkill):
             story+=bla + "\n"
         self.log.info("Generated Story: \n"+ story)
 
+        #step 4---closing: ask feedback 
+        feedback=random.choice(self.MSG_FABULATE_END)
+        self.speak(feedback)
+
         return story
 
 
@@ -581,12 +581,9 @@ class MergeFallback(FallbackSkill):
         output=output.replace("I'm", "We are")
         output=output.replace("I'll", "We will")
 
-
         #cut punctuation and check grammar
         output=self.parse_text(output)
-
-    
-
+        self.speak(output)
         self.log.info(output)
 
         return output
@@ -691,8 +688,6 @@ class MergeFallback(FallbackSkill):
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FEEDBACK)
         self.speak(feedback)
-
-        #TODO: catching opinbion and going on dialogue?
         
         return blabla
 
