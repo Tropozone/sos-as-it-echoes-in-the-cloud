@@ -56,7 +56,7 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 # ------------------TODO-----------------------
 # =============================================
 
-#TODO: TEST Filter for ML generation cool_judge
+#TODO: Tune Fulters ...
 
 #TODO: Tune ML generation for Enter the Weird, Fabulate, What if we Bucket? max_new_tokens instead of max_length when feed context !
 #https://huggingface.co/transformers/main_classes/model.html?highlight=generate
@@ -124,6 +124,7 @@ NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=500
 TOP_P_WEIRD=0.3
 SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
+MAX_TRY_REGENERATE=3 #OK?
 
 #-------- POST PROCESSING FILTER PARAMETERS
 #TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
@@ -142,8 +143,8 @@ MAX_PLAY_SOUND=20000#in ms for pydub
 MAX_CHAR_MEMORY=280
 
 ##--------- ELSEWHERE TUNES PARAMETERS
-TEXT_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
-SISTER_LIKELIHOOD=0.5#percentage of text which are sister node info
+TEXT_LIKELIHOOD=0.0#if collective memory has audio, likelihood get a text. 
+SISTER_LIKELIHOOD=0.0#percentage of text which are sister node info
 
 ##--------- CHAT PARAMETERS
 MAX_TOKEN_HISTORICS=50
@@ -329,7 +330,7 @@ class MergeFallback(FallbackSkill):
             recording_time = DEFAULT_RECORDING_TIME  # default recording duration
         #--- Recording id and path
         now = datetime.now()
-        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
+        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory ?
         recording_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+recording_id+".wav" 
         self.log.info("Recording path:"+recording_path)
        
@@ -396,10 +397,10 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("---Saving the data---")
         today = date.today()
-        today_str = today.strftime("%d%m%Y") # dd/mm/YY
+        today_str = today.strftime("%d.%m.%Y") # dd.mm.YYYY
         #save output and message in text file #NOTE: here separate log file per day
         log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
-        
+
         #---check size file sometimes 1/10 times
         rr=random.uniform(0, 1)
         if rr<0.1:
@@ -529,9 +530,8 @@ class MergeFallback(FallbackSkill):
             self.log.info("step 3---gpt2 generation until pass the filter")
             cool=False
             count=0
-            MAX_TRY=3
 
-            while ((not cool) and (count<MAX_TRY)): 
+            while ((not cool) and (count<MAX_TRY_REGENERATE)): 
                 count+=1
                 raw_response = self.gpt2_generation(seed, self.settings_what_if, remove_context=True)
                 #judge answer:
@@ -588,7 +588,7 @@ class MergeFallback(FallbackSkill):
             cool=False
             count=0
             if i==1:
-                MAX_TRY=3#TODO: adjust this
+                MAX_TRY=MAX_TRY_REGENERATE
             else:
                 MAX_TRY=1
             context=bla+seed #NOTE: Feed previous bla as context + seed
@@ -710,9 +710,8 @@ class MergeFallback(FallbackSkill):
 
         cool=False
         count=0
-        MAX_TRY=3#TODO: adjust this
 
-        while ((not cool) and (count<MAX_TRY)): 
+        while ((not cool) and (count<MAX_TRY_REGENERATE)): 
             count+=1
             #generate gpt2
             raw_drift = self.gpt2_generation(context, current_settings, remove_context=True, historics=historics)
