@@ -63,7 +63,7 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 
 # TODO: Hello Socket: Recording Time ? Fixed  ? Can make longer and cut sound?
 # TODO: Hello Socket : Replace in Events Location and Temporalities and objects to fit Expo in Public space
-#TODO: SOund distortion: Replace file by distorted version in memory so more and mnore distorted ?
+#TODO: Sound distortion: Replace file by distorted version in memory so more and mnore distorted ?
 #TODO: SOUND Distortion: need integrate main script? Apply also Quinoa COllapse ?
 #TODO: SOUND Distortion: Add more effects such as: (and the ones commented out below)
 # equalizer(frequency, q=1.0, db=-3.0)  #"frequency in Hz, q or band-width (default=1.0)"
@@ -115,7 +115,7 @@ SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 
 #----FOR ENTER THE WEIRD gpt2 generation param
 MAX_LENGTH_WEIRD = 120
-VARIANCE_LENGTH_WEIRD = 40
+VARIANCE_LENGTH_WEIRD = 60
 TEMPERATURE_WEIRD = 0.9
 VARIANCE_TEMPERATURE_WEIRD = 0.2
 REPETITION_PENALTY_WEIRD = 1.4
@@ -131,10 +131,10 @@ MAX_MEMORY=100
 #TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","nephew", "war", "God", "muslim", "christian"] #TODO but remove words including he and she...
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","Sharia", "Coran", "nephew", "war", "God", "muslim", "christian"] #TODO but remove words including he and she...
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
-UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian"]
+UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian", "Sharia", "Coran"]
 UNCOOL_WORDS_SET=set(UNCOOL_WORDS)
 UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X", "Fig.", "in Fig.", "Photograph by", "http"]
 
@@ -148,9 +148,9 @@ MAX_PLAY_SOUND=20000#in ms for pydub
 MAX_CHAR_MEMORY=280
 
 #for chatbot with historics
-MAX_TOKEN_HISTORICS=1000
+MAX_TOKEN_HISTORICS=50
 CHAT_TEMPERATURE=2.0 #https://huggingface.co/transformers/main_classes/model.html
-CHAT_TOPK=100
+CHAT_TOPK=50
 
 # -------------OTHER PARAMETERS ----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/words/"
@@ -234,7 +234,6 @@ class MergeFallback(FallbackSkill):
             self.eventscores= load_making_kin("/data/yoko.txt", path_folder=path_folder)
             self.objects= load_data_txt("/data/objects.txt", path_folder=path_folder)
         self.log.info("Loaded {} event score and {} objects".format(len(self.eventscores), len(self.objects)))
-            
 
         self.dico = {} #Dictionnary of list words
         for filename in WORDS_LISTS:
@@ -353,11 +352,12 @@ class MergeFallback(FallbackSkill):
         rand=random.choices(range(self.NUM_SUBSKILLS), weights=LIKELIHOOD_SKILLS, k=1)[0]
 
         #----Chat 
+        chat_output=""
         if rand in [0,3,4]:
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
-            self.chat(utterance)#TODO: historics historics_id=None
+            chat_output=self.chat(utterance)#TODO: historics historics_id=None
 
         #------Rrerouting to skill
         self.log.info("=======================================================")
@@ -388,17 +388,29 @@ class MergeFallback(FallbackSkill):
         today = date.today()
         today_str = today.strftime("%d%m%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
+        
         log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
+        
+        #---check size file sometimes 1/10 times
+        rr=random.uniform(0, 1)
+        if rr<0.1:
+            size = os.path.getsize(log_file) 
+            if size > 4000: # in bytes 
+                log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+"_2.txt"
+
         with open(log_file, 'a+') as f:
+            f.write("¤¤¤hü¤¤¤"+ utterance+ "¤¤¤")
             f.write("\n")
-            f.write(utterance)
-            f.write("\n")
-            f.write(output)
-            f.write("\n")
+            if len(chat_output)>3:
+                f.write("¤¤¤vð¤¤¤"+chat_output+"¤¤¤")
+                f.write("\n")
+            f.write("¤¤¤vð¤¤¤"+output+"¤¤¤")
+            f.write("\n\n")
+        
         self.log.info("=======================================================")
         self.log.info("---END of this INTERACTION")
         self.log.info("=======================================================")
-    
+
         return True
 
 
@@ -597,39 +609,44 @@ class MergeFallback(FallbackSkill):
         return story
 
 
-    def chat(self, utterance, historics_id=None):
-        # encode the new user input, add the eos_token and return a tensor in Pytorch
+    def chat(self, utterance, historics=None):
+        # ---1---encode the new user input, add the eos_token and return a tensor in Pytorch
         new_input_ids = self.dialoTokenizer.encode(utterance + self.dialoTokenizer.eos_token, return_tensors='pt')
-
-        # append the new user input tokens to the chat history
-        if historics_id is None:
+        
+        # -3---append the new user input tokens to the chat history
+        if historics is None:
             input_ids = new_input_ids
         else:
+            #--2---for historics: replace all "\n" by EOS
+            historics = historics.replace("\n", self.dialoTokenizer.eos_token)
+            #token historics
+            historics_id = self.dialoTokenizer.encode(historics + self.dialoTokenizer.eos_token, return_tensors='pt')
             #cut to amaximum length
             historics_id=historics_id[:, :MAX_TOKEN_HISTORICS]
             input_ids = torch.cat([historics_id, new_input_ids], dim=-1)
 
-        # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
-        historics_id = self.dialoGPT.generate(input_ids, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=1.2, max_length=200, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
-        #length_penalty >1 encourage generate longer sentences
+        #-4----- generate chat 
+        output=""
+        count=0
+        while len(output)<10 and count<3:
+            count+=1
+            # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
+            historics_id = self.dialoGPT.generate(input_ids, min_length=10, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=2, max_length=100, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
+            #length_penalty >1 encourage generate longer sentences
 
-        output= self.dialoTokenizer.decode(historics_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
+            output= self.dialoTokenizer.decode(historics_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
+            #cut punctuation and check grammar
+            output=self.parse_text(output)
         
         #check if cool: #TODO: and filters
-
-        #replace I by We
-        output=output.replace("I ", "We ")
-        output=output.replace("I've", "We have")
-        output=output.replace("I'd", "We had")
-        output=output.replace("I'm", "We are")
-        output=output.replace("I'll", "We will")
-
-        #cut punctuation and check grammar
-        output=self.parse_text(output)
-        self.speak(output)
-        self.log.info(output)
-
-        return output
+        if len(output)>3:
+            self.speak(output)
+            self.log.info(output)
+            return output
+        else:
+            output=random.choice(self.MSG_PATIENT)
+            self.speak(output)
+            return output
 
     def gpt2_generation(self, seed, settings, remove_context=False):
         #More parameters ? 
@@ -698,6 +715,14 @@ class MergeFallback(FallbackSkill):
 
 
     def parse_text(self, bla):
+        
+        #replace I by We
+        bla=bla.replace("I ", "We ")
+        bla=bla.replace("I've", "We have")
+        bla=bla.replace("I'd", "We had")
+        bla=bla.replace("I'm", "We are")
+        bla=bla.replace("I'll", "We will")
+
         #good ending with punctuation
         bla=ending_with_punct_manual(bla)
         #grammar check:
