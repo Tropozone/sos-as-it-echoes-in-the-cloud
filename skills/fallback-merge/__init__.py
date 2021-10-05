@@ -48,7 +48,7 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, read_line, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_makingkin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, read_line, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 
 
@@ -56,9 +56,11 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 # ------------------TODO-----------------------
 # =============================================
 
-#TODO: TEST FILTRE cool_judge and when produce several take best ?
+#TODO: TEST Filter for ML generation cool_judge
 
-# TODO: What if We Bucket // ENTER THE WEIRD Tune ML Param. Too human filter, bad token, HomeMade gpt2
+#TODO: Tune ML generation for Enter the Weird, Fabulate, What if we Bucket? max_new_tokens instead of max_length when feed context !
+#https://huggingface.co/transformers/main_classes/model.html?highlight=generate
+
 # TODO: Hello Socket: Recording Time ? Fixed  ? Can make longer and cut sound?
 # TODO: Hello Socket : Replace in Events Location and Temporalities and objects to fit Expo in Public space
 #TODO: SOund distortion: Replace file by distorted version in memory so more and mnore distorted ?
@@ -88,6 +90,7 @@ COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with whe
 #---- If can Use sound with VA:
 SONOR=True #NOTE: For a text-based VA, put false !
 
+DDW=True #for DDW exhibit, adjust event / objects
 # --------------PARAMETERS to TUNE---------------------
 
 ##----For MERGE: Likelihood different skills
@@ -128,7 +131,7 @@ MAX_MEMORY=100
 #TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "muslim", "christian"] #TODO but remove words including he and she...
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","nephew", "war", "God", "muslim", "christian"] #TODO but remove words including he and she...
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian"]
@@ -223,9 +226,16 @@ class MergeFallback(FallbackSkill):
     def init_hello_socket(self):
         # load events and objects
         self.log.info("Init Hello Socket - in fallback-merge")
-        self.eventscores= load_makingkin()
-        self.log.info("Number different Events score:"+str(len(self.eventscores)))
-        self.objects= load_objects()
+        path_folder=str(pathlib.Path(__file__).parent.absolute())
+        if DDW:
+            self.eventscores= load_making_kin("/data/yoko_DDW.txt", path_folder=path_folder)
+            self.objects= load_data_txt("/data/objects_DDW.txt", path_folder=path_folder)
+        else:
+            self.eventscores= load_making_kin("/data/yoko.txt", path_folder=path_folder)
+            self.objects= load_data_txt("/data/objects.txt", path_folder=path_folder)
+        self.log.info("Loaded {} event score and {} objects".format(len(self.eventscores), len(self.objects)))
+            
+
         self.dico = {} #Dictionnary of list words
         for filename in WORDS_LISTS:
             self.dico[filename] = [line.rstrip('\n') for line in open(WORDS_PATH+filename+'.txt')]
@@ -295,6 +305,37 @@ class MergeFallback(FallbackSkill):
         """
         self.audio_service = AudioService(self.bus)#instantiate an AudioService object:
         self.register_fallback(self.handle_routing, 6) 
+
+
+    def recording_preliminary(self):
+        #--- Calculate how long to record
+        self.start_time = now_local()
+        # Extract time, if missing default to 30 seconds
+        stop_time, _ = (
+            (now_local() + timedelta(seconds=self.settings["duration"]), None)
+        )
+        recording_time = (stop_time -self.start_time).total_seconds()
+        #-- check time betweem min and max bound                            
+        if (recording_time <= 0) or (recording_time>MAX_RECORDING_TIME):
+            recording_time = DEFAULT_RECORDING_TIME  # default recording duration
+        #--- Recording id and path
+        now = datetime.now()
+        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
+        recording_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+recording_id+".wav" 
+        self.log.info("Recording path:"+recording_path)
+       
+        #---check if has free disk space# TODO: add free disk space later on
+        has_free_disk_space=self.has_free_disk_space()
+
+        #----also check if memory has maximum recording number, else erase
+        memory_paths=os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/")#
+        while len(memory_paths)>=MAX_MEMORY:
+            forget_one_memory(COLLECTIVE_MEMORY_FOLDER)
+            memory_paths=os.listdir(COLLECTIVE_MEMORY_FOLDER+"sound/")#
+
+
+        recording_time=int(recording_time)
+        return recording_time, recording_id, recording_path, has_free_disk_space
 
     def handle_routing(self, message):
         """
@@ -420,7 +461,9 @@ class MergeFallback(FallbackSkill):
                     #                                name='RecordingFeedback')
                 else:
                     self.speak_dialog("audio.record.disk.full")
+                
                 time.sleep(recording_time) #NOTE: NEEDED?  #TODO: RECORD TRANSCRIPTION STILL!, as converse do
+  
                 self.log.info("***RECORDING ENDED***")
                 #thanks=random.choice(self.MSG_THANKS)
                 #self.speak(thanks)
@@ -751,7 +794,8 @@ class MergeFallback(FallbackSkill):
         # step 5: playback the sound
         self.log.info("Step 4--Play the sound")
         self.audio_service.play(output_path)
-        
+
+
 
     def text_tunes(self, message):
 

@@ -9,6 +9,7 @@ pickles
 keyboard
 karton
 light switch
+wall crack
 sponge
 waste bin
 ash tray

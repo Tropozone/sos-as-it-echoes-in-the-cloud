@@ -38,6 +38,7 @@ def age_memory(folder_memory):
 
 def forget_one_memory(folder_memory):
 
+
     #compute age element memory
     memory_paths, ages=age_memory(folder_memory)
 
@@ -211,7 +212,7 @@ def split_into_sentences(text):
 ######*********************** LOAD PROCEDURES ***********************************************
 ######*****************************************************************************************
 
-def load_data_kin(filename, path_folder="", mode="r"):
+def load_making_kin(filename, path_folder="", mode="r"):
     """
     for messages in skill, load txt
     """
@@ -222,10 +223,6 @@ def load_data_kin(filename, path_folder="", mode="r"):
     #sliced_data=sliced_data.replace('\n', "")#if single ones remaining?
     return sliced_data
 
-def load_objects():
-    path_folder=str(pathlib.Path(__file__).parent.absolute())
-    #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_txt("/data/objects.txt", path_folder=path_folder)
 
 def load_data_txt(filename, path_folder="", mode="r"):
     """
@@ -235,10 +232,6 @@ def load_data_txt(filename, path_folder="", mode="r"):
         data = f.readlines()
     return data
 
-def load_makingkin():
-    path_folder=str(pathlib.Path(__file__).parent.absolute())
-    #self.log.info(str(pathlib.Path(__file__).parent.absolute()))
-    return load_data_kin("/data/yoko.txt", path_folder=path_folder)
 
 
 
@@ -462,4 +455,3 @@ def cool_judge(text, uncool_words=None, uncool_string=None, id_skill=""):
         cool= bool(cool and cool_)
 
     return cool, uncool_score
-
