@@ -80,7 +80,7 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 #TODO: SOUND Distortion: More fade in and out accross time
 ##TODO: Hello Socket : Add Object//Events
 
-# -------------PARAMETERS to check----------------------
+# -------------GENERAL PARAMETERS to check----------------------
 # --FOR ML MODEL
 my_ML_model = True  # If do have a fine-tuned model, set to True
 my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
@@ -101,19 +101,20 @@ DDW=True #for DDW exhibit, adjust event / objects
 #4----> Fabulate
 LIKELIHOOD_SKILLS=[20,15,35,15,15]
 
-#----OR HELLO SOCKET
+#----HELLO SOCKET PARAMETERS
 WAITING_TIME=5 
 
-#----FOR WHAT IF WE BUCKET gpt2 param
+#----FOR WHAT IF WE BUCKET PARAMETERS
+MIN_LENGTH = 10
 MAX_LENGTH = 100
 TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
 TOP_K=70
 TOP_P=0.3
 SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
-#TODO; Max length deprecated ? 
 
-#----FOR ENTER THE WEIRD gpt2 generation param
+#----ENTER THE WEIRD PARAMETERS
+MIN_LENGTH_WEIRD = 24
 MAX_LENGTH_WEIRD = 120
 VARIANCE_LENGTH_WEIRD = 60
 TEMPERATURE_WEIRD = 0.9
@@ -124,10 +125,7 @@ TOP_K_WEIRD=500
 TOP_P_WEIRD=0.3
 SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 
-##FOR COLLECTIVE MEMORY
-MAX_MEMORY=100
-
-#--- FOR POST PROCESSING FILTER and for FILTER GENERATION GPT"...
+#-------- POST PROCESSING FILTER PARAMETERS
 #TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
@@ -137,22 +135,29 @@ FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian", "Sharia", "Coran"]
 UNCOOL_WORDS_SET=set(UNCOOL_WORDS)
 UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X", "Fig.", "in Fig.", "Photograph by", "http"]
-
-#---- For Recording (hello socket and elsewhere tunesY
+#-----------------------------
+##--------- RECORDING PARAMETERS (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 #in seconds
-
-TEXT_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
-SISTER_LIKELIHOOD=0.5#percentage of text which are sister node info
 MAX_PLAY_SOUND=20000#in ms for pydub
-
 MAX_CHAR_MEMORY=280
 
-#for chatbot with historics
+##--------- ELSEWHERE TUNES PARAMETERS
+TEXT_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
+SISTER_LIKELIHOOD=0.5#percentage of text which are sister node info
+
+##--------- CHAT PARAMETERS
 MAX_TOKEN_HISTORICS=50
 CHAT_TEMPERATURE=2.0 #https://huggingface.co/transformers/main_classes/model.html
 CHAT_TOPK=50
+CHAT_MAX_LENGTH=50
+CHAT_MIN_LENGTH=10
+SAMPLING_CHAT="topk"
 
-# -------------OTHER PARAMETERS ----------------------
+#----------------COLLECTIVE MEMORY PARAMETERS
+MAX_MEMORY=100
+
+# ----------------------------------
+# ------------- FIXED  PARAMETERS ----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/words/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "PR0", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
@@ -173,12 +178,15 @@ class MergeFallback(FallbackSkill):
         #self.gingerParser = GingerIt()
         self.grammarParser=language_tool_python.LanguageTool('en-US')
 
+        self.fresh_historics=""
+
         self.load_messages()
         self.init_hello_socket()
         self.init_what_if_we_bucket()
         self.init_enter_the_weird()
         self.init_elsewhere_tunes()
         self.sonor=SONOR
+        
         if self.sonor:#only if sound on:
             self.init_recording_settings()
             self.record_process = None
@@ -262,6 +270,7 @@ class MergeFallback(FallbackSkill):
         self.settings_what_if.setdefault("repetition_penalty", REPETITION_PENALTY)  
         self.settings_what_if.setdefault("temperature", TEMPERATURE)  # recording channels (1 = mono)
         self.settings_what_if.setdefault("max_length", MAX_LENGTH)
+        self.settings_what_if.setdefault("min_length", MIN_LENGTH)
         self.settings_what_if.setdefault("top_k", TOP_K)
         self.settings_what_if.setdefault("top_p", TOP_P)
         self.settings_what_if.setdefault("sampling", SAMPLING)
@@ -280,6 +289,7 @@ class MergeFallback(FallbackSkill):
         self.settings_enter_the_weird.setdefault("repetition_penalty", REPETITION_PENALTY_WEIRD)  
         self.settings_enter_the_weird.setdefault("temperature", TEMPERATURE_WEIRD)  # recording channels (1 = mono)
         self.settings_enter_the_weird.setdefault("max_length", MAX_LENGTH_WEIRD)
+        self.settings_enter_the_weird.setdefault("min_length", MIN_LENGTH_WEIRD)
         self.settings_enter_the_weird.setdefault("variance_length", VARIANCE_LENGTH_WEIRD)
         self.settings_enter_the_weird.setdefault("variance_temperature", VARIANCE_TEMPERATURE_WEIRD)
         self.settings_enter_the_weird.setdefault("num_drifts", NUM_DRIFTS_WEIRD)
@@ -357,30 +367,30 @@ class MergeFallback(FallbackSkill):
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
-            chat_output=self.chat(utterance)#TODO: historics historics_id=None
+            chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
 
         #------Rrerouting to skill
         self.log.info("=======================================================")
         if rand==0:
             self.log.info("***Redirecting to Hello Socket***")
             self.log.info("=======================================================")
-            output=self.make_kin(message)
+            output=self.make_kin()#NOTE: Here utterance do not matter !
         elif rand==1:
             self.log.info("***Redirecting to What if We Bucket***")
             self.log.info("=======================================================")
-            output=self.what_if(message)
+            output=self.what_if(utterance)
         elif rand==2:
             self.log.info("***Redirecting to Enter the Weird***")
             self.log.info("=======================================================")
-            output=self.enter_the_weird(message) 
+            output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
         elif rand==3:
             self.log.info("***Redirecting to Elsewhere Tunes***")
             self.log.info("=======================================================")
-            output=self.elsewhere_tunes(message)
+            output=self.elsewhere_tunes(utterance)
         elif rand==4:
             self.log.info("***Redirecting to Fabulates***")
             self.log.info("=======================================================")
-            output=self.fabulate(message)
+            output=self.fabulate(utterance)
         else:
             raise NotImplementedError
 
@@ -388,7 +398,6 @@ class MergeFallback(FallbackSkill):
         today = date.today()
         today_str = today.strftime("%d%m%Y") # dd/mm/YY
         #save output and message in text file #NOTE: here separate log file per day
-        
         log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
         
         #---check size file sometimes 1/10 times
@@ -407,6 +416,7 @@ class MergeFallback(FallbackSkill):
             f.write("¤¤¤vð¤¤¤"+output+"¤¤¤")
             f.write("\n\n")
         
+        self.fresh_historics= utterance+ "\n" + output+ "\n"
         self.log.info("=======================================================")
         self.log.info("---END of this INTERACTION")
         self.log.info("=======================================================")
@@ -414,7 +424,7 @@ class MergeFallback(FallbackSkill):
         return True
 
 
-    def make_kin(self, message):
+    def make_kin(self):
         """
             Make Kin practices
         """
@@ -490,13 +500,10 @@ class MergeFallback(FallbackSkill):
         
 
 
-    def what_if(self, message):
+    def what_if(self, utterance):
         """
             What if Skill...
         """
-
-        # step 0 --Obtain what the human said
-        utterance = message.data.get("utterance")
 
          # step 1-- extract a keyword from what human said
         keyword= extract_keywords(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy
@@ -506,7 +513,7 @@ class MergeFallback(FallbackSkill):
         # step 2--- pick a seed from file and replace if xxx by keyword
         if keyword=="":
             #reroute to enter the weird
-            return self.enter_the_weird(message)
+            return self.enter_the_weird(utterance)
         else:
             #-----say it is interesting...
             interesting=random.choice(self.MSG_INTERESTING) #TODO: Let or remove ?
@@ -547,7 +554,7 @@ class MergeFallback(FallbackSkill):
             return response
 
 
-    def fabulate(self, message):
+    def fabulate(self, utterance):
 
         """
         Args: 
@@ -614,7 +621,7 @@ class MergeFallback(FallbackSkill):
         new_input_ids = self.dialoTokenizer.encode(utterance + self.dialoTokenizer.eos_token, return_tensors='pt')
         
         # -3---append the new user input tokens to the chat history
-        if historics is None:
+        if (historics is None) or (len(historics)<3):
             input_ids = new_input_ids
         else:
             #--2---for historics: replace all "\n" by EOS
@@ -624,6 +631,8 @@ class MergeFallback(FallbackSkill):
             #cut to amaximum length
             historics_id=historics_id[:, :MAX_TOKEN_HISTORICS]
             input_ids = torch.cat([historics_id, new_input_ids], dim=-1)
+        
+        ctxt_len=input_ids.shape[-1]
 
         #-4----- generate chat 
         output=""
@@ -631,7 +640,7 @@ class MergeFallback(FallbackSkill):
         while len(output)<10 and count<3:
             count+=1
             # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
-            historics_id = self.dialoGPT.generate(input_ids, min_length=10, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=2, max_length=100, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
+            historics_id = self.dialoGPT.generate(input_ids, min_length=CHAT_MIN_LENGTH, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=2, max_length=ctxt_len+CHAT_MAX_LENGTH, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
             #length_penalty >1 encourage generate longer sentences
 
             output= self.dialoTokenizer.decode(historics_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
@@ -648,18 +657,27 @@ class MergeFallback(FallbackSkill):
             self.speak(output)
             return output
 
-    def gpt2_generation(self, seed, settings, remove_context=False):
+    def gpt2_generation(self, seed, settings, remove_context=False, historics=None):
         #More parameters ? 
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
-        #TODO: Bad Token id for generation. Works ? but quotes too?
+        
+        if historics is not None:
+            #--for historics: replace all "\n" by EOS
+            #historics = historics.replace("\n", dialoTokenizer.eos_token)#TODO: this also ok for gpt2?
+            historics_id = self.tokenizer.encode(historics, return_tensors='pt')#+ dialoTokenizer.eos_token
+            #cut to amaximum length
+            encoded_context = torch.cat([historics_id, encoded_context], dim=-1)[:, -MAX_TOKEN_HISTORICS:]
+        
+        ctxt_len=encoded_context.shape[-1]
+
         #different sampling:
         if settings["sampling"]=="nucleus":
-            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length= settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
         elif settings["sampling"]=="topk":#top k sampling
-            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length= settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
         else:#base sampling
-            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length = settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length=settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
         if remove_context:
@@ -667,7 +685,7 @@ class MergeFallback(FallbackSkill):
         else:
             return raw_response
 
-    def one_drift(self, utterance):
+    def one_drift(self, utterance, historics=None):
         """
             One gpt-2 drift from the last blabla
         """
@@ -697,7 +715,7 @@ class MergeFallback(FallbackSkill):
         while ((not cool) and (count<MAX_TRY)): 
             count+=1
             #generate gpt2
-            raw_drift = self.gpt2_generation(context, current_settings, remove_context=True)
+            raw_drift = self.gpt2_generation(context, current_settings, remove_context=True, historics=historics)
             #if cool generation
             cool, uncool_score=cool_judge(raw_drift, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
             if not cool:
@@ -733,16 +751,14 @@ class MergeFallback(FallbackSkill):
 
         return " ".join(split)
    
-    def enter_the_weird(self, message):
+    def enter_the_weird(self, utterance, historics=None):
         """
             Several gpt-2 drifts from the last utterance
         """
-        #---patience
+        #---(0) patience
         be_patient=random.choice(self.MSG_PATIENT)
         self.speak(be_patient)
 
-        #(0) Get the human utterance
-        utterance = message.data.get("utterance")
         #(1) Choose the mode and possible seed and add it
         loopCount=0
         bla=utterance
@@ -750,7 +766,10 @@ class MergeFallback(FallbackSkill):
         while loopCount<self.settings_enter_the_weird["num_drifts"]:
             loopCount+=1
             self.log.info("Drift n° {loopCount}")
-            bla=self.one_drift(bla) #Only keep last part as context else too big? >>>
+            if loopCount==1:
+                bla=self.one_drift(bla, historics=historics) #TODO: Keep historics or not ?  May slow down...
+            else:
+                bla=self.one_drift(bla)
             blabla+=bla
         
         #step 4---closing: ask feedback 
