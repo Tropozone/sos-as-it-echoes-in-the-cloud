@@ -48,7 +48,7 @@ function AddZero(num) {
 var now = new Date();
 var date = [AddZero(now.getDate()), AddZero(now.getMonth()),now.getFullYear()].join(":");
 
-
+//ATTEMPT 1 ?
 function readTextFile(file)
 {
     var rawFile = new XMLHttpRequest();
@@ -60,28 +60,36 @@ function readTextFile(file)
             if(rawFile.status === 200 || rawFile.status == 0)
             {
                 var allText = rawFile.responseText;
-                alert(allText);
+                //alert(allText);
             }
         }
     }
     rawFile.send(null);
 }
 // /Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt
-//readTextFile("file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt");
+//readTextFile("file:///Users/clgl/Github/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt")//"file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt");
 
-fetch('file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt')
-  .then(response => response.text())
-  .then(text => blabla=text )//console.log(text))
 
-  // var fileReader = new FileReader(); 
-  //fileReader.onload = function (e) { 
-	 // var fileContents = document.getElementById('filecontents');
- //filecontents is a div in the html that displays the file.
- //	 fileContents.innerText = fileReader.result; 
- // } 
-  //fileReader.readAsText(fileTobeRead); 
+//ATTEMPT 2 
+//fetch('file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt')
+//  .then(response => response.text())
+ // .then(text => blabla=text )//console.log(text))
 
-//fr.readAsText(fileList[0]);
+//ATTEMPT 3 
+
+async function downloadFile() {
+	let response = await fetch("05.10.2021.txt");
+		
+	if(response.status != 200) {
+		throw new Error("Server Error");
+	}
+		
+	// read response stream as text
+	let text_data = await response.text();
+
+	return text_data;
+}
+//let text_data = await downloadFile();
 
 //TODO: text file
 //load trace of the day conversation sync mode:
