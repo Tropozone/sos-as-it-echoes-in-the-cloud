@@ -60,7 +60,7 @@ class DreamSkill(MycroftSkill):
         It is often used to declare variables or perform setup actions, however
         it cannot utilise MycroftSkill methods as the class does not yet exist.
         """
-        super(DreamSkill, self).__init__(name='Quinoa Collapse Skill')
+        super(DreamSkill, self).__init__(name='Dream Skill')
         #self.learning = True 
 
     def initialize(self):
@@ -99,7 +99,7 @@ class DreamSkill(MycroftSkill):
         dream=random.choice(self.dreams)
         self.speak(dream)
 
-        #- --- ending note#TODO: Ask question ?
+        #- --- ending note
         text_end=random.choice(self.MSG_END)
         self.speak(text_end)
         self.log.info(text_end)

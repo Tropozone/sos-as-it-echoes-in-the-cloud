@@ -59,7 +59,7 @@ class BaseSkill(MycroftSkill):
         It is often used to declare variables or perform setup actions, however
         it cannot utilise MycroftSkill methods as the class does not yet exist.
         """
-        super(BaseSkill, self).__init__(name='Quinoa Collapse Skill')
+        super(BaseSkill, self).__init__(name='Base Skill')
         #self.learning = True 
 
     def initialize(self):

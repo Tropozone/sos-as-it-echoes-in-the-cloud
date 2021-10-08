@@ -16,10 +16,6 @@
 # ============================================
 # ------------------TODO-----------------------
 # =============================================
-
-# TODO: What happens at end: ask opinion ?
-# TODO: Triggers, Message Transition & End
-# TODO: Parameters Max/Min Length, vary etc
 # TODO: Grammar test ? vs Keep special characters?
 
 
@@ -28,7 +24,7 @@
 # ======================================
 
 # --------------PARAMETERS to tune----------------------
-MAX_LENGTH=600
+MAX_LENGTH=400
 MIN_LENGTH=160
 
 # --------------IMPORTS----------------------

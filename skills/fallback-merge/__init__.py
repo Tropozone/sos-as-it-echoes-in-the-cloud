@@ -56,15 +56,11 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 # ------------------TODO-----------------------
 # =============================================
 
-#TODO: Tune Fulters ...
-
-#TODO: Tune ML generation for Enter the Weird, Fabulate, What if we Bucket? max_new_tokens instead of max_length when feed context !
+#TODO: Tune Filters ...Tune ML generation for Enter the Weird, Fabulate, What if we Bucket? max_new_tokens instead of max_length when feed context !
 #https://huggingface.co/transformers/main_classes/model.html?highlight=generate
 
-# TODO: Hello Socket: Recording Time ? Fixed  ? Can make longer and cut sound?
-# TODO: Hello Socket : Replace in Events Location and Temporalities and objects to fit Expo in Public space
-#TODO: Sound distortion: Replace file by distorted version in memory so more and mnore distorted ?
-#TODO: SOUND Distortion: need integrate main script? Apply also Quinoa COllapse ?
+#TODO: ERASE sound IF SILENCE in collective Memory?
+#TODO: Hello Socket: Recording Time ? Fixed  ? Can make longer and cut sound?
 #TODO: SOUND Distortion: Add more effects such as: (and the ones commented out below)
 # equalizer(frequency, q=1.0, db=-3.0)  #"frequency in Hz, q or band-width (default=1.0)"
 # bandpass(frequency, q=1.0)  #"frequency in Hz, q or band-width (default=1.0)"
@@ -74,11 +70,12 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 # speed(self, factor, use_semitones=False)# s"speed takes 2 parameters: factor and use-semitones (True or False).When use-semitones = False, a factor of 2 doubles the speed and raises the pitch an octave. The same result is achieved with factor = 1200 and use semitones = True.
 
 
-
 #####LATER ?
 #TODO  SOUND Distortion: Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
 #TODO: SOUND Distortion: More fade in and out accross time
-##TODO: Hello Socket : Add Object//Events
+#TODO: Sound distortion: Replace file by distorted version in memory so more and mnore distorted ?
+#TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
+
 
 # -------------GENERAL PARAMETERS to check----------------------
 # --FOR ML MODEL
@@ -127,10 +124,9 @@ SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 MAX_TRY_REGENERATE=3 #OK?
 
 #-------- POST PROCESSING FILTER PARAMETERS
-#TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","Sharia", "Coran", "nephew", "war", "God", "muslim", "christian"] #TODO but remove words including he and she...
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","Sharia", "Coran", "nephew", "war", "God", "muslim", "christian"]
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
 UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian", "Sharia", "Coran"]
@@ -217,7 +213,7 @@ class MergeFallback(FallbackSkill):
         self.MSG_RITUAL_END=load_data_txt("message_ritual_end.txt", path_folder=path_folder)
         self.MSG_SISTER_START=load_data_txt("message_sister_start.txt", path_folder=path_folder)
         self.MSG_INTERESTING=load_data_txt("message_interesting.txt", path_folder=path_folder)
-        self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)#TODO: not used ?
+        self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)#NOTE: Not used ?
         self.MSG_WHAT_IF_END=load_data_txt("message_what_if_end.txt", path_folder=path_folder)
         self.MSG_FABULATE_END=load_data_txt("message_fabulate_end.txt", path_folder=path_folder)
 
@@ -334,7 +330,7 @@ class MergeFallback(FallbackSkill):
         recording_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+recording_id+".wav" 
         self.log.info("Recording path:"+recording_path)
        
-        #---check if has free disk space# TODO: add free disk space later on
+        #---check if has free disk space
         has_free_disk_space=self.has_free_disk_space()
 
         #----also check if memory has maximum recording number, else erase
@@ -477,7 +473,6 @@ class MergeFallback(FallbackSkill):
                                                     int(recording_time),
                                                     self.settings["rate"],
                                                     self.settings["channels"])
-                    #TODO: ERASE IF SILENCE?
                     self.enclosure.eyes_color(255, 0, 0)  # set color red #WHAT FOR ?
                     self.last_index = 24
                     #self.schedule_repeating_event(self.recording_feedback, None, 1,
@@ -507,7 +502,7 @@ class MergeFallback(FallbackSkill):
         """
 
          # step 1-- extract a keyword from what human said
-        keyword= extract_keywords(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy
+        keyword= extract_keywords(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 
@@ -517,7 +512,7 @@ class MergeFallback(FallbackSkill):
             return self.enter_the_weird(utterance)
         else:
             #-----say it is interesting...
-            interesting=random.choice(self.MSG_INTERESTING) #TODO: Let or remove ?
+            interesting=random.choice(self.MSG_INTERESTING)
             interesting=interesting.replace("xxx", keyword)
             self.speak(interesting)
 
@@ -637,7 +632,7 @@ class MergeFallback(FallbackSkill):
         #-4----- generate chat 
         output=""
         count=0
-        while len(output)<10 and count<3:
+        while (len(output)<8 or not cool) and count<3:
             count+=1
             # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
             historics_id = self.dialoGPT.generate(input_ids, min_length=CHAT_MIN_LENGTH, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=2, max_length=ctxt_len+CHAT_MAX_LENGTH, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
@@ -646,8 +641,10 @@ class MergeFallback(FallbackSkill):
             output= self.dialoTokenizer.decode(historics_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
             #cut punctuation and check grammar
             output=self.parse_text(output)
-        
-        #check if cool: #TODO: and filters
+
+            #TODO: use uncool score then 
+            cool, uncool_score=cool_judge(output, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
+
         if len(output)>3:
             self.speak(output)
             self.log.info(output)
@@ -795,15 +792,11 @@ class MergeFallback(FallbackSkill):
             self.log.info("=======================================================") 
             output=self.text_tunes(message) 
             
-        
-            #TODO: indicative to say it it not him?
-            
         self.log.info("=======================================================") 
         
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_ELSEWHERE_END)
         self.speak(feedback)
-        #TODO: Do you have some memory to share too?Do you have something to share back for the assemblage ?wait for answer // record if yes...
 
         return output
         
@@ -814,8 +807,8 @@ class MergeFallback(FallbackSkill):
         # step 1: catch attention ? or just as a burp
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
-        message_listen=random.choice(self.MSG_LISTEN) #TODO: KEEP IT or not
-        self.speak(message_listen)
+        #message_listen=random.choice(self.MSG_LISTEN)
+        #self.speak(message_listen)
 
         self.log.info("Step 2--Pick the sound")
         # step 2: pick sound from collective memory
@@ -889,8 +882,6 @@ class MergeFallback(FallbackSkill):
             about=random.choice(sister_node_about)
         self.speak(about)
         self.log.info(about)
-
-
         #TODO: Ask feedback?
 
 
