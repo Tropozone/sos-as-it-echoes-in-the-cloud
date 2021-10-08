@@ -99,7 +99,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 LIKELIHOOD_SKILLS=[20,15,35,15,15]
 
 #----HELLO SOCKET PARAMETERS
-WAITING_TIME=5 
+WAIT_FOR_HUMAN=5 
 
 #----FOR WHAT IF WE BUCKET PARAMETERS
 MIN_LENGTH = 10
@@ -152,6 +152,9 @@ SAMPLING_CHAT="topk"
 
 #----------------COLLECTIVE MEMORY PARAMETERS
 MAX_MEMORY=100
+
+#----------------WAITING TIME BETWEEN SENDING 2 utterance to server
+WAIT_TIME=1
 
 # ----------------------------------
 # ------------- FIXED  PARAMETERS ----------------------
@@ -365,13 +368,14 @@ class MergeFallback(FallbackSkill):
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
+            time.sleep(WAIT_TIME)
 
         #------Rrerouting to skill
         self.log.info("=======================================================")
         if rand==0:
             self.log.info("***Redirecting to Hello Socket***")
             self.log.info("=======================================================")
-            output=self.make_kin()#NOTE: Here utterance do not matter !
+            output=self.make_kin()
         elif rand==1:
             self.log.info("***Redirecting to What if We Bucket***")
             self.log.info("=======================================================")
@@ -383,11 +387,11 @@ class MergeFallback(FallbackSkill):
         elif rand==3:
             self.log.info("***Redirecting to Elsewhere Tunes***")
             self.log.info("=======================================================")
-            output=self.elsewhere_tunes(utterance)
+            output=self.elsewhere_tunes()
         elif rand==4:
             self.log.info("***Redirecting to Fabulates***")
             self.log.info("=======================================================")
-            output=self.fabulate(utterance)
+            output=self.fabulate()
         else:
             raise NotImplementedError
 
@@ -459,7 +463,7 @@ class MergeFallback(FallbackSkill):
                 if ("Narrate me" in event):
                     #record after a lil pause to let person to think
                     self.log.info("About to record Human Answer in 5 seconds")
-                    time.sleep(WAITING_TIME)
+                    time.sleep(WAIT_FOR_HUMAN)
                     self.speak("Please share it with me now.")
                     self.log.info("Please share it with me now.")
                 
@@ -549,8 +553,7 @@ class MergeFallback(FallbackSkill):
             return response
 
 
-    def fabulate(self, utterance):
-
+    def fabulate(self):
         """
         Args: 
         """
@@ -603,7 +606,8 @@ class MergeFallback(FallbackSkill):
             #--- add it to story
             story+=bla + "\n"
         self.log.info("Generated Story: \n"+ story)
-
+        
+        time.sleep(WAIT_TIME)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FABULATE_END)
         self.speak(feedback)
@@ -767,14 +771,15 @@ class MergeFallback(FallbackSkill):
             else:
                 bla=self.one_drift(bla)
             blabla+=bla
-        
+        time.sleep(WAIT_TIME)
+
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FEEDBACK)
         self.speak(feedback)
         
         return blabla
 
-    def elsewhere_tunes(self, message):
+    def elsewhere_tunes(self):
                 
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
@@ -782,18 +787,19 @@ class MergeFallback(FallbackSkill):
         if self.sonor and random.uniform(0, 1)<(1-self.text_likelihood):
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
-            self.sonor_tunes(message)
+            self.sonor_tunes()
         elif random.uniform(0, 1)<self.sister_likelihood:
             self.log.info("Sister Node tunes")
             self.log.info("=======================================================") 
-            self.sister_node_tunes(message) 
+            self.sister_node_tunes() 
         else:
             self.log.info("Text tunes")
             self.log.info("=======================================================") 
-            output=self.text_tunes(message) 
+            output=self.text_tunes() 
             
         self.log.info("=======================================================") 
         
+        time.sleep(WAIT_TIME)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_ELSEWHERE_END)
         self.speak(feedback)
@@ -801,12 +807,13 @@ class MergeFallback(FallbackSkill):
         return output
         
 
-    def sonor_tunes(self, message):
+    def sonor_tunes(self):
         
         self.log.info("Step 1--Catch Attention")
         # step 1: catch attention ? or just as a burp
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
+        time.sleep(WAIT_TIME)
         #message_listen=random.choice(self.MSG_LISTEN)
         #self.speak(message_listen)
 
@@ -833,7 +840,7 @@ class MergeFallback(FallbackSkill):
 
 
 
-    def text_tunes(self, message):
+    def text_tunes(self):
 
         self.log.info("Step 1--Pick a memory")
         #pick random text file from the memory
@@ -843,7 +850,8 @@ class MergeFallback(FallbackSkill):
         #little message
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
-
+        time.sleep(WAIT_TIME)
+        
         self.log.info("Step 2--Share the text")
         # step 3: say the text
         with open(text_path, 'r') as f:
@@ -857,7 +865,7 @@ class MergeFallback(FallbackSkill):
         return memory
 
 
-    def sister_node_tunes(self, message):
+    def sister_node_tunes(self):
 
         NODES=["1", "2", "3", "666"]
 

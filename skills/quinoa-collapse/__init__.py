@@ -26,6 +26,7 @@
 # --------------PARAMETERS to tune----------------------
 MAX_LENGTH=400
 MIN_LENGTH=160
+WAIT_TIME=2
 
 # --------------IMPORTS----------------------
 
@@ -42,6 +43,7 @@ import requests
 import random
 import pathlib
 import re
+import time
 
 from .utils import cut_extract, retrieve_google_urls, clean_text, load_data_txt
 
@@ -136,6 +138,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         #- 5--- share online extract 
         self.speak(final_extract)
         self.log.info("Extract of what found online:"+ final_extract) 
+        time.sleep(WAIT_TIME)
 
         self.log.info("=======================================================")
         self.log.info("==========step 6: Ending note =======")

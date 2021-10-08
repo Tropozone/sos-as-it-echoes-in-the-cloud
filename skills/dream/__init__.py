@@ -39,7 +39,7 @@ import requests
 import random
 import pathlib
 import re
-
+import time
 from .utils import load_data_txt
 
 #from configparser import ConfigParser
@@ -49,6 +49,7 @@ from .utils import load_data_txt
 
 #https://www.dreambank.net/random_sample.cgi?series=blind-f&min=50&max=300&n=100
 
+WAIT_TIME=1
 # =============================================
 # -------------- SKILL ---------------
 # ======================================
@@ -94,10 +95,11 @@ class DreamSkill(MycroftSkill):
         text_start=random.choice(self.MSG_START)
         self.speak(text_start)
         self.log.info(text_start)
-
+        time.sleep(WAIT_TIME)
          #- --- share dream
         dream=random.choice(self.dreams)
         self.speak(dream)
+        time.sleep(WAIT_TIME)
 
         #- --- ending note
         text_end=random.choice(self.MSG_END)
