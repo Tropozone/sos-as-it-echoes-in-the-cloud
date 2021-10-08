@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Randomly Place elements inside the window</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- <script
+    type="text/javascript"
+    src="/js/lib/dummy.js"
+    
+  ></script> --> 
+
+
+<!--  <link rel="stylesheet" type="text/css" href="/css/result-light.css"> --> 
+   
+  <style id="compiled-css" type="text/css">
+      div {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+        
+}
+    /* EOS */
+  </style>
+
+
+<!--   <script id="insert"></script> --> 
+
+
+
+</head>
+<body>
+
+
+  <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+   
+<script src="https://requirejs.org/docs/release/2.3.5/minified/require.js" type="text/javascript">//<![CDATA[
+
+ //ATTEMPT 000
+var fs = require('fs');
+var file_name = "./data/00.txt"// 'file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/00.txt';
+  
+try {
+var output = fs.readFileSync(file_name , 'utf8');
+document.writeln("<div>"+output+"</div>"); 
+console.log(output)
+} catch(e) {
+console.error(e) //see what's going on here
+}
+
+//ATTEMPT 00
+  
+fs.readFileSync(file_name, 'utf8', function (err, data) {
+    if (err) {
+        console.log(err)
+        return false    
+    }
+    console.log(data)
+    document.writeln("<div>"+data+"</div>");
+});
+
+
+//parameters
+maxSnippet=50
+maxLengthSnippet=200
+
+COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/" //TODO: CHange this
+
+//get date : tested ok
+function AddZero(num) {
+    return (num >= 0 && num < 10) ? "0" + num : num + "";
+}
+var now = new Date();
+var date = [AddZero(now.getDate()), AddZero(now.getMonth()),now.getFullYear()].join(":");
+
+
+//ATTEMPT 0
+//var fs = require('fs');
+//var text = fs.readFileSync("./0000.txt", 'utf-8');
+//var textByLine = text.split('\n')
+
+
+// /Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt
+//readTextFile('/0000.txt')//"file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/05.10.2021.txt");
+
+
+//TODO: text file
+//load trace of the day conversation sync mode:
+//var fs = require("fs"); //use nodejs ? cant ?
+//var text = fs.readFileSync(date+".txt");
+// cut into lil units of conversations
+//var blabla = text.split("\n\n")
+//save the last M ones
+//max=Math.min(maxSnippet,blabla.length-1)
+//blabla=blabla.slice(-max, 0)
+
+//blabla.length
+for (let i = 0; i < maxSnippet; i++) {
+//document.writeln("<div>"+date+"</div>");
+
+ // document.write(blabla[i])
+}
+
+    //]]></script>
+
+
+<div>
+¤¤¤hü¤¤¤ Why are you so Blue today ?¤¤¤hü¤¤¤
+¤¤¤vð¤¤¤ What if the sky and where in it?It must be a big dark night.But when you are asleep?A long way from heaven; its wind shall have done its duty, but not without destruction!The birds seemed to shake their head at me with great sorrows all around them for several days before reaching us nowandthen—the most dreadful of storms I ever saw since seeing clouds for so many years or even centuries on my face (as was very difficult).They shrieked violently as they looked over their heads: one then lifted up and began devouring the dead of trees, while another continued trying once again till this last day would finish after the little time had elapsed.I should soon recognize an entire cluster under our feet, each containing a human bird that belonged here long ago among two small shrublings.There could hardly possibly seem any doubt that those three individuals were both flying about in [circles.At](http://circles.at/) a distance half a dozen yards down we came upon some green branches which appeared like flickers flickering sparks within whose delicate airweird limbs sprang up from every point of flight except perhaps between four spots just below —for only now did these sparkle suddenly into existence beyond visible sight; yet there is no need either o'erwing cloudic atmosphere beneath, nor ground where life stands suspended or living.These seeds went away quite unharmed and far in appearance throughout my body until I was caught by lightning bolts a short minute later ; and, as I floated slowly through thundercloudy mist from above, near outspread wings arose from other regions equally scattered across different parts –perhaps as much hail and vapour, for example!On reflection I could see nothing as thickening as myself; though still less than a mile round it fell nearly completely onto grasses, sometimes falling together into flakes and thorns, although it never lost my view of mountainside heights well enough :–one might imagine indeed what can happen to this partofplanet!¤¤¤vð¤¤¤
+</div>
+<div>¤¤¤hü¤¤¤When the bees have reached the moon, where do they meet the phones, and how can those contacts be traced back to their hive?Are these communications devices more or less like our own and perhaps, at greater or lesser scales, less secure at all?And at a wider scale, what could be anachronistic—yet in the spirit of Kantian idealism, could it be the other way around?But again, let’s add that these conversations are not the bees of the Hive or even of the technological hive.I am not here to judge you all on your technical competence.I’m just trying to take you through all the steps of it.As I mentioned in the previous chapter I am not a physicist, but I am interested in the processes, in the processes between bees and technology.Hobbyists, students, and volunteers in the beekeeping industry, both use the devices, as well as the media, to develop a system in which bees could communicate.It is very simple in the sense, I believe.The hive is a space of relationships.The bees are not really conscious, nor are the computers conscious to bemoan.I want to explore the bees.Indeed, one might like to show that the bees are neither conscious of the difference between bees’ naturalistic and artificial worlds.The bees’ interactions with computer technologies is not simply a relation: there is also a relation that emerges, though not an analogy.If it is a relation.The difference is a relation between a machine and the hive, then there is a process, it is a difference between, but not a process.An insect, the bee, in the flower and the machine, and the bee's artificial.¤¤¤hü¤¤¤</div>
+<div>¤¤¤hü¤¤¤The people I spoke to were like me, “there’s no reason I should be dreaming.It also had three main reasons.It seemed to me that humans were responsible for every nameless entity we know, regardless of the existence of any other or that it has been around long enough to have evolved independently.It seems that humans have acquired a secondarily primitive and universal identity in which each person’s life is an integral part.As one might surmise, humans are part of every part of nature.But humans were not created to be machines, but rather to work as social or cultural agents within the world.It’s no surprise that the people who know the animals best find themselves in direct contradiction with the animals depicted in the ﬁrst human novels.As a result, I don’t think most ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrst ﬁrnd a common narrative with the various ﬁrst ﬁrst ﬁrst ﬁriﬁcation and the various actions that have been taken to bring about their difference.I hope that people who do know the animals at all will conclude that they understand more deeply the ﬁrst human stories of animals than most ﬁrst ﬁrst ﬁraﬁcation of the human world.They will also be surprised at how well ﬁrst the animals were represented as different, rather than the same as most ﬁrst humans’ stories we have just heard.¤¤¤hü¤¤¤</div>
+
+
+
+    <script type="text/javascript">//<![CDATA[
+
+
+// collect all the divs
+var divs = document.getElementsByTagName('div');
+// get window width and height
+var winWidth = window.innerWidth;
+var winHeight = window.innerHeight;
+
+var bgcolorlist=new Array("#228B22", "#FF69B4")
+
+
+var blabla = "Are the animals being prevented from making mistakes or getting eaten by rambunctious birds that straight out consume they way I use to say how much better I eat these birds live where I’m going.With help and volunteerism, many end up spilling over into a wasteland of burnt out principle farmed bodies.So what does technology mean for doing harm with this place if I have ten dollars left ingone trash pile all but owned by birds?How exactly will caregiving and extrem hip be made possible absent judgements like obsession based on feeding preference and glarebased gratuities, devastating science questions behind Megabop victories like that one Now my eyes begin wondering!";
+//document.body.style.background=bgcolorlist[Math.floor(Math.random()*bgcolorlist.length)];//background
+
+// i stands for "index". you could also call this banana or haircut. it's a variable
+for ( var i=0; i < divs.length; i++ ) {
+ 	
+    // shortcut! the current div in the list
+    var thisDiv = divs[i];
+    
+    // get random numbers for each element
+    randomTop = getRandomNumber(0, winHeight);
+    randomLeft = getRandomNumber(0, winWidth-100);
+    width = getRandomNumber(150, 300);
+    width = Math.min(width, winWidth-randomLeft)
+    
+    
+    // update top and left position
+    thisDiv.style.top = randomTop +"px";
+    thisDiv.style.left = randomLeft +"px";
+    thisDiv.style.fontSize = 6 + "px";
+    thisDiv.style.width = width +"px";
+    thisDiv.style.textAlign = "justify";
+  
+    
+}
+
+
+
+// function that returns a random number between a min and max
+function getRandomNumber(min, max) {
+    
+  return Math.random() * (max - min) + min;
+    
+}
+
+
+  //]]></script>
+
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "6dr4cyhv"
+      }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
+
+
+</body>
+</html>
