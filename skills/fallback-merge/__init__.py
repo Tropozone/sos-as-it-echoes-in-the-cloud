@@ -75,7 +75,7 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 #TODO: SOUND Distortion: More fade in and out accross time
 #TODO: Sound distortion: Replace file by distorted version in memory so more and mnore distorted ?
 #TODO Experiment with more filters, different for the generation and the post processing Do several words may be forbodden ?
-
+# TODO: What / When save collective memory
 
 # -------------GENERAL PARAMETERS to check----------------------
 # --FOR ML MODEL
@@ -329,7 +329,7 @@ class MergeFallback(FallbackSkill):
             recording_time = DEFAULT_RECORDING_TIME  # default recording duration
         #--- Recording id and path
         now = datetime.now()
-        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory ?
+        recording_id = now.strftime("%H%M%S") #TODO: Add id NOde in collective memory ?
         recording_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+recording_id+".wav" 
         self.log.info("Recording path:"+recording_path)
        
@@ -397,9 +397,15 @@ class MergeFallback(FallbackSkill):
 
         self.log.info("---Saving the data---")
         today = date.today()
-        today_str = today.strftime("%d.%m.%Y") # dd.mm.YYYY
+        today_str = today.strftime("%d%m%Y") # dd.mm.YYYY
+        now_str=today.strftime("%H%M%S")
         #save output and message in text file #NOTE: here separate log file per day
         log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
+        human_txt_file=COLLECTIVE_MEMORY_FOLDER+"text/"+"human_"+now_str+".txt"
+        #TODO: Save machine too ?
+
+        with open(human_txt_file, 'w+') as f:
+            f.write(utterance)
 
         #---check size file sometimes 1/10 times
         rr=random.uniform(0, 1)
@@ -851,7 +857,7 @@ class MergeFallback(FallbackSkill):
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
         time.sleep(WAIT_TIME)
-        
+
         self.log.info("Step 2--Share the text")
         # step 3: say the text
         with open(text_path, 'r') as f:
