@@ -1,3 +1,6 @@
+horse
+dog
+grass
 socket
 chair
 pen
