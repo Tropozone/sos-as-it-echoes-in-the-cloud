@@ -96,7 +96,8 @@ DDW=True #for DDW exhibit, adjust event / objects
 #2----> Enter the Weird
 #3----> Elsewhere Tunes
 #4----> Fabulate
-LIKELIHOOD_SKILLS=[20,15,35,15,15]
+#5----> Wonder
+LIKELIHOOD_SKILLS=[15,15,30,10,15,15]
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -171,8 +172,9 @@ class MergeFallback(FallbackSkill):
     def __init__(self):
         super(MergeFallback, self).__init__(name='Merge Fallback Skill')    
         self.log.info("*****INIT FALLBACK MERGE ****")
-        self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes"]
+        self.SUBSKILLS=["Hello Socket", "What if we bucket", "Enter the Weird", "Elsewhere Tunes", "Fabulate", "Wonder"]
         self.NUM_SUBSKILLS=len(self.SUBSKILLS)
+        self.log.info("Init MERGE FALL BACK with {} subskills".format(self.NUM_SUBSKILLS)+ ",".join(self.SUBSKILLS))
         self.settings_what_if=dict()
         self.settings_enter_the_weird=dict()
         #self.gingerParser = GingerIt()
@@ -219,6 +221,8 @@ class MergeFallback(FallbackSkill):
         self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)#NOTE: Not used ?
         self.MSG_WHAT_IF_END=load_data_txt("message_what_if_end.txt", path_folder=path_folder)
         self.MSG_FABULATE_END=load_data_txt("message_fabulate_end.txt", path_folder=path_folder)
+        self.MSG_WONDER_START=load_data_txt("message_wonder_start.txt", path_folder=path_folder)
+        self.MSG_WONDER_END=load_data_txt("message_wonder_end.txt", path_folder=path_folder)
 
 
     def init_recording_settings(self):
@@ -264,6 +268,7 @@ class MergeFallback(FallbackSkill):
         # load
         path_folder=str(pathlib.Path(__file__).parent.absolute())
         self.critters = load_data_txt("/data/critters.txt", path_folder=path_folder)
+        self.wonders = load_data_txt("/data/wonders.txt", path_folder=path_folder)
         self.whatif = load_data_txt("/data/whatif.txt", path_folder=path_folder)
         self.whatif_nokey = load_data_txt("/data/whatif_nokey.txt", path_folder=path_folder)
         self.storylines = load_storylines("/data/fabulations.txt", path_folder=path_folder)
@@ -363,7 +368,7 @@ class MergeFallback(FallbackSkill):
 
         #----Chat 
         chat_output=""
-        if rand in [0,3,4]:
+        if rand in [0,3,4, 5]:
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
@@ -392,13 +397,19 @@ class MergeFallback(FallbackSkill):
             self.log.info("***Redirecting to Fabulates***")
             self.log.info("=======================================================")
             output=self.fabulate()
+        elif rand==4:
+            self.log.info("***Redirecting to Wonder***")
+            self.log.info("=======================================================")
+            output=self.wonder()
+
         else:
             raise NotImplementedError
 
         self.log.info("---Saving the data---")
         today = date.today()
         today_str = today.strftime("%d%m%Y") # dd.mm.YYYY
-        now_str=today.strftime("%H%M%S")
+        now = datetime.now()
+        now_str=now.strftime("%H%M%S")
         #save output and message in text file #NOTE: here separate log file per day
         log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
         human_txt_file=COLLECTIVE_MEMORY_FOLDER+"text/"+"human_"+now_str+".txt"
@@ -568,7 +579,6 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 2---Extracted critter"+critter)
 
         #TODO: Currently story without keyword as too rare close >>> could check similarity
-        keyword=""
 
         #---step 3 generate Story line by line
         story=""
@@ -580,10 +590,7 @@ class MergeFallback(FallbackSkill):
             line=random.choice(lines.split("\n"))
             #- replace xxx , yyy and cc
             line=line.replace("xxx", critter)
-            if keyword=="":#did not find keyword in sentence
-                line=line.replace("yyy", critter)
-            else:
-                line=line.replace("yyy", keyword)
+            line=line.replace("yyy", critter)
             line=line.replace("cc", str(random.randint(0,9))+str(random.randint(0,9)))
             #--read it
             seed, w=read_line(line, dico=self.dico)
@@ -611,11 +618,54 @@ class MergeFallback(FallbackSkill):
 
             #--- add it to story
             story+=bla + "\n"
+
+        self.speak(story)
         self.log.info("Generated Story: \n"+ story)
         
         time.sleep(WAIT_TIME)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FABULATE_END)
+        self.speak(feedback)
+
+        return story
+
+
+    def wonder(self):
+        """
+        Args: 
+        """
+        #step 1---wonder start
+        msg=random.choice(self.MSG_WONDER_START)
+        self.speak(msg)
+
+        # step 2-- extract critter
+        critter=random.choice(self.critters)
+        self.log.info("step 2---Extracted critter"+critter)
+
+
+        #---step 3 pick stuff
+        seed = random.choice(self.wonders)
+        seed = seed.replace("xxx", critter)#replace xxx (if exist w/ ecological critter
+        self.log.info("step 3---Seed used for generation"+seed)
+        
+        count=0
+        count=False
+
+        while ((not cool) and (count<MAX_TRY_REGENERATE)): 
+            count+=1
+            #generate gpt2
+            raw=self.gpt2_generation(context, self.settings_what_if, remove_context=False) #TODO: Other settings ?
+            #if cool generation
+            cool, uncool_score=cool_judge(raw, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
+
+        #--- process it 
+        wonder=self.parse_text(raw)
+        self.speak(wonder)
+        self.log.info("Generated:"+ wonder)
+        
+        time.sleep(WAIT_TIME)
+        #step 4---closing: ask feedback 
+        feedback=random.choice(self.MSG_WONDER_END)
         self.speak(feedback)
 
         return story
@@ -680,11 +730,11 @@ class MergeFallback(FallbackSkill):
 
         #different sampling:
         if settings["sampling"]=="nucleus":
-            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length= settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, min_length= settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_p=settings["top_p"], top_k=0)
         elif settings["sampling"]=="topk":#top k sampling
-            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length= settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, min_length= settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=settings["top_k"])
         else:#base sampling
-            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, max_length=settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
+            generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, min_length=settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
         if remove_context:

@@ -190,7 +190,7 @@ class ShareStuffSkill(MycroftSkill):
             recording_time = DEFAULT_RECORDING_TIME  # default recording duration
         #--- Recording id and path
         now = datetime.now()
-        recording_id = now.strftime("%H:%M:%S") #TODO: Add id NOde in collective memory
+        recording_id = now.strftime("%H%M%S") #TODO: Add id NOde in collective memory
         recording_path=COLLECTIVE_MEMORY_FOLDER+"sound/"+recording_id+".wav" 
         self.log.info("Recording path:"+recording_path)
        

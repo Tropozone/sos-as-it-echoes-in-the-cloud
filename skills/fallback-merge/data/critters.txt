@@ -17,6 +17,8 @@ lynx
 enzyme
 polymers
 cellulose
+coral
+lychen
 oil drilling rig
 fertiliser
 pesticide
@@ -55,12 +57,13 @@ colloid
 silica layer
 quantumscale magnets
 plumbers
-cotton
+cotton pad
 bonobo
 sandstone
 gypsum
 Capsicum pepper
 water pipe
+single use plastic
 redwoods
 matsutake
 silicon
@@ -76,6 +79,9 @@ shipping containers
 hydraulic rams
 Levi’s 501
 asphalt
+tree
+submarine cable
+styrofoam
 zephyr
 tsunami
 stratosphere
@@ -87,6 +93,7 @@ virus
 hydrogen
 carbon
 supernova
+super conductors
 neutron star
 black hole
 universe expansion
@@ -117,6 +124,8 @@ cabbage
 nutmeg
 unrefined salt
 ripped peaches
+amazonian forest
+Iceberg
 aloe vera
 rubber
 mushroom pore
@@ -130,6 +139,9 @@ monosodium glutamate
 catnip
 psilocybin
 biomass
+mammal
+reptilian
+insects
 sand dunes
 foliage
 firefly
@@ -144,11 +156,12 @@ extremophile
 fern
 yeast
 Sourdough
-Lactic acid bacteria
+lactic acid bacteria
 kefir
 biofilm
-Soil
+soil
 magnesium
 earthquake
+petrol
 oil
 electromagnetic field
