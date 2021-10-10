@@ -48,9 +48,10 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, read_line, forget_one_memory, random_distortion, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
-
+#DISACTIVATE TEMPOTARILY
+#from .sound import random_distortion
 
 # ============================================
 # ------------------TODO-----------------------
@@ -86,6 +87,7 @@ COLLECTIVE_MEMORY_FOLDER="/root/sos-as-it-echoes-in-the-cloud/collective_memory/
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 #---- If can Use sound with VA:
 SONOR=False #NOTE: For a text-based VA, put false !
+
 
 DDW=True #for DDW exhibit, adjust event / objects
 # --------------PARAMETERS to TUNE---------------------
@@ -890,7 +892,8 @@ class MergeFallback(FallbackSkill):
 
         # step 4: Distort the sound
         output_path= COLLECTIVE_MEMORY_FOLDER+"temp.wav" #here just a temporary path
-        random_distortion(sound_path, output_path, proba_overlay=0.8, min_gain_drop=4, max_gain_drop=8, max_length=MAX_PLAY_SOUND)
+        #TODO: Temporarily disactivated because potential issues  
+        #random_distortion(sound_path, output_path, proba_overlay=0.8, min_gain_drop=4, max_gain_drop=8, max_length=MAX_PLAY_SOUND)
 
         # step 5: playback the sound
         self.log.info("Step 4--Play the sound")
