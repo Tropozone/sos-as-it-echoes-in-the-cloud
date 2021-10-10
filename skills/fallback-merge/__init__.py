@@ -692,6 +692,7 @@ class MergeFallback(FallbackSkill):
         #-4----- generate chat 
         output=""
         count=0
+        cool=False
         while (len(output)<8 or not cool) and count<3:
             count+=1
             # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
