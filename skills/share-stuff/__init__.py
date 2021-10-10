@@ -60,7 +60,7 @@ DEFAULT_RECORDING_TIME=10
 MAX_RECORDING_TIME=60
 
 #----------- OTHER PARAMETERS --------
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/" #NOTE: REPLACE IF ON A SERVER
+COLLECTIVE_MEMORY_FOLDER="/root/sos-as-it-echoes-in-the-cloud/collective_memory/" #NOTE: REPLACE IF ON A SERVER
 #.mycroft/skills/Collective Memory Skill/"
 
 

@@ -82,10 +82,10 @@ from .utils import load_storylines, read_line, forget_one_memory, random_distort
 my_ML_model = True  # If do have a fine-tuned model, set to True
 my_ML_model_path = str(pathlib.Path(__file__).parent.parent.absolute())+'/fallback-merge/gpt2_model'  # path to your fine tuned model
 #----Folder Collective Memory
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with where collective memory resides...
+COLLECTIVE_MEMORY_FOLDER="/root/sos-as-it-echoes-in-the-cloud/collective_memory/"#NOTE: Match path with where collective memory resides...
 #"/home/pi/.mycroft/skills/Collective Memory Skill/
 #---- If can Use sound with VA:
-SONOR=True #NOTE: For a text-based VA, put false !
+SONOR=False #NOTE: For a text-based VA, put false !
 
 DDW=True #for DDW exhibit, adjust event / objects
 # --------------PARAMETERS to TUNE---------------------

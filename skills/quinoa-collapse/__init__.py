@@ -50,7 +50,7 @@ from .utils import cut_extract, retrieve_google_urls, clean_text, load_data_txt
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
 #from googleapiclient.discovery import build #METHOD 1 with BUILD and google_search function for previous scraper
-COLLECTIVE_MEMORY_FOLDER="/home/pi/collective_memory/"#NOTE: Match path with where collective memory resides...
+COLLECTIVE_MEMORY_FOLDER="/root/sos-as-it-echoes-in-the-cloud/collective_memory/"#NOTE: Match path with where collective memory resides...
 
 # =============================================
 # -------------- SKILL ---------------
