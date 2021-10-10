@@ -99,7 +99,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 #3----> Elsewhere Tunes
 #4----> Fabulate
 #5----> Wonder
-LIKELIHOOD_SKILLS=[5,5,20,40,10,20] #[10,15,35,10,15,15]
+LIKELIHOOD_SKILLS=[5,5,20,80,10,20] #[10,15,35,10,15,15]
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -145,14 +145,14 @@ MAX_CHAR_MEMORY=300
 MAX_RECORDING_TIME=15
 
 ##--------- ELSEWHERE TUNES PARAMETERS
-TEXT_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. 
+SOUND_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
 SISTER_LIKELIHOOD=0.0#percentage of text which are sister node info
 
 ##--------- CHAT PARAMETERS
 MAX_TOKEN_HISTORICS=50
 CHAT_TEMPERATURE=2.0 #https://huggingface.co/transformers/main_classes/model.html
 CHAT_TOPK=50
-CHAT_MAX_LENGTH=50
+CHAT_MAX_LENGTH=40
 CHAT_MIN_LENGTH=10
 SAMPLING_CHAT="topk"
 
@@ -314,7 +314,7 @@ class MergeFallback(FallbackSkill):
 
         
     def init_elsewhere_tunes(self):
-        self.text_likelihood=TEXT_LIKELIHOOD
+        self.sound_likelihood=SOUND_LIKELIHOOD
         self.sister_likelihood=SISTER_LIKELIHOOD
         self.MAX_CHAR_MEMORY=MAX_CHAR_MEMORY
 
@@ -865,7 +865,7 @@ class MergeFallback(FallbackSkill):
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
-        if random.uniform(0, 1)<(1-self.text_likelihood):
+        if random.uniform(0, 1)<self.sound_likelihood:
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes()
