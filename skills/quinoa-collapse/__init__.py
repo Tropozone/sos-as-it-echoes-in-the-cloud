@@ -96,7 +96,8 @@ class QuinoaCollapseSkill(MycroftSkill):
         # -- extract keyword
         keyword = str(message.data.get('stuff')) #catch what human was talking about
         self.log.info(f'Stuff human talking about {keyword}')
-        
+        rr=random.uniform(0, 1)
+
         self.log.info("=======================================================")
         self.log.info("==========step 1: Share concern=======")
         self.log.info("=======================================================")
@@ -185,7 +186,7 @@ class QuinoaCollapseSkill(MycroftSkill):
                 article.parse()
                 #get text
                 content=article.text
-                if len(content)>MIN_LENGTH:
+                if len(content)>MIN_LENGTH and not ("JavaScript" in content):#NOTE: because of error "JavaScript is not available..."
                     article_downloaded = True
                     self.log.info("Happy scraping. Article downloaded succeeded.")
                 count+=1

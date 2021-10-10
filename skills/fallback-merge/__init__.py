@@ -143,7 +143,7 @@ MAX_CHAR_MEMORY=280
 MAX_RECORDING_TIME=15
 
 ##--------- ELSEWHERE TUNES PARAMETERS
-TEXT_LIKELIHOOD=0.0#if collective memory has audio, likelihood get a text. 
+TEXT_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. 
 SISTER_LIKELIHOOD=0.0#percentage of text which are sister node info
 
 ##--------- CHAT PARAMETERS
@@ -857,7 +857,7 @@ class MergeFallback(FallbackSkill):
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
-        if self.sonor and random.uniform(0, 1)<(1-self.text_likelihood):
+        if random.uniform(0, 1)<(1-self.text_likelihood):
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes()
@@ -904,13 +904,14 @@ class MergeFallback(FallbackSkill):
         self.speak(name_file)
 
         # step 4: Distort the sound
-        output_path= COLLECTIVE_MEMORY_FOLDER+"temp.wav" #here just a temporary path
+        #output_path= COLLECTIVE_MEMORY_FOLDER+"temp.wav" #here just a temporary path
         #TODO: Temporarily disactivated because potential issues  
         #random_distortion(sound_path, output_path, proba_overlay=0.8, min_gain_drop=4, max_gain_drop=8, max_length=MAX_PLAY_SOUND)
 
         # step 5: playback the sound
         self.log.info("Step 4--Play the sound")
-        self.audio_service.play(output_path)
+        #self.audio_service.play(output_path)
+        self.audio_service.play(sound_path) #TODO: Temporarily, raw
 
 
 
