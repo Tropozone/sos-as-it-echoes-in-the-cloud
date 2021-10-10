@@ -48,7 +48,7 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, load_objects, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 #DISACTIVATE TEMPOTARILY
 #from .sound import random_distortion
