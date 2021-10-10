@@ -687,7 +687,7 @@ class MergeFallback(FallbackSkill):
             #token historics
             historics_id = self.dialoTokenizer.encode(historics + self.dialoTokenizer.eos_token, return_tensors='pt')
             #cut to amaximum length
-            historics_id=historics_id[:, :MAX_TOKEN_HISTORICS]
+            historics_id=historics_id[:, -MAX_TOKEN_HISTORICS:]
             input_ids = torch.cat([historics_id, new_input_ids], dim=-1)
         
         ctxt_len=input_ids.shape[-1]
@@ -699,10 +699,10 @@ class MergeFallback(FallbackSkill):
         while (len(output)<8 or not cool) and count<3:
             count+=1
             # generated a response while limiting the total chat history to 1000 tokens, #ADD bad_words_ids=FORBIDDEN_TOKEN_ids,
-            historics_id = self.dialoGPT.generate(input_ids, min_length=CHAT_MIN_LENGTH, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=2, max_length=ctxt_len+CHAT_MAX_LENGTH, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
+            output_id = self.dialoGPT.generate(input_ids, min_length=CHAT_MIN_LENGTH, bad_words_ids=self.FORBIDDEN_TOKEN_ids, length_penalty=2, max_length=ctxt_len+CHAT_MAX_LENGTH, pad_token_id=self.dialoTokenizer.eos_token_id, temperature=CHAT_TEMPERATURE, repetition_penalty = 1.2, do_sample=True, top_k=CHAT_TOPK)#max_length=1000,
             #length_penalty >1 encourage generate longer sentences
 
-            output= self.dialoTokenizer.decode(historics_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
+            output= self.dialoTokenizer.decode(output_id[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
             #cut punctuation and check grammar
             output=self.parse_text(output)
 
@@ -723,7 +723,7 @@ class MergeFallback(FallbackSkill):
         #  #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
         encoded_context = self.tokenizer.encode(seed, return_tensors="pt")
         
-        if historics is not None:
+        if (historics is not None) and (len(historics)>2):
             #--for historics: replace all "\n" by EOS
             #historics = historics.replace("\n", dialoTokenizer.eos_token)#TODO: this also ok for gpt2?
             historics_id = self.tokenizer.encode(historics, return_tensors='pt')#+ dialoTokenizer.eos_token
@@ -827,7 +827,7 @@ class MergeFallback(FallbackSkill):
             loopCount+=1
             self.log.info("Drift n° {loopCount}")
             if loopCount==1:
-                bla=self.one_drift(bla, historics=historics) #TODO: Keep historics or not ?  May slow down...
+                bla=self.one_drift(bla, historics=historics)
             else:
                 bla=self.one_drift(bla)
             blabla+=bla
