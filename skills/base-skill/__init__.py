@@ -70,6 +70,8 @@ class BaseSkill(MycroftSkill):
         with open(str(pathlib.Path(__file__).parent.absolute())+'/data/base_qa.json', 'r') as json_file:
             self.base_qa=json.load(json_file)
 
+        self.log.info("All keys are:" + " ".join(list(self.base_qa.keys())))
+
         # load message
         path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
         #self.MSG_WONDER=load_data_txt("message_wonder.txt", path_folder=path_folder)
@@ -85,12 +87,13 @@ class BaseSkill(MycroftSkill):
         self.log.info(f'Human said {utterance}')
         
         #---- find answer in dictionary question
-        distance_=10000
+        distance=10000
         response=""
         for key in list(self.base_qa.keys()):
-            distance = sum([1 for x, y in zip(utterance, key) if x.lower() != y.lower()])
-            if distance<distance_:
+            distance_ = sum([1 for x, y in zip(utterance, key) if x.lower() != y.lower()])
+            if distance_<distance:
                 response=random.choice(self.base_qa[key]) #pick one of this key
+                distance=distance_
 
         #- answer
         self.speak(response)
