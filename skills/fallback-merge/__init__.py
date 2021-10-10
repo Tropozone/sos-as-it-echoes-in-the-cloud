@@ -141,7 +141,7 @@ UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H."
 ##--------- RECORDING PARAMETERS (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 #in seconds
 MAX_PLAY_SOUND=20000#in ms for pydub
-MAX_CHAR_MEMORY=280
+MAX_CHAR_MEMORY=300
 MAX_RECORDING_TIME=15
 
 ##--------- ELSEWHERE TUNES PARAMETERS
@@ -869,10 +869,10 @@ class MergeFallback(FallbackSkill):
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes()
-        elif random.uniform(0, 1)<self.sister_likelihood:
-            self.log.info("Sister Node tunes")
-            self.log.info("=======================================================") 
-            self.sister_node_tunes() 
+        # elif random.uniform(0, 1)<self.sister_likelihood:
+        #     self.log.info("Sister Node tunes")
+        #     self.log.info("=======================================================") 
+        #     self.sister_node_tunes() 
         else:
             self.log.info("Text tunes")
             self.log.info("=======================================================") 
