@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Randomly Place elements inside the window</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script
+    type="text/javascript"
+    src="/js/lib/dummy.js"
+    
+  ></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+  <style id="compiled-css" type="text/css">
+      div {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+        
+}
+    /* EOS */
+  </style>
+
+  <script id="insert"></script>
+
+
+</head>
+<body>
+  <script type="text/javascript">
+  //<![CDATA[
+//Load the text from local file trace conversation: Load last lines file ?
+
+  //]]></script>
+
+<div> </div>
+<div> </div>
+<div class="output"></div>
+
+
+<script type="text/javascript">//<![CDATA[
+
+// collect all the divs
+var divs = document.getElementsByTagName('div');
+var div
+div=divs[0]
+var data="blipbloup"
+document.writeln("<div>"+data+"</div>");
+
+//ATTEMPT 000
+var fs = require('fs');
+var file_name = "00.txt";//'file:///Users/lou/GitHub/sos-as-it-echoes-in-the-cloud/bug/00.txt';
+  
+const output=""
+
+// asynchronous code
+async function readFile(filePath) {
+try {
+    output= await fs.readFile(filePath);
+    console.log(data.toString());
+    
+} catch (error) {
+    console.error(`Got an error trying to read the file: ${error.message}`);
+}
+}
+readFile("00.txt");
+
+fs.readFile("00.txt", 'utf8', (err, data) => {
+  if (err) {
+    console.log('Error reading file:', err);
+    return;
+  }
+  const output = data;
+
+});
+document.writeln("<div>"+output+"</div>"); 
+
+  //]]></script>
+
+  <script>
+    // tell the embed parent frame the height of the content
+//    if (window.parent && window.parent.parent){
+//       window.parent.parent.postMessage(["resultsFrame", {
+ //        height: document.body.getBoundingClientRect().height,
+//         slug: "6dr4cyhv"
+//       }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+//     window.name = "result"
+  </script>
+
+
+</body>
+</html>
