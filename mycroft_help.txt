@@ -1,4 +1,3 @@
-password:convenient
 
 
 #### to download the git repo:

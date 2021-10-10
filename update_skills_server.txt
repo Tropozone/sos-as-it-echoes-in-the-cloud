@@ -1,0 +1,51 @@
+
+
+
+********** Update Github
+cd sos-as-it-echoes-in-the-cloud
+git fetch
+git pull
+
+********** Erase skills, e.g.
+rm -r /opt/mycroft/skills/quinoa-collapse
+
+********** Save gpt2 before erasing fallback merge
+cp -r /opt/mycroft/skills/fallback-merge/gpt2_model /opt/mycroft/skills/
+rm -r /opt/mycroft/skills/fallback-merge
+
+
+********** Copy skills from GitHub
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge /opt/mycroft/skills/
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/quinoa-collapse /opt/mycroft/skills/
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/base-skill /opt/mycroft/skills/
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/dream-skill /opt/mycroft/skills/
+
+**********copy gpt2 model back and erase where has saved it temporarily
+cp -r /opt/mycroft/skills/gpt2_model/ /opt/mycroft/skills/fallback-merge/
+rm -r /opt/mycroft/skills/gpt2_model
+
+
+********** open Config file to change black listed skills
+vim mycroft-core/mycroft/configuration/mycroft.conf
+((((((Quit with esc+ ZZ))
+e.g. Changed in config file auto update skill msg
+""auto_update": false”
+E.g. can also decide which skills blacklisted
+
+**********venv activate
+source ./mycroft/core/.venv/bin/activate
+
+**********launch Mycroft:
+./mycroft-core/start-mycroft.sh all
+./mycroft-core/start-mycroft.sh cli
+
+**********check log, and go at end file
+vim /var/log/mycroft/skills.log
+((( to go down the file: ESC ,  Shift + G
+
+
+********** when debug, and need to update __init__file for merge for instance:
+rm /opt/mycroft/skills/fallback-merge/__init__.py
+cp /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge/__init__.py /opt/mycroft/skills/fallback-merge/
+
+
