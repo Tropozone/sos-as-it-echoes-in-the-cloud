@@ -106,7 +106,9 @@ WAIT_FOR_HUMAN=5
 
 #----FOR WHAT IF WE BUCKET PARAMETERS
 MIN_LENGTH = 10
-MAX_LENGTH = 100
+MAX_LENGTH = 80
+MAX_LENGTH_FABULATE = 40 #here is per bit...
+VARIANCE_FABULATE = 10 #here is per bit...
 TEMPERATURE = 0.9
 REPETITION_PENALTY = 1.4
 TOP_K=70
@@ -115,8 +117,8 @@ SAMPLING="default"# betweem nucleus, or topk, or default sampling (not greedy)
 
 #----ENTER THE WEIRD PARAMETERS
 MIN_LENGTH_WEIRD = 24
-MAX_LENGTH_WEIRD = 120
-VARIANCE_LENGTH_WEIRD = 60
+MAX_LENGTH_WEIRD = 100
+VARIANCE_LENGTH_WEIRD = 50
 TEMPERATURE_WEIRD = 0.9
 VARIANCE_TEMPERATURE_WEIRD = 0.2
 REPETITION_PENALTY_WEIRD = 1.4
@@ -619,8 +621,11 @@ class MergeFallback(FallbackSkill):
             
             while ((not cool) and (count<MAX_TRY)): 
                 count+=1
+                temp_settings=self.settings_what_if.copy()
+                temp_settings["max_length"]=random.randint(MAX_LENGTH_FABULATE-VARIANCE_FABULATE, MAX_LENGTH_FABULATE+VARIANCE_FABULATE)
+                
                 #generate gpt2
-                raw=self.gpt2_generation(context, self.settings_what_if, remove_context=True)
+                raw=self.gpt2_generation(context, temp_settings, remove_context=True)
                 #if cool generation
                 cool, uncool_score=cool_judge(raw, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
 
@@ -810,6 +815,7 @@ class MergeFallback(FallbackSkill):
         bla=bla.replace("I've", "We have")
         bla=bla.replace("I'd", "We had")
         bla=bla.replace("I'm", "We are")
+        bla=bla.replace("I’m", "We are")
         bla=bla.replace("I am ", "We are ")
         bla=bla.replace("am I ", "are we ")
         bla=bla.replace("Am I ", "Are we ")
@@ -836,7 +842,7 @@ class MergeFallback(FallbackSkill):
 
         #(1) Choose the mode and possible seed and add it
         loopCount=0
-        bla=utterance
+        bla=utterance+"\n"
         blabla=""
         while loopCount<self.settings_enter_the_weird["num_drifts"]:
             loopCount+=1
