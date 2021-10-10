@@ -40,7 +40,6 @@ import pathlib
 import re
 import json
 
-from .utils import .
 
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
@@ -78,8 +77,8 @@ class BaseSkill(MycroftSkill):
 
 
     #What happen when detect like Intent. PADATIOUS: use .intent file
-    @intent_handler('classic.intent')
-    def handle_classic_intent(self, message):
+    @intent_handler('baseqa.intent')
+    def handle_baseqa_intent(self, message):
 
         # -- caught what human asked 
         utterance = str(message.data.get("utterance"))
@@ -102,9 +101,7 @@ class BaseSkill(MycroftSkill):
         #self.speak(text_end)
         #self.log.info(text_end)
 
-        
-
-
+    
 
 ######*****************************************************************************************
 ######*********************** SKILL ***********************************************
@@ -117,3 +114,12 @@ class BaseSkill(MycroftSkill):
 def create_skill():
     return BaseSkill()
 
+
+
+# def load_data_txt(filename, path_folder="", mode="r"):
+#     """
+#     for messages in skill, load txt
+#     """
+#     with open(path_folder+filename,  mode=mode) as f:
+#         data = f.readlines()
+#     return data
