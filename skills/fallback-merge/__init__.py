@@ -99,7 +99,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 #3----> Elsewhere Tunes
 #4----> Fabulate
 #5----> Wonder
-LIKELIHOOD_SKILLS=[5,5,20,80,10,20] #[10,15,35,10,15,15]
+LIKELIHOOD_SKILLS=[10,15,35,10,15,15] 
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -145,7 +145,7 @@ MAX_CHAR_MEMORY=300
 MAX_RECORDING_TIME=15
 
 ##--------- ELSEWHERE TUNES PARAMETERS
-SOUND_LIKELIHOOD=0.2#if collective memory has audio, likelihood get a text. 
+SOUND_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. 
 SISTER_LIKELIHOOD=0.0#percentage of text which are sister node info
 
 ##--------- CHAT PARAMETERS
