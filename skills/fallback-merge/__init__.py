@@ -99,7 +99,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 #3----> Elsewhere Tunes
 #4----> Fabulate
 #5----> Wonder
-LIKELIHOOD_SKILLS=[15,15,30,10,15,15]
+LIKELIHOOD_SKILLS=[5,5,20,40,10,20] #[10,15,35,10,15,15]
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
