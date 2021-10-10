@@ -805,11 +805,14 @@ class MergeFallback(FallbackSkill):
     def parse_text(self, bla):
         
         #replace I by We
-        bla=bla.replace("I ", "We ")
         bla=bla.replace("I've", "We have")
         bla=bla.replace("I'd", "We had")
         bla=bla.replace("I'm", "We are")
+        bla=bla.replace("I am ", "We are ")
+        bla=bla.replace("am I ", "are we ")
+        bla=bla.replace("Am I ", "Are we ")
         bla=bla.replace("I'll", "We will")
+        bla=bla.replace("I ", "We ")
 
         #good ending with punctuation
         bla=ending_with_punct_manual(bla)

@@ -45,7 +45,7 @@ import pathlib
 import re
 import time
 
-from .utils import cut_extract, retrieve_google_urls, clean_text, load_data_txt
+from .utils import ending_with_punct_manual, cut_extract, retrieve_google_urls, clean_text, load_data_txt
 
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
@@ -129,8 +129,11 @@ class QuinoaCollapseSkill(MycroftSkill):
         self.log.info("==========step 4: Clean & Cut extract=======")
         self.log.info("=======================================================")
         # 4----clean & cut extract of what found online
-        final_extract= cut_extract(scraped_data, MAX_LENGTH)
-        final_extract = clean_text(final_extract)
+        if len(scraped_data)>MAX_LENGTH:
+            scraped_data=scraped_data[:MAX_LENGTH]
+        final_extract= ending_with_punct_manual(scraped_data)
+        #cut_extract(scraped_data, MAX_LENGTH)
+        #final_extract = clean_text(final_extract)
 
         self.log.info("=======================================================")
         self.log.info("==========step 5: Share what found=======")

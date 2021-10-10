@@ -54,6 +54,20 @@ def cut_extract(extract, maximum_char):
     #TODO: NEED ADD self.crop_unfinished_sentence(bound_extract) ?
 
 
+def ending_with_punct_manual(data):
+    punct = [";", ":", "!", ".", "?"]
+    idx_last=0
+    #if not 
+    #    str.endswith(data)
+    for sign in punct:
+        idx_temp=data.rfind(sign) #last occurence sign on the righ
+        idx_last=max(idx_last,idx_temp)
+
+    if idx_last==0:#case no punctuation
+        return data
+    else: 
+        return data[:idx_last+1]
+
 
 ######*****************************************************************************************
 ######*********************** SCRAPING PROCEDURES ***********************************************
