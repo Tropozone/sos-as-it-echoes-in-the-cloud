@@ -404,7 +404,7 @@ class MergeFallback(FallbackSkill):
             self.log.info("***Redirecting to Fabulates***")
             self.log.info("=======================================================")
             output=self.fabulate()
-        elif rand==4:
+        elif rand==5:
             self.log.info("***Redirecting to Wonder***")
             self.log.info("=======================================================")
             output=self.wonder()
