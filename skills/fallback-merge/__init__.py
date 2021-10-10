@@ -156,6 +156,8 @@ SAMPLING_CHAT="topk"
 
 #----------------COLLECTIVE MEMORY PARAMETERS
 MAX_MEMORY=100
+global LOG_FULL
+LOG_FULL=False
 
 #----------------WAITING TIME BETWEEN SENDING 2 utterance to server
 WAIT_TIME=1
@@ -164,6 +166,8 @@ WAIT_TIME=1
 # ------------- FIXED  PARAMETERS ----------------------
 WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merge/data/words/"
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "PR0", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
+
+
 
 
 # =============================================
@@ -409,24 +413,29 @@ class MergeFallback(FallbackSkill):
             raise NotImplementedError
 
         self.log.info("---Saving the data---")
+        
         today = date.today()
         today_str = today.strftime("%d%m%Y") # dd.mm.YYYY
         now = datetime.now()
         now_str=now.strftime("%H%M%S")
-        #save output and message in text file #NOTE: here separate log file per day
-        log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
-        human_txt_file=COLLECTIVE_MEMORY_FOLDER+"text/"+"human_"+now_str+".txt"
-        #TODO: Save machine too ?
 
+
+        human_txt_file=COLLECTIVE_MEMORY_FOLDER+"text/"+"human_"+now_str+".txt"
         with open(human_txt_file, 'w+') as f:
             f.write(utterance)
 
+        global LOG_FULL
+        #save output and message in text file #NOTE: here separate log file per day
+        log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+".txt"
+        if LOG_FULL:
+            log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+"_2.txt"
         #---check size file sometimes 1/10 times
-        rr=random.uniform(0, 1)
-        if rr<0.1:
-            size = os.path.getsize(log_file) 
-            if size > 4000: # in bytes 
-                log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+"_2.txt"
+        if not LOG_FULL:
+            rr=random.uniform(0, 1)
+            if rr<0.1 and os.path.exists(log_file):
+                size = os.path.getsize(log_file) 
+                if size > 4000: # in bytes 
+                    LOG_FULL=True
 
         with open(log_file, 'a+') as f:
             f.write("¤¤¤hü¤¤¤"+ utterance+ "¤¤¤")
