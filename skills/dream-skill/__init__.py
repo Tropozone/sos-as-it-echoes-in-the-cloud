@@ -72,7 +72,7 @@ class DreamSkill(MycroftSkill):
         self.log.info("--Importing Dreams-")#
         with open(str(pathlib.Path(__file__).parent.absolute())+'/data/blind_dreams.txt', 'r') as f:
             self.dreams=f.read()
-        self.dreams=self.dreams.split("\n \n") 
+        self.dreams=self.dreams.split("\n\n") 
         self.log.info("number of dreams loaded {}".format(len(self.dreams)))
 
         # load message
