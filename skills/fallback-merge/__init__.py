@@ -542,7 +542,7 @@ class MergeFallback(FallbackSkill):
         # step 2--- pick a seed from file and replace if xxx by keyword
         if keyword=="":
             #reroute to enter the weird
-            return self.enter_the_weird(utterance)
+            return self.enter_the_weird(utterance, historics=self.fresh_historics)
         else:
             #-----say it is interesting...
             interesting=random.choice(self.MSG_INTERESTING)
@@ -569,7 +569,7 @@ class MergeFallback(FallbackSkill):
 
             # step 4 ---
             self.log.info("step 4---final output")
-            response=self.parse_text(seed+raw_response)
+            response=self.parse_text(seed+" "+ raw_response)
             #response=self.gingerParser.parse(response)['result']
             self.log.info("***COOL and filtered ***"+response)
             self.speak(response)
@@ -619,14 +619,12 @@ class MergeFallback(FallbackSkill):
             while ((not cool) and (count<MAX_TRY)): 
                 count+=1
                 #generate gpt2
-                raw=self.gpt2_generation(context, self.settings_what_if)
+                raw=self.gpt2_generation(context, self.settings_what_if, remove_context=True)
                 #if cool generation
                 cool, uncool_score=cool_judge(raw, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
 
-            raw=raw.replace(bla, "")
-
             #--- cut it to a sentence 
-            bla=self.parse_text(raw)
+            bla=self.parse_text(seed+" "+raw)
 
             #--- add it to story
             story+=bla + "\n"
@@ -750,11 +748,14 @@ class MergeFallback(FallbackSkill):
         else:#base sampling
             generated = self.model.generate(encoded_context,bad_words_ids=self.FORBIDDEN_TOKEN_ids, min_length=settings["min_length"], max_length = ctxt_len+settings["max_length"], temperature=settings["temperature"], repetition_penalty = settings["repetition_penalty"], do_sample=True, top_k=0)
         #early_stopping=True, no_repeat_ngram_size=repetition_penalty,
-        raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
-        if remove_context:
-            return raw_response.replace(seed, "")
+        
+        if remove_context:#remove both seed + historics, ie start from ctxt_len...
+            raw_response = self.tokenizer.decode(generated.tolist()[0][ctxt_len:], clean_up_tokenization_spaces=True, skip_special_tokens=True)
+            #return raw_response.replace(seed + historics, "")
         else:
-            return raw_response
+            raw_response = self.tokenizer.decode(generated.tolist()[0], clean_up_tokenization_spaces=True, skip_special_tokens=True)
+        
+        return raw_response
 
     def one_drift(self, utterance, historics=None):
         """
