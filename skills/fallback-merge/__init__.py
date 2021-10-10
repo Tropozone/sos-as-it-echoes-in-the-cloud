@@ -637,6 +637,7 @@ class MergeFallback(FallbackSkill):
         time.sleep(WAIT_TIME)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FABULATE_END)
+        feedback=feedback.replace("xxx", critter)
         self.speak(feedback)
 
         return story
