@@ -887,8 +887,8 @@ class MergeFallback(FallbackSkill):
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
         time.sleep(WAIT_TIME)
-        #message_listen=random.choice(self.MSG_LISTEN)
-        #self.speak(message_listen)
+        message_listen=random.choice(self.MSG_LISTEN)
+        self.speak(message_listen) #For Website to play it 
 
         self.log.info("Step 2--Pick the sound")
         # step 2: pick sound from collective memory
