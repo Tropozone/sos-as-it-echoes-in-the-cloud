@@ -52,7 +52,7 @@ def parse_article(urls):
                 article_downloaded = True
                 print("Happy scraping. Article downloaded succeeded.")
             count+=1
-        except requests.exceptions.RequestException:
+        except:#requests.exceptions.RequestException:
             print("Unhappy scraping.Article download failed. Trying again")
             pass
     
@@ -60,10 +60,12 @@ def parse_article(urls):
     # article.nlp()
     return content
 
-keyword="quinoa" #NOTE: Here to test, try with different keywords...
+keyword="strange loop" #NOTE: Here to test, try with different keywords...
 
 
-
+urls=["https://www.researchgate.net/post/What-is-your-opinion-about-plastic-waste", "https://www.scientificamerican.com/article/is-there-a-thing-or-a-relationship-betweenthings-at-the-bottom-of-things/"]
+content=parse_article(urls)
+print(content)
 print("=======================================================")
 print("==========step 1: Share concern=======")
 print("=======================================================")

@@ -174,9 +174,9 @@ class QuinoaCollapseSkill(MycroftSkill):
         article_downloaded = False
         count=1
         while count<20 and (not article_downloaded):
+            # choose random url from list obtained from Google
+            url = urls[random.randint(0, len(urls)-1)]
             try:
-                # choose random url from list obtained from Google
-                url = urls[random.randint(0, len(urls)-1)]
                 # locate website
                 article = newspaper.Article(url)
                 # download website
@@ -190,7 +190,7 @@ class QuinoaCollapseSkill(MycroftSkill):
                     article_downloaded = True
                     self.log.info("Happy scraping. Article downloaded succeeded.")
                 count+=1
-            except requests.exceptions.RequestException:
+            except:#requests.exceptions.RequestException:#TODO:Better catch name exception or not ?
                 self.log.info("Unhappy scraping.Article download failed. Trying again")
                 pass
         

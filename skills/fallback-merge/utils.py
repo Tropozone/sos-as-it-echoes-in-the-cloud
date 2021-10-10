@@ -146,7 +146,7 @@ def readUnit(unit, dico):
     if unit in WORDS_LISTS:
         neue=random.choice(dico[unit])#choose one randomly
     elif unit=="Vg" or unit=="Vtg":
-        neue=random.choice(dico[unit.replace("g", "")])
+        neue=random.choice(dico[unit.replace("g", "")])+"ing"
     elif "/" in unit:
         possible=unit.split("/")
         neue=readUnit(random.choice(possible), dico)
