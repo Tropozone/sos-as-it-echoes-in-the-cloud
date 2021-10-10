@@ -138,6 +138,7 @@ UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H."
 DEFAULT_RECORDING_TIME=10 #in seconds
 MAX_PLAY_SOUND=20000#in ms for pydub
 MAX_CHAR_MEMORY=280
+MAX_RECORDING_TIME=15
 
 ##--------- ELSEWHERE TUNES PARAMETERS
 TEXT_LIKELIHOOD=0.0#if collective memory has audio, likelihood get a text. 
@@ -649,12 +650,12 @@ class MergeFallback(FallbackSkill):
         self.log.info("step 3---Seed used for generation"+seed)
         
         count=0
-        count=False
+        cool=False
 
         while ((not cool) and (count<MAX_TRY_REGENERATE)): 
             count+=1
             #generate gpt2
-            raw=self.gpt2_generation(context, self.settings_what_if, remove_context=False) #TODO: Other settings ?
+            raw=self.gpt2_generation(seed, self.settings_what_if, remove_context=False) #TODO: Other settings ?
             #if cool generation
             cool, uncool_score=cool_judge(raw, uncool_words=UNCOOL_WORDS_SET, uncool_string=UNCOOL_STRING)
 
@@ -668,7 +669,7 @@ class MergeFallback(FallbackSkill):
         feedback=random.choice(self.MSG_WONDER_END)
         self.speak(feedback)
 
-        return story
+        return wonder
 
 
     def chat(self, utterance, historics=None):
