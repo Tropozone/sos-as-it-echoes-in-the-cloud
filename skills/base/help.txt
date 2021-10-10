@@ -1,5 +1,0 @@
-
-
-
-Base skill, for which certain answers to certain questions are preprogrammed.
-

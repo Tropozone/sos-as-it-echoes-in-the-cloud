@@ -8,7 +8,7 @@ git clone https://github.com/claireaoi/sos-as-it-echoes-in-the-cloud
 ********** basic commands
 
 Start Mycroft:
-./mycroft-core/start-mycroft.sh all
+
 
 Restart if needed:
 ./mycroft-core/start-mycroft.sh restart all
