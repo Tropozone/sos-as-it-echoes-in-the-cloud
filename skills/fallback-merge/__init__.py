@@ -100,7 +100,9 @@ DDW=True #for DDW exhibit, adjust event / objects
 #3----> Elsewhere Tunes
 #4----> Fabulate
 #5----> Wonder
-LIKELIHOOD_SKILLS=[10,15,35,10,15,15] 
+LIKELIHOOD_SKILLS=[10,15,35,10,15,15]
+
+MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=9
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -370,6 +372,9 @@ class MergeFallback(FallbackSkill):
         """
      
         utterance = message.data.get("utterance")
+        length_utterance=len(utterance)
+
+
 
         self.log.info("=======================================================")
         self.log.info("step 0---Randomly redirect to other skills")
@@ -379,44 +384,47 @@ class MergeFallback(FallbackSkill):
         #weighted random sampling so some skills mlore likely than other
         rand=random.choices(range(self.NUM_SUBSKILLS), weights=LIKELIHOOD_SKILLS, k=1)[0]
 
-        #----Chat 
+        #----Chat depending which skill would be triggered, and depending length sentence
         chat_output=""
-        if rand in [0,3,4, 5]:
+        output=""
+
+        if (rand in [0,3,4, 5]) or (length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER):
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
             time.sleep(WAIT_TIME_MEDIUM)
 
-        #------Rrerouting to skill
-        self.log.info("=======================================================")
-        if rand==0:
-            self.log.info("***Redirecting to Hello Socket***")
+        if length_utterance>MINIMAL_LENGTH_UTTERANCE_TO_BOTHER:
+            #------Rrerouting to skill
             self.log.info("=======================================================")
-            output=self.make_kin()
-        elif rand==1:
-            self.log.info("***Redirecting to What if We Bucket***")
-            self.log.info("=======================================================")
-            output=self.what_if(utterance)
-        elif rand==2:
-            self.log.info("***Redirecting to Enter the Weird***")
-            self.log.info("=======================================================")
-            output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
-        elif rand==3:
-            self.log.info("***Redirecting to Elsewhere Tunes***")
-            self.log.info("=======================================================")
-            output=self.elsewhere_tunes()
-        elif rand==4:
-            self.log.info("***Redirecting to Fabulates***")
-            self.log.info("=======================================================")
-            output=self.fabulate()
-        elif rand==5:
-            self.log.info("***Redirecting to Wonder***")
-            self.log.info("=======================================================")
-            output=self.wonder()
+            if rand==0:
+                self.log.info("***Redirecting to Hello Socket***")
+                self.log.info("=======================================================")
+                output=self.make_kin()
+            elif rand==1:
+                self.log.info("***Redirecting to What if We Bucket***")
+                self.log.info("=======================================================")
+                output=self.what_if(utterance)
+            elif rand==2:
+                self.log.info("***Redirecting to Enter the Weird***")
+                self.log.info("=======================================================")
+                output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
+            elif rand==3:
+                self.log.info("***Redirecting to Elsewhere Tunes***")
+                self.log.info("=======================================================")
+                output=self.elsewhere_tunes()
+            elif rand==4:
+                self.log.info("***Redirecting to Fabulates***")
+                self.log.info("=======================================================")
+                output=self.fabulate()
+            elif rand==5:
+                self.log.info("***Redirecting to Wonder***")
+                self.log.info("=======================================================")
+                output=self.wonder()
 
-        else:
-            raise NotImplementedError
+            else:
+                raise NotImplementedError
 
         self.log.info("---Saving the data---")
         
@@ -425,7 +433,7 @@ class MergeFallback(FallbackSkill):
         now = datetime.now()
         now_str=now.strftime("%H%M%S")
 
-
+        #TODO: Could add there to collective memory?
         human_txt_file=COLLECTIVE_MEMORY_FOLDER+"text/"+"human_"+now_str+".txt"
         with open(human_txt_file, 'w+') as f:
             f.write(utterance)
