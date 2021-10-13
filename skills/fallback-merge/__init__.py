@@ -146,7 +146,7 @@ MAX_CHAR_MEMORY=300
 MAX_RECORDING_TIME=15
 
 ##--------- ELSEWHERE TUNES PARAMETERS
-SOUND_LIKELIHOOD=0.5#if collective memory has audio, likelihood get a text. 
+SOUND_LIKELIHOOD=0.0#if collective memory has audio, likelihood get a text. 
 SISTER_LIKELIHOOD=0.0#percentage of text which are sister node info
 
 ##--------- CHAT PARAMETERS
@@ -941,12 +941,12 @@ class MergeFallback(FallbackSkill):
         with open(text_path, 'r') as f:
             lines = f.readlines()
         memory=" ".join(lines)[:self.MAX_CHAR_MEMORY]
-        memory=self.parse_text(memory)
+        output= "\""+self.parse_text(memory)+"\""
 
-        self.log.info(memory)
-        self.speak(memory)
+        self.log.info(output)
+        self.speak(output)
 
-        return memory
+        return output
 
 
     def sister_node_tunes(self):
