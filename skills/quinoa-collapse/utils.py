@@ -30,12 +30,12 @@ def extract_keywords(input, keyworder):
 
     return keyword
 
-def yake_extract_keywords(input, keyworder):
+def yake_extract_keyword(input, keyworder):
     keywords = keyworder.extract_keywords(input)
     if len(keywords)>0:
-        output=keywords[0]
+        output=keywords[0][0]
     else:
-        output=None
+        output=""
 
     return output
 

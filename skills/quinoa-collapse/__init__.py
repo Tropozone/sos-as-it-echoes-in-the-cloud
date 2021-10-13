@@ -102,10 +102,11 @@ class QuinoaCollapseSkill(MycroftSkill):
         stuff = str(message.data.get('stuff')) #catch what human was talking about
         stuff=stuff.lstrip().rstrip()
         num_words=len(stuff.split(" "))
+        keyword=stuff
         if num_words>2: 
             #extract sub keyword from stuff
             keyword= yake_extract_keyword(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
-        else:
+        if keyword=="":
             keyword=stuff
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info(f'Stuff human talking about {keyword}')

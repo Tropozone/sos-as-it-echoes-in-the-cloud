@@ -264,9 +264,9 @@ def yake_extract_keyword(input, keyworder):
 
     keywords = keyworder.extract_keywords(input)
     if len(keywords)>0:
-        output=keywords[0]
+        output=keywords[0][0]
     else:
-        output=None
+        output=""
 
     return output
 
@@ -290,7 +290,7 @@ def extract_keywords(input, keyworder):
     keyword = random.choice(keywords)
     #TODO: not very good... as any word... check other keyword extractors ?, check good word etd
     #TODO: extract one key word
-    
+
     return keyword
 
 

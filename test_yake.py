@@ -1,4 +1,6 @@
 import yake
+
+text="the mermaids are listening to their seashells"
 kw_extractor = yake.KeywordExtractor()
 language = "en"
 max_ngram_size = 2
@@ -9,5 +11,5 @@ keywords = custom_kw_extractor.extract_keywords(text)
 print(keywords)
 for kw in keywords:
     print(kw)
-print(len(keywords)==0)
-print(keywords is None)
+if len(keywords)>0:
+    print(keywords[0][0])
