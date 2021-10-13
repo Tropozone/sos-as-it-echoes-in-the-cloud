@@ -8,6 +8,25 @@ import requests
 from urllib.error import URLError
 import random
 import re
+from string import punctuation
+
+def extract_keywords(input, keyworder):
+    # we're looking for proper nouns, nouns, and adjectives
+    pos_tag = ['PROPN', 'NOUN', 'ADJ']
+    # tokenize and store input
+    phrase = keyworder(input.lower())
+    keywords = []
+    # for each tokenized word
+    for token in phrase:
+        # if word is a proper noun, noun, or adjective;
+        if token.pos_ in pos_tag:
+            # and if NOT a stop word or NOT punctuation
+            if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
+                keywords.append(token.text)
+    # convert list back to string
+    key_string = " ".join(keywords)
+
+    return key_string
 
 
 ######*****************************************************************************************
