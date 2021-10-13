@@ -37,7 +37,9 @@ import re
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false" # Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false) hugging face...
 from os.path import exists
-import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4
+import yake
+#import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4 #NOTE: USE NOW YAKE
+#cf doing python3 -m spacy download en_core_web_sm
 #for gpt2
 import torch
 import transformers 
@@ -49,7 +51,7 @@ from datetime import timedelta
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import load_storylines, yake_extract_keyword, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 #DISACTIVATE TEMPOTARILY
 #from .sound import random_distortion
@@ -278,8 +280,10 @@ class MergeFallback(FallbackSkill):
 
         # Initialise a tokenizer
         self.tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
-        # initialise keyworder
-        self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
+        # initialise keyworder  #TODO: Check deduplication_threshold = 0.9... numOfKeywords
+        numOfKeywords = 3
+        self.keyworder=yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=numOfKeywords, features=None)
+        #self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
         # load
         path_folder=str(pathlib.Path(__file__).parent.absolute())
         self.critters = load_data_txt("/data/critters.txt", path_folder=path_folder)
@@ -371,10 +375,8 @@ class MergeFallback(FallbackSkill):
             Make Kin practices
         """
      
-        utterance = message.data.get("utterance")
+        utterance = str(message.data.get("utterance"))
         length_utterance=len(utterance)
-
-
 
         self.log.info("=======================================================")
         self.log.info("step 0---Randomly redirect to other skills")
@@ -551,7 +553,7 @@ class MergeFallback(FallbackSkill):
         """
 
          # step 1-- extract a keyword from what human said
-        keyword= extract_keywords(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
+        keyword= yake_extract_keyword(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
 

@@ -12,7 +12,7 @@ from string import punctuation
 
 def extract_keywords(input, keyworder):
     # we're looking for proper nouns, nouns, and adjectives
-    pos_tag = ['PROPN', 'NOUN', 'ADJ']
+    pos_tag = ['PROPN', 'NOUN']#, 'ADJ']
     # tokenize and store input
     phrase = keyworder(input.lower())
     keywords = []
@@ -24,10 +24,20 @@ def extract_keywords(input, keyworder):
             if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
                 keywords.append(token.text)
     # convert list back to string
-    key_string = " ".join(keywords)
+    keyword = random.choice(keywords)
+    #TODO: not very good... as any word... check other keyword extractors ?, check good word etd
+    #TODO: extract one key word
 
-    return key_string
+    return keyword
 
+def yake_extract_keywords(input, keyworder):
+    keywords = keyworder.extract_keywords(input)
+    if len(keywords)>0:
+        output=keywords[0]
+    else:
+        output=None
+
+    return output
 
 ######*****************************************************************************************
 ######*********************** LOAD PROCEDURES ***********************************************

@@ -260,10 +260,20 @@ def cut_one_sentence(generated):
     output = re.split('.|?|!', generated)[0]+"."
     return output
 
+def yake_extract_keyword(input, keyworder):
+
+    keywords = keyworder.extract_keywords(input)
+    if len(keywords)>0:
+        output=keywords[0]
+    else:
+        output=None
+
+    return output
+
 
 def extract_keywords(input, keyworder):
     # we're looking for proper nouns, nouns, and adjectives
-    pos_tag = ['PROPN', 'NOUN', 'ADJ']
+    pos_tag = ['PROPN', 'NOUN']#, 'ADJ']
     # tokenize and store input
     phrase = keyworder(input.lower())
     keywords = []
@@ -275,9 +285,14 @@ def extract_keywords(input, keyworder):
             if token.text not in keyworder.Defaults.stop_words or token.text not in punctuation:
                 keywords.append(token.text)
     # convert list back to string
-    key_string = " ".join(keywords)
 
-    return key_string
+    # convert list back to string
+    keyword = random.choice(keywords)
+    #TODO: not very good... as any word... check other keyword extractors ?, check good word etd
+    #TODO: extract one key word
+
+    return keyword
+
 
 
 

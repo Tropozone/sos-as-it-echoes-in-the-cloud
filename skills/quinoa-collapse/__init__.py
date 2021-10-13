@@ -44,9 +44,10 @@ import random
 import pathlib
 import re
 import time
-import spacy
+import yake
+#import spacy
 
-from .utils import extract_keywords, ending_with_punct_manual, cut_extract, retrieve_google_urls, clean_text, load_data_txt
+from .utils import yake_extract_keyword, extract_keywords, ending_with_punct_manual, cut_extract, retrieve_google_urls, clean_text, load_data_txt
 
 #from configparser import ConfigParser
 #For alternative scraper, not needed currently
@@ -82,7 +83,10 @@ class QuinoaCollapseSkill(MycroftSkill):
         path_folder=str(pathlib.Path(__file__).parent.absolute())+'/messages/'
         self.MSG_WONDER=load_data_txt("message_wonder.txt", path_folder=path_folder)
         self.MSG_END=load_data_txt("message_end.txt", path_folder=path_folder)
-        self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
+        numOfKeywords = 3
+        self.keyworder=yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=numOfKeywords, features=None)
+
+        #self.keyworder = spacy.load("en_core_web_sm") #NOTE: temporarily desactivated for raspberry pi
 
 
     #What happen when detect like Intent. PADATIOUS: use .intent file
@@ -100,7 +104,7 @@ class QuinoaCollapseSkill(MycroftSkill):
         num_words=len(stuff.split(" "))
         if num_words>2: 
             #extract sub keyword from stuff
-            keyword= extract_keywords(stuff, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
+            keyword= yake_extract_keyword(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
         else:
             keyword=stuff
         self.log.info("step 1---Extracted keyword"+keyword)
