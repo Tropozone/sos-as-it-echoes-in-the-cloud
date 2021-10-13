@@ -163,8 +163,9 @@ global LOG_FULL
 LOG_FULL=False
 
 #----------------WAITING TIME BETWEEN SENDING 2 utterance to server
-WAIT_TIME=1
-WAIT_TIME_CHAT=2
+WAIT_TIME_SHORT=1
+WAIT_TIME_MEDIUM=2
+WAIT_TIME_LONG=3
 
 # ----------------------------------
 # ------------- FIXED  PARAMETERS ----------------------
@@ -384,7 +385,7 @@ class MergeFallback(FallbackSkill):
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
-            time.sleep(WAIT_TIME_CHAT)
+            time.sleep(WAIT_TIME_MEDIUM)
 
         #------Rrerouting to skill
         self.log.info("=======================================================")
@@ -466,6 +467,7 @@ class MergeFallback(FallbackSkill):
         # start message
         ritual_start=random.choice(self.MSG_RITUAL_START)
         self.speak(ritual_start)
+        time.sleep(WAIT_TIME_SHORT)
 
         #pick object
         self.log.info("step 1---Pick Object")
@@ -523,6 +525,7 @@ class MergeFallback(FallbackSkill):
                 #thanks=random.choice(self.MSG_THANKS)
                 #self.speak(thanks)
 
+        time.sleep(WAIT_TIME_MEDIUM)
         #----Ending, ask back about the agent 
         ritual_end=random.choice(self.MSG_RITUAL_END)
         ritual_end=ritual_end.replace("xxx", agent)
@@ -578,6 +581,7 @@ class MergeFallback(FallbackSkill):
             self.log.info("***COOL and filtered ***"+response)
             self.speak(response)
             self.log.info("=======================================================")
+            time.sleep(WAIT_TIME_MEDIUM)
 
             #step 4---closing: ask feedback 
             feedback=random.choice(self.MSG_WHAT_IF_END)
@@ -639,7 +643,7 @@ class MergeFallback(FallbackSkill):
         self.speak(story)
         self.log.info("Generated Story: \n"+ story)
         
-        time.sleep(WAIT_TIME)
+        time.sleep(WAIT_TIME_MEDIUM)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FABULATE_END)
         feedback=feedback.replace("xxx", critter)
@@ -655,6 +659,7 @@ class MergeFallback(FallbackSkill):
         #step 1---wonder start
         msg=random.choice(self.MSG_WONDER_START)
         self.speak(msg)
+        time.sleep(WAIT_TIME_SHORT)
 
         # step 2-- extract critter
         critter=random.choice(self.critters)
@@ -681,7 +686,7 @@ class MergeFallback(FallbackSkill):
         self.speak(wonder)
         self.log.info("Generated:"+ wonder)
         
-        time.sleep(WAIT_TIME)
+        time.sleep(WAIT_TIME_MEDIUM)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_WONDER_END)
         self.speak(feedback)
@@ -840,6 +845,7 @@ class MergeFallback(FallbackSkill):
         #---(0) patience
         be_patient=random.choice(self.MSG_PATIENT)
         self.speak(be_patient)
+    
 
         #(1) Choose the mode and possible seed and add it
         loopCount=0
@@ -853,7 +859,7 @@ class MergeFallback(FallbackSkill):
             else:
                 bla=self.one_drift(bla)
             blabla+=bla
-        time.sleep(WAIT_TIME)
+        time.sleep(WAIT_TIME_LONG)
 
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FEEDBACK)
@@ -881,7 +887,7 @@ class MergeFallback(FallbackSkill):
             
         self.log.info("=======================================================") 
         
-        time.sleep(WAIT_TIME)
+        time.sleep(WAIT_TIME_MEDIUM)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_ELSEWHERE_END)
         self.speak(feedback)
@@ -895,7 +901,7 @@ class MergeFallback(FallbackSkill):
         # step 1: catch attention ? or just as a burp
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
-        time.sleep(WAIT_TIME)
+        time.sleep(WAIT_TIME_SHORT)
         message_listen=random.choice(self.MSG_LISTEN)
         self.speak(message_listen) #For Website to play it 
 
@@ -934,7 +940,7 @@ class MergeFallback(FallbackSkill):
         #little message
         travel=random.choice(self.MSG_ELSEWHERE_START)
         self.speak(travel)
-        time.sleep(WAIT_TIME)
+        time.sleep(WAIT_TIME_SHORT)
 
         self.log.info("Step 2--Share the text")
         # step 3: say the text
