@@ -128,6 +128,7 @@ TOP_K_WEIRD=500
 TOP_P_WEIRD=0.3
 SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 MAX_TRY_REGENERATE=3 #OK?
+FEEDBACK_PROBA=0.1
 
 #-------- POST PROCESSING FILTER PARAMETERS
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
@@ -436,7 +437,7 @@ class MergeFallback(FallbackSkill):
             log_file=COLLECTIVE_MEMORY_FOLDER+"trace/"+today_str+"_2.txt"
         #---check size file sometimes 1/10 times
         if not LOG_FULL:
-            rr=random.uniform(0, 1)
+            rr=random.random()
             if rr<0.1 and os.path.exists(log_file):
                 size = os.path.getsize(log_file) 
                 if size > 4000: # in bytes 
@@ -581,11 +582,11 @@ class MergeFallback(FallbackSkill):
             self.log.info("***COOL and filtered ***"+response)
             self.speak(response)
             self.log.info("=======================================================")
-            time.sleep(WAIT_TIME_MEDIUM)
+            #time.sleep(WAIT_TIME_MEDIUM)
 
             #step 4---closing: ask feedback 
-            feedback=random.choice(self.MSG_WHAT_IF_END)
-            self.speak(feedback)
+            #feedback=random.choice(self.MSG_WHAT_IF_END)
+            #self.speak(feedback)
 
             return response
 
@@ -861,9 +862,11 @@ class MergeFallback(FallbackSkill):
             blabla+=bla
         time.sleep(WAIT_TIME_LONG)
 
-        #step 4---closing: ask feedback 
-        feedback=random.choice(self.MSG_FEEDBACK)
-        self.speak(feedback)
+        #step 4---closing: ask feedback #NOTE: probabilistically here
+        rr=random.random()
+        if rr<FEEDBACK_PROBA:
+            feedback=random.choice(self.MSG_FEEDBACK)
+            self.speak(feedback)
         
         return blabla
 
@@ -872,7 +875,7 @@ class MergeFallback(FallbackSkill):
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
-        if random.uniform(0, 1)<self.sound_likelihood:
+        if random.random()<self.sound_likelihood:
             self.log.info("Sonor tunes")
             self.log.info("=======================================================") 
             self.sonor_tunes()
