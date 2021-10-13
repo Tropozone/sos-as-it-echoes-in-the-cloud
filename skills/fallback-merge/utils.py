@@ -290,7 +290,7 @@ def extract_keywords(input, keyworder):
     keyword = random.choice(keywords)
     #TODO: not very good... as any word... check other keyword extractors ?, check good word etd
     #TODO: extract one key word
-
+    
     return keyword
 
 

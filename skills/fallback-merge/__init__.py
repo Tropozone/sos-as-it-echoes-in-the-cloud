@@ -37,23 +37,27 @@ import re
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false" # Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false) hugging face...
 from os.path import exists
-import yake
-#import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4 #NOTE: USE NOW YAKE
-#cf doing python3 -m spacy download en_core_web_sm
+from datetime import datetime, date
+from datetime import timedelta
+
 #for gpt2
 import torch
 import transformers 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoModelForCausalLM, AutoTokenizer
-from datetime import datetime, date
-from datetime import timedelta
-# for grammar
+
+#######  #TODO: KEYWORDER CHOICE: https://towardsdatascience.com/keyword-extraction-process-in-python-with-natural-language-processing-nlp-d769a9069d5c
+import yake #https://github.com/LIAAD/yake
+#import spacy #NOTE: Temporarily desactivate spacy for reapsberry 4 #NOTE: USE NOW YAKE
+#cf doing python3 -m spacy download en_core_web_sm
+
+#### #TODO: GRAMMAR CHECK CHOICE ?
 #from gingerit.gingerit import GingerIt
 import language_tool_python
 
 # other scrips in utils
 from .utils import load_storylines, yake_extract_keyword, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
-#DISACTIVATE TEMPOTARILY
+#DISACTIVATE TEMPORARILY
 #from .sound import random_distortion
 
 # ============================================
