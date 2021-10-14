@@ -108,7 +108,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 #5----> Wonder
 LIKELIHOOD_SKILLS=[10,15,35,10,15,15]
 
-MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=9
+MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=8
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -397,7 +397,7 @@ class MergeFallback(FallbackSkill):
         chat_output=""
         output=""
 
-        shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not utterance.lower().rstrip()=="hello")
+        shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not "hello" in utterance.lower())
 
         if (rand in [0,3,4, 5]) or shortcut:
             self.log.info("=======================================================")
