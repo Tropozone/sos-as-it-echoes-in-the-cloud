@@ -108,6 +108,7 @@ def filter_human_token(bla):
     bla=bla.replace(" mine ", " ours ")
     bla=bla.replace(" me ", " us ")
 
+    bla=bla.replace("readers", "listeners")
     bla=bla.replace("book", "territory")
     bla=bla.replace("page", "Earth")
     bla=bla.replace("article", "territory")
