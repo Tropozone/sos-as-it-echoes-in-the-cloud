@@ -405,7 +405,7 @@ class MergeFallback(FallbackSkill):
         #TODO: No shortcut for now...
         shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not "hello" in utterance.lower())
 
-        if (rand in [0,3,4,5]) and shortcut:
+        if (rand in [0,3,4,5]) or shortcut:
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
