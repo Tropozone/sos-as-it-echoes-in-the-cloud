@@ -55,10 +55,11 @@ import yake #https://github.com/LIAAD/yake
 import language_tool_python
 
 # other scrips in utils
-from .utils import load_storylines, yake_extract_keyword, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
+from .utils import filter_human_token, load_storylines, yake_extract_keyword, read_line, forget_one_memory, split_into_sentences, ending_with_punct_manual, cool_judge, load_data_txt, load_making_kin, read_event, extract_keywords, cut_one_sentence, remove_context, ending_with_punct
 
 #DISACTIVATE TEMPORARILY
 #from .sound import random_distortion
+#TODO: proper noun, replace by critter or by random Na>>>...but replace every nound with capital letter :S
 
 # ============================================
 # ------------------TODO-----------------------
@@ -79,6 +80,7 @@ from .utils import load_storylines, yake_extract_keyword, read_line, forget_one_
 
 
 #####LATER ?
+#TODO: recognise when proper noun, replace by ecologically critter.
 #TODO  SOUND Distortion: Normalise sound ?  normalize(self) "normalize has no parameters, boosts level so that the loudest part of your file reaches maximum, without clipping.
 #TODO: SOUND Distortion: More fade in and out accross time
 #TODO: Sound distortion: Replace file by distorted version in memory so more and mnore distorted ?
@@ -141,13 +143,15 @@ FEEDBACK_PROBA_WEIRD=0.1
 #-------- POST PROCESSING FILTER PARAMETERS
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
-TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","Sharia", "Coran", "nephew", "war", "God", "muslim", "christian"]
+TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","Sharia", "Coran", "nephew", "war", "God", "muslim", "christian", "sir", "http", "classroom", "teacher"]
 BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew", "Jews", "stupid", "page", "on page", "hate"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
-UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian", "Sharia", "Coran", "19", "(19", "20", "(20", "hate"]
+UNCOOL_WORDS=["She", "he", "she", "He", "his", "boy", "girl", "woman", "wife", "husband", "children", "servant", "soldier", "war", "God", "Jew", "muslim", "christian", "Sharia", "Coran", "hate"] #, "Professor"#"19", "(19", "20", "(20","Fig.", "in Fig.",
 UNCOOL_WORDS_SET=set(UNCOOL_WORDS)
-UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X", "Fig.", "in Fig.", "Photograph by", "http"]
+UNCOOL_STRING=["\”", "\"","\'"]# "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X", 
+#TODO: Remobve token with http...
 #-----------------------------
+
 ##--------- RECORDING PARAMETERS (hello socket and elsewhere tunesY
 DEFAULT_RECORDING_TIME=10 #in seconds
 MAX_PLAY_SOUND=20000#in ms for pydub
@@ -401,42 +405,46 @@ class MergeFallback(FallbackSkill):
         #TODO: No shortcut for now...
         shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not "hello" in utterance.lower())
 
-        if (rand in [0,3,4,5]):
+        if (rand in [0,3,4,5]) and shortcut:
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
 
         #if not shortcut:#if shortcut do not say more
-        #------Rrerouting to skill
-        self.log.info("=======================================================")
-        if rand==0:
-            self.log.info("***Redirecting to Hello Socket***")
-            self.log.info("=======================================================")
-            output=self.make_kin()
-        elif rand==1:
-            self.log.info("***Redirecting to What if We Bucket***")
-            self.log.info("=======================================================")
-            output=self.what_if(utterance)
-        elif rand==2:
-            self.log.info("***Redirecting to Enter the Weird***")
-            self.log.info("=======================================================")
-            output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
-        elif rand==3:
-            self.log.info("***Redirecting to Elsewhere Tunes***")
-            self.log.info("=======================================================")
-            output=self.elsewhere_tunes()
-        elif rand==4:
-            self.log.info("***Redirecting to Fabulates***")
-            self.log.info("=======================================================")
-            output=self.fabulate()
-        elif rand==5:
-            self.log.info("***Redirecting to Wonder***")
-            self.log.info("=======================================================")
-            output=self.wonder()
-
+        if shortcut:
+            self.log.info("***Do not pursue, want more?***")
+            output=""
         else:
-            raise NotImplementedError
+            #------Rrerouting to skill
+            self.log.info("=======================================================")
+            if rand==0:
+                self.log.info("***Redirecting to Hello Socket***")
+                self.log.info("=======================================================")
+                output=self.make_kin()
+            elif rand==1:
+                self.log.info("***Redirecting to What if We Bucket***")
+                self.log.info("=======================================================")
+                output=self.what_if(utterance)
+            elif rand==2:
+                self.log.info("***Redirecting to Enter the Weird***")
+                self.log.info("=======================================================")
+                output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
+            elif rand==3:
+                self.log.info("***Redirecting to Elsewhere Tunes***")
+                self.log.info("=======================================================")
+                output=self.elsewhere_tunes()
+            elif rand==4:
+                self.log.info("***Redirecting to Fabulates***")
+                self.log.info("=======================================================")
+                output=self.fabulate()
+            elif rand==5:
+                self.log.info("***Redirecting to Wonder***")
+                self.log.info("=======================================================")
+                output=self.wonder()
+
+            else:
+                raise NotImplementedError
 
         self.log.info("---Saving the data---")
         
@@ -846,18 +854,12 @@ class MergeFallback(FallbackSkill):
         return drift
 
 
-    def parse_text(self, bla):
+    def parse_text(self, bla, filter_human=True):
         
-        #replace I by We
-        bla=bla.replace("I've", "We have")
-        bla=bla.replace("I'd", "We had")
-        bla=bla.replace("I'm", "We are")
-        bla=bla.replace("I’m", "We are")
-        bla=bla.replace("I am ", "We are ")
-        bla=bla.replace("am I ", "are we ")
-        bla=bla.replace("Am I ", "Are we ")
-        bla=bla.replace("I'll", "We will")
-        bla=bla.replace("I ", "We ")
+
+        #replace I by We etc filter too human token
+        if filter_human:
+            bla=filter_human_token(bla)
 
         #good ending with punctuation
         bla=ending_with_punct_manual(bla)
