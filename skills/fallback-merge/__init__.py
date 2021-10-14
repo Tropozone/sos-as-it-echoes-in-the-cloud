@@ -108,7 +108,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 #5----> Wonder
 LIKELIHOOD_SKILLS=[10,15,35,10,15,15]
 
-MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=7
+MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=8
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -136,15 +136,15 @@ TOP_K_WEIRD=500
 TOP_P_WEIRD=0.3
 SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
 MAX_TRY_REGENERATE=3 #OK?
-FEEDBACK_PROBA=0.1
+FEEDBACK_PROBA_WEIRD=0.1
 
 #-------- POST PROCESSING FILTER PARAMETERS
 SOME_QUOTE_TOKEN=["\”", "\"","\'", ",\”",",\'", "\”.", "\".","\'.", ".\”", ".\"",".\'"]
 MORE_QUOTE_TOKEN=['"', "'", 'Ġ"', "'t", '."', ',"', "Ġ'", '":', '",', '?"', '".', '":"', '","', '!"', '="', ".'", "',", ",'", "'.", '{"', '")', '">', 'Ġ("', "''", '("', '\\"', '";', "?'", '":{"', '},{"', '"]', '},"', '..."', 'âĢ¦"', "Ġ''", "':", "('", '").', ':"', '.\'"', "')", "='", '"},{"', '"),', 'Ġ"/', 'Ġ"[', '"},"', ".''", 'Ġ""', "!'", '"?', ",''", 'Ġ["', '["', '"âĢĶ', '");', '":"/', '""', ',\'"', ')"', "';", '],"', '=\\"', "['", '"[', 'Ġ"$', '"(', '."[', 'âĢĶ"', "Ġ('", "-'", '.")', 'Ġ{"', 'Ġ\\"', "']", '":[', '"}', '-"', ')."', '"><', 'Ġ."', '"]=>', '"></', 'Ġ"\'', "');", '"âĢ¦', '>"', 'Ġ"#', '="#', '"},', ';"', '"...', '":["', "'/", '"/>', '"-', '?\'"', 'Ġ".', '),"', 'Ġ"-', "').", 'Ġ"...', "'-", ']."', 'Ġ"âĢ¦', "Ġ'(", '\'"', '\\":', '/"', '"\'', 'Ġ"(', '?!"', '\'."', ']"', "'?", "Ġ'/", 'Ġ"$:/', ":'", '.""', '":[{"', ")'", '"],', '=""', 'Ġ",', '.",', 'Ġ"<', "'),", '"],"', "Ġ\\'", '\\",', '":"","', '?",', "''.", 'Ġ..."', '="/', 'Ġ"%', '}"', 'Ġ"\\', '!!"', 'Ġ"""', "Ġ['", '"""', '\\">', "''''", '%"', '\',"', '"!', '!",', '.","', "','", ')",', '!?"', '"}],"', 'Ġ,"', '".[', "\\'", '?".', 'Ġ"+', "'>", 'Ġ"@', '.,"', "Ġ'[", "'';", 'Ġ"{', "Ġ'.", 'Ġ"_', "Ġ',", 'ĠâĢ¦"', '":""},{"', '":-', '!".', '"))', '!\'"', "]'", ".''.", 'âĢ¦."']
 TOO_HUMAN_TOKEN=['ĠHe','He','he','Ġhe', 'He','She', 'She','ĠShe', 'ĠShe', "he", "she", "He", "She", "her", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "counsin", "aunt", "uncle","Sharia", "Coran", "nephew", "war", "God", "muslim", "christian"]
-BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew", "Jews", "stupid"]
+BAD_TOKEN=["http", "in this book", "in this chapter","(See", "in this section", "in this paper", "book", "chapter", "section", "New York", "in Section", "in Chapter", "Fig.", "in Fig.", "Photograph by", "in this volume", "Jew", "Jews", "stupid", "page", "on page", "hate"]
 FORBIDDEN_TOKEN=SOME_QUOTE_TOKEN+MORE_QUOTE_TOKEN+TOO_HUMAN_TOKEN+BAD_TOKEN
-UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian", "Sharia", "Coran", "19", "(19", "20", "(20"]
+UNCOOL_WORDS=["She", "he", "she", "He", "his", "Obama","boy", "girl", "woman", "wife", "husband", "children","blog", "John", "Mary", "Peter", "servant", "soldier", "war", "God", "book", "chapter", "section", "Section", "Chapter", "Fig.", "in Fig.", "Jew", "muslim", "christian", "Sharia", "Coran", "19", "(19", "20", "(20", "hate"]
 UNCOOL_WORDS_SET=set(UNCOOL_WORDS)
 UNCOOL_STRING=["\”", "\"","\'", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "Q.", "R.", "S.", "T.", "U.", "V.", "W.", "X", "Fig.", "in Fig.", "Photograph by", "http"]
 #-----------------------------
@@ -170,6 +170,7 @@ SAMPLING_CHAT="topk"
 MAX_MEMORY=100
 global LOG_FULL
 LOG_FULL=False
+MIN_CHAR_MEMORY=22
 
 #----------------WAITING TIME BETWEEN SENDING 2 utterance to server
 WAIT_TIME_SHORT=0.5
@@ -182,8 +183,10 @@ WORDS_PATH= str(pathlib.Path(__file__).parent.parent.absolute())+"/fallback-merg
 WORDS_LISTS=["A", "Ad1", "Ad2", "Ad3", "V", "PR0", "Vt", "P", "P0", "PR1", "N", "N2", "Na", "S", "Sc", "Sp", "V", "Vt"]
 
 
+FEEDBACK_PROBA_WONDER=0.5
 
 
+#TODO: yadda yadda yadda
 # =============================================
 # ------------------MERGE FALLBACK---------------
 # =============================================
@@ -394,14 +397,16 @@ class MergeFallback(FallbackSkill):
         chat_output=""
         output=""
 
-        if (rand in [0,3,4, 5]) or (length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER):
+        shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not "hello" in utterance.lower())
+
+        if (rand in [0,3,4, 5]) or shortcut:
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
             time.sleep(WAIT_TIME_MEDIUM)
 
-        if length_utterance>MINIMAL_LENGTH_UTTERANCE_TO_BOTHER:
+        if shortcut:
             #------Rrerouting to skill
             self.log.info("=======================================================")
             if rand==0:
@@ -441,8 +446,9 @@ class MergeFallback(FallbackSkill):
 
         #TODO: Could add there to collective memory?
         human_txt_file=COLLECTIVE_MEMORY_FOLDER+"text/"+"human_"+now_str+".txt"
-        with open(human_txt_file, 'w+') as f:
-            f.write(utterance)
+        if len(utterance)>MIN_CHAR_MEMORY:
+            with open(human_txt_file, 'w+') as f:
+                f.write(utterance)
 
         global LOG_FULL
         #save output and message in text file #NOTE: here separate log file per day
@@ -701,10 +707,12 @@ class MergeFallback(FallbackSkill):
         self.speak(wonder)
         self.log.info("Generated:"+ wonder)
         
-        time.sleep(WAIT_TIME_MEDIUM)
-        #step 4---closing: ask feedback 
-        feedback=random.choice(self.MSG_WONDER_END)
-        self.speak(feedback)
+        rr=random.random()
+        if rr<FEEDBACK_PROBA_WONDER:
+            time.sleep(WAIT_TIME_MEDIUM)
+            #step 4---closing: ask feedback 
+            feedback=random.choice(self.MSG_WONDER_END)
+            self.speak(feedback)
 
         return wonder
 
@@ -874,11 +882,11 @@ class MergeFallback(FallbackSkill):
             else:
                 bla=self.one_drift(bla)
             blabla+=bla
-        time.sleep(WAIT_TIME_LONG)
 
         #step 4---closing: ask feedback #NOTE: probabilistically here
         rr=random.random()
-        if rr<FEEDBACK_PROBA:
+        if rr<FEEDBACK_PROBA_WEIRD:
+            time.sleep(WAIT_TIME_LONG)
             feedback=random.choice(self.MSG_FEEDBACK)
             self.speak(feedback)
         
