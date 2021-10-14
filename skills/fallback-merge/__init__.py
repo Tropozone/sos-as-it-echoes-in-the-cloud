@@ -108,7 +108,7 @@ DDW=True #for DDW exhibit, adjust event / objects
 #5----> Wonder
 LIKELIHOOD_SKILLS=[10,15,35,10,15,15]
 
-MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=9
+MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=7
 
 #----HELLO SOCKET PARAMETERS
 WAIT_FOR_HUMAN=5 
@@ -172,9 +172,9 @@ global LOG_FULL
 LOG_FULL=False
 
 #----------------WAITING TIME BETWEEN SENDING 2 utterance to server
-WAIT_TIME_SHORT=1
-WAIT_TIME_MEDIUM=2
-WAIT_TIME_LONG=3
+WAIT_TIME_SHORT=0.5
+WAIT_TIME_MEDIUM=1
+WAIT_TIME_LONG=1
 
 # ----------------------------------
 # ------------- FIXED  PARAMETERS ----------------------
@@ -341,7 +341,7 @@ class MergeFallback(FallbackSkill):
             Lower number means higher priority, however number 1-4 are bypassing other skills.
         """
         self.audio_service = AudioService(self.bus)#instantiate an AudioService object:
-        self.register_fallback(self.handle_routing, 6) 
+        self.register_fallback(self.handle_routing, 6) #NOTE IF <=4 high priority...
 
 
     def recording_preliminary(self):
