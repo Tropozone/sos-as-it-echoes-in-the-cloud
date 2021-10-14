@@ -108,10 +108,10 @@ DDW=True #for DDW exhibit, adjust event / objects
 #5----> Wonder
 LIKELIHOOD_SKILLS=[10,15,35,10,15,15]
 
-MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=8
+MINIMAL_LENGTH_UTTERANCE_TO_BOTHER=6
 
 #----HELLO SOCKET PARAMETERS
-WAIT_FOR_HUMAN=5 
+WAIT_FOR_HUMAN=3
 
 #----FOR WHAT IF WE BUCKET PARAMETERS
 MIN_LENGTH = 10
@@ -135,7 +135,7 @@ NUM_DRIFTS_WEIRD=1
 TOP_K_WEIRD=500
 TOP_P_WEIRD=0.3
 SAMPLING_WEIRD="topk" # between nucleus, topk, or default sampling
-MAX_TRY_REGENERATE=3 #OK?
+MAX_TRY_REGENERATE=2 #OK?
 FEEDBACK_PROBA_WEIRD=0.1
 
 #-------- POST PROCESSING FILTER PARAMETERS
@@ -238,6 +238,7 @@ class MergeFallback(FallbackSkill):
         self.MSG_ELSEWHERE_START=load_data_txt("message_elsewhere_start.txt", path_folder=path_folder)
         self.MSG_ELSEWHERE_END=load_data_txt("message_elsewhere_end.txt", path_folder=path_folder)
         self.MSG_PATIENT=load_data_txt("message_patient.txt", path_folder=path_folder)
+        self.MSG_ANYWAY=load_data_txt("message_anyway.txt", path_folder=path_folder)
         self.MSG_RITUAL_START=load_data_txt("message_ritual_start.txt", path_folder=path_folder)
         self.MSG_RITUAL_END=load_data_txt("message_ritual_end.txt", path_folder=path_folder)
         self.MSG_SISTER_START=load_data_txt("message_sister_start.txt", path_folder=path_folder)
@@ -245,6 +246,7 @@ class MergeFallback(FallbackSkill):
         self.MSG_FEEDBACK=load_data_txt("message_feedback.txt", path_folder=path_folder)#NOTE: Not used ?
         self.MSG_WHAT_IF_END=load_data_txt("message_what_if_end.txt", path_folder=path_folder)
         self.MSG_FABULATE_END=load_data_txt("message_fabulate_end.txt", path_folder=path_folder)
+        self.MSG_FABULATE_START=load_data_txt("message_fabulate_start.txt", path_folder=path_folder)
         self.MSG_WONDER_START=load_data_txt("message_wonder_start.txt", path_folder=path_folder)
         self.MSG_WONDER_END=load_data_txt("message_wonder_end.txt", path_folder=path_folder)
 
@@ -399,14 +401,13 @@ class MergeFallback(FallbackSkill):
 
         shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not "hello" in utterance.lower())
 
-        if (rand in [0,3,4, 5]) or shortcut:
+        if (rand in [0,3,4,5]) or shortcut:
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
-            time.sleep(WAIT_TIME_MEDIUM)
 
-        if shortcut:
+        if not shortcut:#if shortcut do not say more
             #------Rrerouting to skill
             self.log.info("=======================================================")
             if rand==0:
@@ -486,6 +487,7 @@ class MergeFallback(FallbackSkill):
         """
         
         # start message
+        time.sleep(WAIT_TIME_SHORT)
         ritual_start=random.choice(self.MSG_RITUAL_START)
         self.speak(ritual_start)
         time.sleep(WAIT_TIME_SHORT)
@@ -562,7 +564,7 @@ class MergeFallback(FallbackSkill):
             What if Skill...
         """
 
-         # step 1-- extract a keyword from what human said
+        # step 1-- extract a keyword from what human said
         keyword= yake_extract_keyword(utterance, self.keyworder) #NOTE: May have issue with raspberry 4 with spacy?
         self.log.info("step 1---Extracted keyword"+keyword)
         self.log.info("=======================================================")
@@ -615,9 +617,15 @@ class MergeFallback(FallbackSkill):
         """
         Args: 
         """
-        # step 2-- extract critter
+        # step 1-- extract critter
         critter=random.choice(self.critters)
         self.log.info("step 2---Extracted critter"+critter)
+      
+        #step 2---wonder start
+        msg_init=random.choice(self.MSG_FABULATE_START)
+        msg_init=msg_init.replace("xxx", critter)
+        time.sleep(WAIT_TIME_SHORT)
+        self.speak(msg_init)
 
         #TODO: Currently story without keyword as too rare close >>> could check similarity
 
@@ -649,7 +657,6 @@ class MergeFallback(FallbackSkill):
                 count+=1
                 temp_settings=self.settings_what_if.copy()
                 temp_settings["max_length"]=random.randint(MAX_LENGTH_FABULATE-VARIANCE_FABULATE, MAX_LENGTH_FABULATE+VARIANCE_FABULATE)
-                
                 #generate gpt2
                 raw=self.gpt2_generation(context, temp_settings, remove_context=True)
                 #if cool generation
@@ -663,8 +670,8 @@ class MergeFallback(FallbackSkill):
 
         self.speak(story)
         self.log.info("Generated Story: \n"+ story)
-        
         time.sleep(WAIT_TIME_MEDIUM)
+
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_FABULATE_END)
         feedback=feedback.replace("xxx", critter)
@@ -677,16 +684,17 @@ class MergeFallback(FallbackSkill):
         """
         Args: 
         """
-        #step 1---wonder start
-        msg=random.choice(self.MSG_WONDER_START)
-        self.speak(msg)
-        time.sleep(WAIT_TIME_SHORT)
 
         # step 2-- extract critter
         critter=random.choice(self.critters)
         self.log.info("step 2---Extracted critter"+critter)
-
-
+        
+        #step 1---wonder start
+        msg_init=random.choice(self.MSG_WONDER_START)
+        msg_init=msg_init.replace("xxx", critter)
+        time.sleep(WAIT_TIME_SHORT)
+        self.speak(msg_init)
+        
         #---step 3 pick stuff
         seed = random.choice(self.wonders)
         seed = seed.replace("xxx", critter)#replace xxx (if exist w/ ecological critter
@@ -757,7 +765,7 @@ class MergeFallback(FallbackSkill):
             self.log.info(output)
             return output
         else:
-            output=random.choice(self.MSG_PATIENT)
+            output=random.choice(self.MSG_ANYWAY)
             self.speak(output)
             return output
 
@@ -869,7 +877,6 @@ class MergeFallback(FallbackSkill):
         be_patient=random.choice(self.MSG_PATIENT)
         self.speak(be_patient)
     
-
         #(1) Choose the mode and possible seed and add it
         loopCount=0
         bla=utterance+"\n"
@@ -893,7 +900,9 @@ class MergeFallback(FallbackSkill):
         return blabla
 
     def elsewhere_tunes(self):
-                
+        
+        time.sleep(WAIT_TIME_SHORT)
+
         #Even if sonor, small likelihood say text memory currently...
         self.log.info("=======================================================") 
         output=""
@@ -912,7 +921,7 @@ class MergeFallback(FallbackSkill):
             
         self.log.info("=======================================================") 
         
-        time.sleep(WAIT_TIME_MEDIUM)
+        time.sleep(WAIT_TIME_SHORT)
         #step 4---closing: ask feedback 
         feedback=random.choice(self.MSG_ELSEWHERE_END)
         self.speak(feedback)
