@@ -397,46 +397,46 @@ class MergeFallback(FallbackSkill):
 
         #----Chat depending which skill would be triggered, and depending length sentence
         chat_output=""
-        output=""
 
+        #TODO: No shortcut for now...
         shortcut=(length_utterance<=MINIMAL_LENGTH_UTTERANCE_TO_BOTHER) and (not "hello" in utterance.lower())
 
-        if (rand in [0,3,4,5]) or shortcut:
+        if (rand in [0,3,4,5]):
             self.log.info("=======================================================")
             self.log.info("step 1-First small Chatbot interaction")
             self.log.info("=======================================================")
             chat_output=self.chat(utterance, historics=self.fresh_historics)#TODO: historics historics_id=None
 
-        if not shortcut:#if shortcut do not say more
-            #------Rrerouting to skill
+        #if not shortcut:#if shortcut do not say more
+        #------Rrerouting to skill
+        self.log.info("=======================================================")
+        if rand==0:
+            self.log.info("***Redirecting to Hello Socket***")
             self.log.info("=======================================================")
-            if rand==0:
-                self.log.info("***Redirecting to Hello Socket***")
-                self.log.info("=======================================================")
-                output=self.make_kin()
-            elif rand==1:
-                self.log.info("***Redirecting to What if We Bucket***")
-                self.log.info("=======================================================")
-                output=self.what_if(utterance)
-            elif rand==2:
-                self.log.info("***Redirecting to Enter the Weird***")
-                self.log.info("=======================================================")
-                output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
-            elif rand==3:
-                self.log.info("***Redirecting to Elsewhere Tunes***")
-                self.log.info("=======================================================")
-                output=self.elsewhere_tunes()
-            elif rand==4:
-                self.log.info("***Redirecting to Fabulates***")
-                self.log.info("=======================================================")
-                output=self.fabulate()
-            elif rand==5:
-                self.log.info("***Redirecting to Wonder***")
-                self.log.info("=======================================================")
-                output=self.wonder()
+            output=self.make_kin()
+        elif rand==1:
+            self.log.info("***Redirecting to What if We Bucket***")
+            self.log.info("=======================================================")
+            output=self.what_if(utterance)
+        elif rand==2:
+            self.log.info("***Redirecting to Enter the Weird***")
+            self.log.info("=======================================================")
+            output=self.enter_the_weird(utterance, historics=self.fresh_historics) 
+        elif rand==3:
+            self.log.info("***Redirecting to Elsewhere Tunes***")
+            self.log.info("=======================================================")
+            output=self.elsewhere_tunes()
+        elif rand==4:
+            self.log.info("***Redirecting to Fabulates***")
+            self.log.info("=======================================================")
+            output=self.fabulate()
+        elif rand==5:
+            self.log.info("***Redirecting to Wonder***")
+            self.log.info("=======================================================")
+            output=self.wonder()
 
-            else:
-                raise NotImplementedError
+        else:
+            raise NotImplementedError
 
         self.log.info("---Saving the data---")
         
