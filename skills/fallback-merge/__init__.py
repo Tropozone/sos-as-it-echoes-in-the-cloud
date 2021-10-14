@@ -469,7 +469,7 @@ class MergeFallback(FallbackSkill):
             rr=random.random()
             if rr<0.1 and os.path.exists(log_file):
                 size = os.path.getsize(log_file) 
-                if size > 4000: # in bytes 
+                if size > 1000000: # 1 MB in bytes
                     LOG_FULL=True
 
         with open(log_file, 'a+') as f:
