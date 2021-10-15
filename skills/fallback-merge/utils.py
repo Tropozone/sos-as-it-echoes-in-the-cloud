@@ -8,7 +8,7 @@ from nltk import sent_tokenize
 import re
 from string import punctuation
 import re
-
+import string
 
 import os
 import os.path, time
@@ -89,6 +89,42 @@ def split_into_sentences(text):
     return sentences
 
 
+FILTERED_HUMAN_TOKEN=["God", "muslim", "Jew", "soldier", "hate", "http"]
+
+def filter_human_token(bla):
+    
+    #REPLACE I by we
+    bla=bla.replace("I've", "We have")
+    bla=bla.replace("I'd", "We had")
+    bla=bla.replace("I'm", "We are")
+    bla=bla.replace("I’m", "We are")
+    bla=bla.replace("I am ", "We are ")
+    bla=bla.replace("am I ", "are we ")
+    bla=bla.replace("Am I ", "Are we ")
+    bla=bla.replace("I'll", "We will")
+    bla=bla.replace("I ", "We ")
+    bla=bla.replace(" my ", " our ")
+    bla=bla.replace("My ", "Our ")
+    bla=bla.replace(" mine ", " ours ")
+    bla=bla.replace(" me ", " us ")
+
+    bla=bla.replace("readers", "listeners")
+    bla=bla.replace("book", "territory")
+    bla=bla.replace("page", "Earth")
+    bla=bla.replace("article", "territory")
+    bla=bla.replace("chapter", "territory")
+    bla=bla.replace("blog", "territory")
+    bla=bla.replace("Chapter", "Planet")
+    bla=bla.replace("Section", "Planet")
+    bla=bla.replace("section", "territory")
+    #TODO:More efficient?
+
+    if len(FILTERED_HUMAN_TOKEN)>0:
+        for token in FILTERED_HUMAN_TOKEN:
+            tok=random.choice(string.ascii_letters)+random.choice(string.ascii_letters)+random.choice(string.ascii_letters)
+            bla=bla.replace(token, tok)
+
+    return bla
 
 ######*****************************************************************************************
 ######*********************** LOAD PROCEDURES ***********************************************
@@ -120,6 +156,7 @@ def load_data_txt(filename, path_folder="", mode="r"):
 ######*****************************************************************************************
 ######*********************** READ EVENT PROCEDURES ***********************************************
 ######*****************************************************************************************
+
 
 
 def read_event(event_score, agent, dico):

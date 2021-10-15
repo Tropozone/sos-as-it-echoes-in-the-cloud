@@ -1,10 +1,8 @@
-Although this is just a story, init?
-Do you have something to share about this story or xxx ?
+Do you have something to share about this or xxx ?
 How does xxx sounds to you ?
 How does this story sounds to you ?
 Have you had similar encounter with xxx ?
 How do you feel about xxx ?
-Have you a story to share about xxx or any other non human critter ?
 Does it sounds gibberish in your reality?
 How do you imagine xxx ?
 Have you any story that you want to share?
@@ -12,3 +10,6 @@ Maybe you can imagine too an adventure with xxx .
 What did you put in your carrier bag today?
 Although this is just a story, init?
 Could you fabulate about xxx too?
+Could you share your last real or imaginary encounter with xxx too?
+
+
