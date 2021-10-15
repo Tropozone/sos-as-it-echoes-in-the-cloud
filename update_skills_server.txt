@@ -1,4 +1,6 @@
 
+Some useful commands to update the website
+
 
 
 ********** Update Github
@@ -6,28 +8,43 @@ cd sos-as-it-echoes-in-the-cloud
 git fetch
 git pull
 
-********** Erase skills, e.g.
+
+
+********* Erase and copy a skillfile or skill folder
+NB: Beware not erasingfull  fallback-merge folder only individual files because of gpt2 model
+
 rm -r /opt/mycroft/skills/quinoa-collapse
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/quinoa-collapse /opt/mycroft/skills/
+
+rm -r /opt/mycroft/skills/base-skill
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/base-skill /opt/mycroft/skills/
+
+rm -r /opt/mycroft/skills/dream-skill
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/dream-skill /opt/mycroft/skills/
+
+rm -r /opt/mycroft/skills/fallback-merge/messages
+cp -r /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge/messages /opt/mycroft/skills/fallback-merge/
+rm /opt/mycroft/skills/fallback-merge/__init__.py
+cp /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge/__init__.py /opt/mycroft/skills/fallback-merge/
+rm /opt/mycroft/skills/fallback-merge/utils.py
+cp /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge/utils.py /opt/mycroft/skills/fallback-merge/
+
+
 
 ********** Save gpt2 before erasing fallback merge
 cp -r /opt/mycroft/skills/fallback-merge/gpt2_model /opt/mycroft/skills/
 rm -r /opt/mycroft/skills/fallback-merge
 
 
-********** Copy skills from GitHub
-cp -r /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge /opt/mycroft/skills/
-cp -r /root/sos-as-it-echoes-in-the-cloud/skills/quinoa-collapse /opt/mycroft/skills/
-cp -r /root/sos-as-it-echoes-in-the-cloud/skills/base-skill /opt/mycroft/skills/
-cp -r /root/sos-as-it-echoes-in-the-cloud/skills/dream-skill /opt/mycroft/skills/
-
 **********copy gpt2 model back and erase where has saved it temporarily
 cp -r /opt/mycroft/skills/gpt2_model/ /opt/mycroft/skills/fallback-merge/
 rm -r /opt/mycroft/skills/gpt2_model
 
 
-********** open Config file to change black listed skills
+********** open to edit Mycroft config file to change black listed skills for instance
 vim mycroft-core/mycroft/configuration/mycroft.conf
-((((((Quit with esc+ ZZ))
+((((((To exit & Save: Quit with esc+ ZZ))
+((((((To exit & not Save: Quit with esc+ : and type q!))
 e.g. Changed in config file auto update skill msg
 ""auto_update": false”
 E.g. can also decide which skills blacklisted
@@ -39,13 +56,33 @@ source ./mycroft/core/.venv/bin/activate
 ./mycroft-core/start-mycroft.sh all
 ./mycroft-core/start-mycroft.sh cli
 
-**********check log, and go at end file
-vim /var/log/mycroft/skills.log
+**********check logs
 ((( to go down the file: ESC ,  Shift + G
+vim /var/log/mycroft/skills.log
+
 
 
 ********** when debug, and need to update __init__file for merge for instance:
 rm /opt/mycroft/skills/fallback-merge/__init__.py
 cp /root/sos-as-it-echoes-in-the-cloud/skills/fallback-merge/__init__.py /opt/mycroft/skills/fallback-merge/
+
+
+
+******HTML website copy or edit
+scp root@64.227.65.4:/root/HiveMind-flask-template/hivemind_chatroom/templates/room.html /Users/lou/
+vim /root/HiveMind-flask-template/hivemind_chatroom/templates/room.html
+
+********* Copy stuff on server to local computer. (e.g. logs, memory)
+NB: adapt local address to your own computer !
+scp -r root@64.227.65.4:/var/log/mycroft/ /Users/lou/
+scp -r root@64.227.65.4:/root/sos-as-it-echoes-in-the-cloud/collective_memory/trace Users/lou/
+
+
+
+****** Erase Memory or logs if needed to avoid saturation:
+find ./collective_memory/text/ -name "human*.txt" -type f
+find ./collective_memory/text/ -name "human*.txt" -type f -delete
+find ./collective_memory/trace/ -name "*.txt" -type f
+find ./collective_memory/trace/ -name "human*.txt" -type f -delete
 
 
